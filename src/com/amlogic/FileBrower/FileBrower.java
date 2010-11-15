@@ -11,7 +11,6 @@ import java.util.Map;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
@@ -29,6 +28,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 public class FileBrower extends Activity {
 	private static final String TAG = "FileBrower";
@@ -42,6 +42,7 @@ public class FileBrower extends Activity {
 	private static final int CLICK_DIALOG_ID = 2;
 	private AlertDialog sort_dialog;	
 	private AlertDialog edit_dialog;
+	private AlertDialog click_dialog;
 	
 	private ListView lv;
 	private TextView tv;
@@ -71,13 +72,18 @@ public class FileBrower extends Activity {
 					cur_path = file_path;
 					lv.setAdapter(getFileListAdapter(file_path));	
 				}
-				else {				
-					if (item.get("item_sel").equals(R.drawable.item_img_unsel))
-						item.put("item_sel", R.drawable.item_img_sel);
-					else if (item.get("item_sel").equals(R.drawable.item_img_sel))
-						item.put("item_sel", R.drawable.item_img_unsel);
-					
-					((BaseAdapter) lv.getAdapter()).notifyDataSetChanged();	
+				else {	
+					ToggleButton btn_mode = (ToggleButton) findViewById(R.id.btn_mode); 
+					if (btn_mode.isChecked())
+						showDialog(CLICK_DIALOG_ID);	
+					else {
+						if (item.get("item_sel").equals(R.drawable.item_img_unsel))
+							item.put("item_sel", R.drawable.item_img_sel);
+						else if (item.get("item_sel").equals(R.drawable.item_img_sel))
+							item.put("item_sel", R.drawable.item_img_unsel);
+						
+						((BaseAdapter) lv.getAdapter()).notifyDataSetChanged();	
+					}
 				}
 								
 			}        	
@@ -236,16 +242,23 @@ public class FileBrower extends Activity {
 	    	return edit_dialog;
         	
         case CLICK_DIALOG_ID:
-        	return new AlertDialog.Builder(FileBrower.this)                
-            .setTitle("click dialog")     
-            .setNegativeButton("Close", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-          	
-                	/* User clicked Cancel so do some stuff */                    	
-                }
-            })             
-            .create();  
-            
+	        LayoutInflater inflater2 = (LayoutInflater) FileBrower.this
+	    	.getSystemService(LAYOUT_INFLATER_SERVICE);
+	    	View layout_click = inflater2.inflate(R.layout.click_dialog_layout,
+	    		(ViewGroup) findViewById(R.id.layout_root_click));
+	    	
+	    	click_dialog = new AlertDialog.Builder(FileBrower.this)   
+	    	.setView(layout_click)
+	        .show();    
+	    	
+	    	 Button click_btn_close = (Button) click_dialog.getWindow().findViewById(R.id.click_btn_close);  
+	    	 click_btn_close.setOnClickListener(new OnClickListener() {
+	    			public void onClick(View v) {
+	    				click_dialog.dismiss();
+	    			}        	
+	         }); 
+	    	 return click_dialog;
+	    
         }
         
 		return null;    	
@@ -280,6 +293,17 @@ public class FileBrower extends Activity {
     		}
     		break;
     	case CLICK_DIALOG_ID:
+			{
+            WindowManager wm = getWindowManager();
+            Display display = wm.getDefaultDisplay();
+            LayoutParams lp = dialog.getWindow().getAttributes();
+            if (display.getHeight() > display.getWidth()) {            	
+            	lp.width = (int) (display.getWidth() * 1.0);       	
+        	} else {        		
+        		lp.width = (int) (display.getWidth() * 0.5);            	
+        	}
+            dialog.getWindow().setAttributes(lp);  
+    		}    		
     		break;
     	}
     }  

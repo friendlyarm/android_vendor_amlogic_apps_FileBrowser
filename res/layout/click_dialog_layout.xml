@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/layout_root_click"
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	>
+	<LinearLayout
+		android:orientation="horizontal"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		>
+		<ImageView 
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="10dp"
+			android:src="@drawable/edit_dialog_icon"
+		/>
+		<TextView 
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/click_dialog_title_str"
+			android:textStyle="bold"
+			android:textColor="@color/dialog_text_color"
+		/>
+	</LinearLayout>
+
+	<Button style="?android:attr/buttonStyleSmall"
+		android:id="@+id/click_btn_close"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:text="@string/dialog_close_str"		
+		android:textStyle="bold"
+		android:textColor="@color/dialog_text_color"		
+		/>	
+</LinearLayout>
