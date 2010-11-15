@@ -57,13 +57,13 @@ public class FileBrower extends Activity {
         
         /* setup file list */
         lv = (ListView) findViewById(R.id.listview);  
-        //lv.setAdapter(getDevListAdapter());
+        
         //lv.setAdapter(getFileListAdapter(ROOT_PATH));
         DeviceScan();
         
         /* lv OnItemClickListener */
         lv.setOnItemClickListener(new OnItemClickListener() {
-			@Override
+			
 			public void onItemClick(AdapterView<?> parent, View view, int pos,
 					long id) {
 				Map<String, Object> item = (Map<String, Object>)parent.getItemAtPosition(pos);
@@ -82,7 +82,7 @@ public class FileBrower extends Activity {
 				}
 				else {	
 					ToggleButton btn_mode = (ToggleButton) findViewById(R.id.btn_mode); 
-					if (btn_mode.isChecked())
+					if (!btn_mode.isChecked())
 						showDialog(CLICK_DIALOG_ID);	
 					else {
 						if (item.get("item_sel").equals(R.drawable.item_img_unsel))
@@ -436,13 +436,13 @@ public class FileBrower extends Activity {
             	        		map.put("item_sel", R.drawable.item_img_nosel);
             	        		map.put("item_type", R.drawable.item_type_dir);
             	        		
-            	        		String rw = "";
+            	        		String rw = "d";
             	        		if (file.canRead()) rw += "r"; else rw += "-";
             	        		if (file.canWrite()) rw += "w"; else rw += "-";  
             	        		map.put("item_rw", rw);       
             	        		
             	        		long file_date = file.lastModified();
-            	        		String date = new SimpleDateFormat("yyyy/MM/dd")
+            	        		String date = new SimpleDateFormat("yyyy/MM/dd HH:mm")
             	        			.format(new Date(file_date));
             	        		map.put("item_date", date + " | ");
             	        		map.put("file_date", file_date);	//use for sorting
@@ -454,13 +454,13 @@ public class FileBrower extends Activity {
             	        		map.put("item_sel", R.drawable.item_img_unsel);            	        		
             	        		map.put("item_type", FileOp.getFileTypeImg(file.getName()));
             	        		
-            	        		String rw = "";
+            	        		String rw = "-";
             	        		if (file.canRead()) rw += "r"; else rw += "-";
             	        		if (file.canWrite()) rw += "w"; else rw += "-";  
             	        		map.put("item_rw", rw);       
             	        		
             	        		long file_date = file.lastModified();
-            	        		String date = new SimpleDateFormat("yyyy/MM/dd")
+            	        		String date = new SimpleDateFormat("yyyy/MM/dd HH:mm")
             	        			.format(new Date(file_date));
             	        		map.put("item_date", date + " | ");
             	        		map.put("file_date", file_date);	//use for sorting
