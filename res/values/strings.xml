@@ -3,8 +3,7 @@
     <string name="app_name">FileBrower</string>
     <string name="btn_home_str">Home</string>
     <string name="btn_parent_str">Back</string>
-    <string name="btn_mode_str1">S-Sel</string>
-    <string name="btn_mode_str2">M-Sel</string>
+   
     <string name="btn_edit_str">Edit</string>
     <string name="btn_sort_str">Sort</string>
     <string name="btn_close_str">Close</string>
@@ -20,6 +19,8 @@
     <string name="edit_dialog_delete_str">Delete</string>
     <string name="edit_dialog_paste_str">Paste</string>
     
+    
     <string name="click_dialog_title_str">Open File</string>
+    <string name="rootDevice">DEVICE</string>
     
 </resources>

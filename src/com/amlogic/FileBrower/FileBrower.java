@@ -12,6 +12,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -25,6 +26,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -46,6 +48,7 @@ public class FileBrower extends Activity {
 	
 	private ListView lv;
 	private TextView tv;
+	private List<String> devList = new ArrayList<String>();
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -55,17 +58,22 @@ public class FileBrower extends Activity {
         /* setup file list */
         lv = (ListView) findViewById(R.id.listview);  
         //lv.setAdapter(getDevListAdapter());
-        lv.setAdapter(getFileListAdapter(ROOT_PATH));
+        //lv.setAdapter(getFileListAdapter(ROOT_PATH));
+        DeviceScan();
         
         /* lv OnItemClickListener */
         lv.setOnItemClickListener(new OnItemClickListener() {
-			
+			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int pos,
 					long id) {
 				Map<String, Object> item = (Map<String, Object>)parent.getItemAtPosition(pos);
 			
 				String file_path = (String) item.get("file_path");
 				File file = new File(file_path);
+				if(!file.exists()){
+					//finish();
+					return;
+				}
 
 				if (file.isDirectory()) {	
 					prev_path = cur_path;
@@ -115,7 +123,13 @@ public class FileBrower extends Activity {
 					String parent_path = file.getParent();
 					prev_path = cur_path;
 					cur_path = parent_path;
-					lv.setAdapter(getFileListAdapter(parent_path));
+					if(parent_path.equals(ROOT_PATH)){
+						DeviceScan();
+					}
+					else{
+						lv.setAdapter(getFileListAdapter(parent_path));
+					
+					}
 				}
 			}        	
         });
@@ -123,23 +137,18 @@ public class FileBrower extends Activity {
         /* btn_home listener */
         Button btn_home = (Button) findViewById(R.id.btn_home);  
         btn_home.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
-				if (!cur_path.equals(ROOT_PATH)) {
-					String home_path = ROOT_PATH;
-					prev_path = cur_path;
-					cur_path = home_path;
-					lv.setAdapter(getFileListAdapter(home_path));
-				}
+			public void onClick(View v) {				
+				DeviceScan();
 			}        	
         });       
         
         /* btn_close_listener */
-        Button btn_close = (Button) findViewById(R.id.btn_close);  
+        /*Button btn_close = (Button) findViewById(R.id.btn_close);  
         btn_close.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				finish();
 			}        	
-        });     
+        });  */   
         
         /* btn_edit_listener */
         Button btn_edit = (Button) findViewById(R.id.btn_edit);  
@@ -158,6 +167,86 @@ public class FileBrower extends Activity {
         });           
     }
     
+    private void DeviceScan() {
+		// TODO Auto-generated method stub
+    	devList.clear();
+    	String DeviceArray[]={"Internal Memory","SD Card","USB"};   	
+    	for(int i=0;i<DeviceArray.length;i++){
+    		if(deviceExist(DeviceArray[i])){
+    			devList.add(DeviceArray[i]);
+    		}
+    	} 
+    	lv.setAdapter(getDeviceListAdapter());
+		
+	}
+
+	private ListAdapter getDeviceListAdapter() {
+		// TODO Auto-generated method stub
+		return new SimpleAdapter(FileBrower.this,
+        		getDeviceListData(),
+        		R.layout.device_item,        		
+                new String[]{
+        	"item_type",
+        	"item_name",        	        	
+        	"item_rw",
+        	"item_size"},        		
+                new int[]{
+        	R.id.device_type,
+        	R.id.device_name,        	
+        	R.id.device_rw,       	
+        	R.id.device_size});  		
+	}
+
+	private List<? extends Map<String, ?>> getDeviceListData() {
+		// TODO Auto-generated method stub
+		String file_path = null;
+		String device = null;
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();              
+    	for(int i = 0; i < this.devList.size(); i++) {   
+    		Map<String, Object> map = new HashMap<String, Object>();    		
+    		map.put("item_name", this.devList.get(i)); 
+    		file_path = convertDeviceName(this.devList.get(i));
+    		map.put("file_path", file_path);         
+    		map.put("item_size", null);
+    		map.put("item_rw", null);
+    		map.put("item_type", getDeviceIcon(file_path));    		
+    		list.add(map); 
+    	}
+    	device = getString(R.string.rootDevice);
+    	updatePathShow(device);
+    	return list; 
+	}
+	private int getDeviceIcon(String device_name){
+		if(device_name.equals("/mnt/usb")){
+			return R.drawable.usb_card_icon;
+		}
+		else if(device_name.equals("/mnt/flash")){
+			return R.drawable.memory_icon;
+		}
+		else if(device_name.equals("/mnt/sdcard")){
+			return R.drawable.sd_card_icon;		
+		}
+		return 0;
+		
+	}
+	protected String convertDeviceName(String name) {
+		// TODO Auto-generated method stub   	
+    		String temp_name=null;
+    		if(name.equals("Internal Memory"))
+    			temp_name="/mnt/flash";
+    		else if(name.equals("SD Card"))
+    			temp_name="/mnt/sdcard";
+    		else if(name.equals("USB"))
+    			temp_name="/mnt/usb";
+    		return temp_name;  
+	}
+	private boolean deviceExist(String string) {
+		// TODO Auto-generated method stub
+		if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+			 File sdCardDir = Environment.getExternalStorageDirectory();
+		}
+		return true;
+	}
     /** Dialog */
     @Override
     protected Dialog onCreateDialog(int id) {
