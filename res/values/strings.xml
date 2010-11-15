@@ -9,12 +9,13 @@
     <string name="btn_sort_str">Sort</string>
     <string name="btn_close_str">Close</string>
     
-    <string name="sort_dialog_title_str">Sort file by:</string>
-    <string name="sort_dialog_name_str">File name</string>
-    <string name="sort_dialog_date_str">File date</string>
-    <string name="sort_dialog_size_str">File size</string>
+    <string name="sort_dialog_title_str">Sort File</string>
+    <string name="sort_dialog_name_str">Sort By Name</string>
+    <string name="sort_dialog_date_str">Sort By Date</string>
+    <string name="sort_dialog_size_str">Sort By Size</string>
+    <string name="dialog_close_str">Cancel</string>
     
-    <string name="edit_dialog_title_str">Edit file</string>
+    <string name="edit_dialog_title_str">Edit File</string>
     <string name="edit_dialog_copy_str">Copy</string>
     <string name="edit_dialog_delete_str">Delete</string>
     <string name="edit_dialog_paste_str">Paste</string>

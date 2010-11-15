@@ -11,7 +11,6 @@ import java.util.Map;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,7 +26,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -42,6 +40,8 @@ public class FileBrower extends Activity {
 	private static final int SORT_DIALOG_ID = 0;
 	private static final int EDIT_DIALOG_ID = 1;
 	private static final int CLICK_DIALOG_ID = 2;
+	private AlertDialog sort_dialog;	
+	private AlertDialog edit_dialog;
 	
 	private ListView lv;
 	private TextView tv;
@@ -157,59 +157,83 @@ public class FileBrower extends Activity {
     protected Dialog onCreateDialog(int id) {
         switch (id) {
         case SORT_DIALOG_ID:
+        	LayoutInflater inflater = (LayoutInflater) FileBrower.this
+        		.getSystemService(LAYOUT_INFLATER_SERVICE);
+        	View layout_sort = inflater.inflate(R.layout.sort_dialog_layout,
+        		(ViewGroup) findViewById(R.id.layout_root_sort));
         	
-        	CharSequence[] sort_list = {
-        			getText(R.string.sort_dialog_name_str),
-        			getText(R.string.sort_dialog_date_str),
-        			getText(R.string.sort_dialog_size_str)};
-        	
-        	return new AlertDialog.Builder(FileBrower.this)   
-        	.setIcon(R.drawable.sort_dialog_icon)
-            .setTitle(R.string.sort_dialog_title_str)   
-            .setItems(sort_list, null)
-            .setNegativeButton("Close", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-          	
-                	                  	
-                }
-            })            
-            .create();  
+            sort_dialog =  new AlertDialog.Builder(FileBrower.this)   
+        	.setView(layout_sort)
+            .show();  
             
-        	/*
-        	AlertDialog.Builder builder;
-        	AlertDialog alertDialog;
+            Button sort_btn_close = (Button) sort_dialog.getWindow().findViewById(R.id.sort_btn_close);  
+            sort_btn_close.setOnClickListener(new OnClickListener() {
+    			public void onClick(View v) {
+    				sort_dialog.dismiss();
+    			}        	
+            });      
+            Button sort_btn_name = (Button) sort_dialog.getWindow().findViewById(R.id.sort_btn_name);  
+            sort_btn_name.setOnClickListener(new OnClickListener() {
+    			public void onClick(View v) {
+    				Log.i(TAG, "do: sort_btn_name");
+    				sort_dialog.dismiss();
+    			}        	
+            });  
+            Button sort_btn_date = (Button) sort_dialog.getWindow().findViewById(R.id.sort_btn_date);  
+            sort_btn_date.setOnClickListener(new OnClickListener() {
+    			public void onClick(View v) {
+    				Log.i(TAG, "do: sort_btn_date");
+    				sort_dialog.dismiss();
+    			}        	
+            });   
+            Button sort_btn_size = (Button) sort_dialog.getWindow().findViewById(R.id.sort_btn_size);  
+            sort_btn_size.setOnClickListener(new OnClickListener() {
+    			public void onClick(View v) {
+    				Log.i(TAG, "do: sort_btn_size");
+    				sort_dialog.dismiss();
+    			}        	
+            });             
+            return sort_dialog;
 
-        	Context mContext = FileBrower.this;
-        	LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(LAYOUT_INFLATER_SERVICE);
-        	View layout = inflater.inflate(R.layout.sort_dialog_layout,
-        	(ViewGroup) findViewById(R.id.layout_root));
-
-        	TextView text = (TextView) layout.findViewById(R.id.text);
-        	text.setText("Sory file by:");
-        	ImageView image = (ImageView) layout.findViewById(R.id.image);
-        	image.setImageResource(R.drawable.sort_dialog_icon);
-
-        	builder = new AlertDialog.Builder(mContext);
-        	builder.setView(layout);
-        	return alertDialog = builder.create();
-        	*/
         case EDIT_DIALOG_ID:
-        	CharSequence[] edit_list = {
-        			getText(R.string.edit_dialog_copy_str),
-        			getText(R.string.edit_dialog_paste_str),
-        			getText(R.string.edit_dialog_delete_str)};
-        	
-        	return new AlertDialog.Builder(FileBrower.this)        
-        	.setIcon(R.drawable.edit_dialog_icon)
-            .setTitle(R.string.edit_dialog_title_str)    
-            .setItems(edit_list, null)
-            .setNegativeButton("Close", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-          	
-                	/* User clicked Cancel so do some stuff */                    	
-                }
-            })             
-            .create();          	
+	        LayoutInflater inflater1 = (LayoutInflater) FileBrower.this
+	    	.getSystemService(LAYOUT_INFLATER_SERVICE);
+	    	View layout_edit = inflater1.inflate(R.layout.edit_dialog_layout,
+	    		(ViewGroup) findViewById(R.id.layout_root_edit));
+	    	
+	    	edit_dialog = new AlertDialog.Builder(FileBrower.this)   
+	    	.setView(layout_edit)
+	        .show();   
+	    	
+            Button edit_btn_close = (Button) edit_dialog.getWindow().findViewById(R.id.edit_btn_close);  
+            edit_btn_close.setOnClickListener(new OnClickListener() {
+    			public void onClick(View v) {
+    				edit_dialog.dismiss();
+    			}        	
+            });  
+            Button edit_btn_copy = (Button) edit_dialog.getWindow().findViewById(R.id.edit_btn_copy);  
+            edit_btn_copy.setOnClickListener(new OnClickListener() {
+    			public void onClick(View v) {
+    				Log.i(TAG, "do: edit_btn_copy");
+    				edit_dialog.dismiss();
+    			}        	
+            });   
+            Button edit_btn_paste = (Button) edit_dialog.getWindow().findViewById(R.id.edit_btn_paste);  
+            edit_btn_paste.setOnClickListener(new OnClickListener() {
+    			public void onClick(View v) {
+    				Log.i(TAG, "do: edit_btn_paste");
+    				edit_dialog.dismiss();
+    			}        	
+            });  
+            Button edit_btn_delete = (Button) edit_dialog.getWindow().findViewById(R.id.edit_btn_delete);  
+            edit_btn_delete.setOnClickListener(new OnClickListener() {
+    			public void onClick(View v) {
+    				Log.i(TAG, "do: edit_btn_delete");
+    				edit_dialog.dismiss();
+    			}        	
+            });             
+            
+	    	return edit_dialog;
         	
         case CLICK_DIALOG_ID:
         	return new AlertDialog.Builder(FileBrower.this)                
