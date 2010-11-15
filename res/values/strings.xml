@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>   
+    <string name="app_name">FileBrower</string>
+    <string name="btn_home_str">Home</string>
+    <string name="btn_parent_str">Back</string>
+    <string name="btn_mode_str1">S-Sel</string>
+    <string name="btn_mode_str2">M-Sel</string>
+    <string name="btn_edit_str">Edit</string>
+    <string name="btn_sort_str">Sort</string>
+    <string name="btn_close_str">Close</string>
+    
+    <string name="sort_dialog_title_str">Sort file by:</string>
+    <string name="sort_dialog_name_str">File name</string>
+    <string name="sort_dialog_date_str">File date</string>
+    <string name="sort_dialog_size_str">File size</string>
+    
+    <string name="edit_dialog_title_str">Edit file</string>
+    <string name="edit_dialog_copy_str">Copy</string>
+    <string name="edit_dialog_delete_str">Delete</string>
+    <string name="edit_dialog_paste_str">Paste</string>
+    
+</resources>
