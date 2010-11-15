@@ -3,6 +3,8 @@ package com.amlogic.FileBrower;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -269,22 +271,22 @@ public class FileBrower extends Activity {
             });      
             Button sort_btn_name = (Button) sort_dialog.getWindow().findViewById(R.id.sort_btn_name);  
             sort_btn_name.setOnClickListener(new OnClickListener() {
-    			public void onClick(View v) {
-    				Log.i(TAG, "do: sort_btn_name");
+    			public void onClick(View v) {    				
+    				lv.setAdapter(getFileListAdapterSorted(cur_path, "by_name"));
     				sort_dialog.dismiss();
     			}        	
             });  
             Button sort_btn_date = (Button) sort_dialog.getWindow().findViewById(R.id.sort_btn_date);  
             sort_btn_date.setOnClickListener(new OnClickListener() {
-    			public void onClick(View v) {
-    				Log.i(TAG, "do: sort_btn_date");
+    			public void onClick(View v) {    				
+    				lv.setAdapter(getFileListAdapterSorted(cur_path, "by_date"));
     				sort_dialog.dismiss();
     			}        	
             });   
             Button sort_btn_size = (Button) sort_dialog.getWindow().findViewById(R.id.sort_btn_size);  
             sort_btn_size.setOnClickListener(new OnClickListener() {
-    			public void onClick(View v) {
-    				Log.i(TAG, "do: sort_btn_size");
+    			public void onClick(View v) {    				
+    				lv.setAdapter(getFileListAdapterSorted(cur_path, "by_size"));
     				sort_dialog.dismiss();
     			}        	
             });             
@@ -493,6 +495,123 @@ public class FileBrower extends Activity {
         tv.setText(path);    	
     }
    
-
+    /** getFileListAdapterSorted */
+    private SimpleAdapter getFileListAdapterSorted(String path, String sort_type) {
+        return new SimpleAdapter(FileBrower.this,
+        		getFileListDataSorted(path, sort_type),
+        		R.layout.filelist_item,        		
+                new String[]{
+        	"item_type",
+        	"item_name",
+        	"item_sel",
+        	"item_size",
+        	"item_date",
+        	"item_rw"},        		
+                new int[]{
+        	R.id.item_type,
+        	R.id.item_name,
+        	R.id.item_sel,
+        	R.id.item_size,
+        	R.id.item_date,
+        	R.id.item_rw});  
+    }
+    
+    /** getFileListDataSorted */
+    private List<Map<String, Object>> getFileListDataSorted(String path, String sort_type) {    	
+    	List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();   	
+    	try {
+    		File file_path = new File(path); 
+        	if (file_path != null && file_path.exists()) { 
+        		if (file_path.listFiles() != null) {
+            		if (file_path.listFiles().length > 0) {
+            			for (File file : file_path.listFiles()) {    					
+            	        	Map<String, Object> map = new HashMap<String, Object>();    		        	
+            	        	map.put("item_name", file.getName());            	        	
+            	        	map.put("file_path", file.getAbsolutePath());
+            	        	
+            	        	if (file.isDirectory()) {
+            	        		map.put("item_sel", R.drawable.item_img_nosel);
+            	        		map.put("item_type", R.drawable.item_type_dir);
+            	        		
+            	        		String rw = "d";
+            	        		if (file.canRead()) rw += "r"; else rw += "-";
+            	        		if (file.canWrite()) rw += "w"; else rw += "-";  
+            	        		map.put("item_rw", rw);       
+            	        		
+            	        		long file_date = file.lastModified();
+            	        		String date = new SimpleDateFormat("yyyy/MM/dd HH:mm")
+            	        			.format(new Date(file_date));
+            	        		map.put("item_date", date + " | ");
+            	        		map.put("file_date", file_date);	//use for sorting
+            	        		
+            	        		long file_size = file.length();
+            	        		map.put("file_size", file_size);	//use for sorting
+            	        		map.put("item_size", " | ");            	        		
+            	        	} else {
+            	        		map.put("item_sel", R.drawable.item_img_unsel);            	        		
+            	        		map.put("item_type", FileOp.getFileTypeImg(file.getName()));
+            	        		
+            	        		String rw = "-";
+            	        		if (file.canRead()) rw += "r"; else rw += "-";
+            	        		if (file.canWrite()) rw += "w"; else rw += "-";  
+            	        		map.put("item_rw", rw);       
+            	        		
+            	        		long file_date = file.lastModified();
+            	        		String date = new SimpleDateFormat("yyyy/MM/dd HH:mm")
+            	        			.format(new Date(file_date));
+            	        		map.put("item_date", date + " | ");
+            	        		map.put("file_date", file_date);	//use for sorting
+            	        		
+            	        		long file_size = file.length();
+            	        		map.put("file_size", file_size);	//use for sorting
+            	        		map.put("item_size", FileOp.getFileSizeStr(file_size) + " | ");
+            	        		
+            	        		
+            	        	}
+            	        	
+            	        	list.add(map);    		        	
+            			}
+            		}            		
+        		}
+        		updatePathShow(path);
+        	}
+    	} catch (Exception e) {
+    		Log.e(TAG, "Exception when getFileListData(): ", e);
+    		return list;
+		}   
+    	
+		/* sorting */
+    	if (!list.isEmpty()) {    	
+        	if (sort_type.equals("by_name")) {
+        		Collections.sort(list, new Comparator<Map<String, Object>>() {
+    				@Override
+    				public int compare(Map<String, Object> object1,
+    						Map<String, Object> object2) {	
+    					return ((String) object1.get("item_name")).compareTo((String) object2.get("item_name"));					
+    				}    			
+        		});           		
+        		
+        	} else if (sort_type.equals("by_date")) {
+        		Collections.sort(list, new Comparator<Map<String, Object>>() {
+    				@Override
+    				public int compare(Map<String, Object> object1,
+    						Map<String, Object> object2) {	
+    					return ((Long) object1.get("file_date")).compareTo((Long) object2.get("file_date"));					
+    				}    			
+        		});         		
+        	} else if (sort_type.equals("by_size")) {
+        		Collections.sort(list, new Comparator<Map<String, Object>>() {
+    				@Override
+    				public int compare(Map<String, Object> object1,
+    						Map<String, Object> object2) {	
+    					return ((Long) object1.get("file_size")).compareTo((Long) object2.get("file_size"));					
+    				}    			
+        		});         		
+        	}   		
+ 		
+    	}
+    	
+    	return list;
+ 	}  
     
 }
