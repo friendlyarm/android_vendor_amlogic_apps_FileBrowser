@@ -541,12 +541,12 @@ public class FileBrower extends Activity {
             	        		long file_date = file.lastModified();
             	        		String date = new SimpleDateFormat("yyyy/MM/dd HH:mm")
             	        			.format(new Date(file_date));
-            	        		map.put("item_date", date + " | ");
+            	        		map.put("item_date", " | " + date + " | ");
             	        		map.put("file_date", file_date);	//use for sorting
             	        		
             	        		long file_size = file.length();
             	        		map.put("file_size", file_size);	//use for sorting
-            	        		map.put("item_size", " | ");            	        		
+            	        		map.put("item_size", "");            	        		
             	        	} else {
             	        		map.put("item_sel", R.drawable.item_img_unsel);            	        		
             	        		map.put("item_type", FileOp.getFileTypeImg(file.getName()));
@@ -559,12 +559,12 @@ public class FileBrower extends Activity {
             	        		long file_date = file.lastModified();
             	        		String date = new SimpleDateFormat("yyyy/MM/dd HH:mm")
             	        			.format(new Date(file_date));
-            	        		map.put("item_date", date + " | ");
+            	        		map.put("item_date", " | " + date + " | ");
             	        		map.put("file_date", file_date);	//use for sorting
             	        		
             	        		long file_size = file.length();
             	        		map.put("file_size", file_size);	//use for sorting
-            	        		map.put("item_size", FileOp.getFileSizeStr(file_size) + " | ");
+            	        		map.put("item_size", FileOp.getFileSizeStr(file_size));
             	        		
             	        		
             	        	}
@@ -584,7 +584,7 @@ public class FileBrower extends Activity {
     	if (!list.isEmpty()) {    	
         	if (sort_type.equals("by_name")) {
         		Collections.sort(list, new Comparator<Map<String, Object>>() {
-    				@Override
+    				
     				public int compare(Map<String, Object> object1,
     						Map<String, Object> object2) {	
     					return ((String) object1.get("item_name")).compareTo((String) object2.get("item_name"));					
@@ -593,7 +593,7 @@ public class FileBrower extends Activity {
         		
         	} else if (sort_type.equals("by_date")) {
         		Collections.sort(list, new Comparator<Map<String, Object>>() {
-    				@Override
+    				
     				public int compare(Map<String, Object> object1,
     						Map<String, Object> object2) {	
     					return ((Long) object1.get("file_date")).compareTo((Long) object2.get("file_date"));					
@@ -601,7 +601,7 @@ public class FileBrower extends Activity {
         		});         		
         	} else if (sort_type.equals("by_size")) {
         		Collections.sort(list, new Comparator<Map<String, Object>>() {
-    				@Override
+    				
     				public int compare(Map<String, Object> object1,
     						Map<String, Object> object2) {	
     					return ((Long) object1.get("file_size")).compareTo((Long) object2.get("file_size"));					
