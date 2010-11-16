@@ -86,13 +86,11 @@ public class FileOp {
        /* "" */
     };
     //music
-    private static final String[] music_extensions = { "mp3",
-    	"wma",
-    	
+    private static final String[] music_extensions = {"mp3",
+    	"wma","m4a","aac","ape","ogg","flac","alac","wav"    	
     };
     //photo
-    private static final String[] photo_extensions = { "jpg",
-    	"bmp",
-    	
+    private static final String[] photo_extensions = { "jpg","jpeg",
+    	"bmp","tif","tiff","png","mp3","gif"  	
     };	
 }

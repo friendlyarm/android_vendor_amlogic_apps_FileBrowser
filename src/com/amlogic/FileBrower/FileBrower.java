@@ -626,17 +626,17 @@ public class FileBrower extends Activity {
     	switch (id) {
     	case SORT_DIALOG_ID:  	
     		map = new HashMap<String, Object>();     		
-        	map.put("item_type", R.drawable.dialog_item_type_default);  
+        	map.put("item_type", R.drawable.dialog_item_type_sort);  
         	map.put("item_name", getText(R.string.sort_dialog_name_str));            	        	
         	map.put("item_sel", R.drawable.dialog_item_img_unsel);  
         	list.add(map);
         	map = new HashMap<String, Object>();         	
-        	map.put("item_type", R.drawable.dialog_item_type_default);  
+        	map.put("item_type", R.drawable.dialog_item_type_sort);  
         	map.put("item_name", getText(R.string.sort_dialog_date_str));            	        	
         	map.put("item_sel", R.drawable.dialog_item_img_unsel);  
         	list.add(map);    	
         	map = new HashMap<String, Object>();         	
-        	map.put("item_type", R.drawable.dialog_item_type_default);  
+        	map.put("item_type", R.drawable.dialog_item_type_sort);  
         	map.put("item_name", getText(R.string.sort_dialog_size_str));            	        	
         	map.put("item_sel", R.drawable.dialog_item_img_unsel);  
         	list.add(map);       	
@@ -644,17 +644,17 @@ public class FileBrower extends Activity {
         	
     	case EDIT_DIALOG_ID: 
     		map = new HashMap<String, Object>();    		
-        	map.put("item_type", R.drawable.dialog_item_type_default);  
+        	map.put("item_type", R.drawable.dialog_item_type_copy);  
         	map.put("item_name", getText(R.string.edit_dialog_copy_str));            	        	
         	map.put("item_sel", R.drawable.dialog_item_img_unsel);  
         	list.add(map);
         	map = new HashMap<String, Object>();         	
-        	map.put("item_type", R.drawable.dialog_item_type_default);  
+        	map.put("item_type", R.drawable.dialog_item_type_paste);  
         	map.put("item_name", getText(R.string.edit_dialog_paste_str));            	        	
         	map.put("item_sel", R.drawable.dialog_item_img_unsel);  
         	list.add(map);    	
         	map = new HashMap<String, Object>();         	
-        	map.put("item_type", R.drawable.dialog_item_type_default);  
+        	map.put("item_type", R.drawable.dialog_item_type_delete);  
         	map.put("item_name", getText(R.string.edit_dialog_delete_str));            	        	
         	map.put("item_sel", R.drawable.dialog_item_img_unsel);  
         	list.add(map);     		
@@ -663,7 +663,7 @@ public class FileBrower extends Activity {
     	case CLICK_DIALOG_ID:
     		map = new HashMap<String, Object>(); 
         	map.put("item_type", R.drawable.dialog_item_type_default);  
-        	map.put("item_name", "...");            	        	
+        	map.put("item_name", "Open file...");            	        	
         	map.put("item_sel", R.drawable.dialog_item_img_unsel);   
         	list.add(map); 
     	}

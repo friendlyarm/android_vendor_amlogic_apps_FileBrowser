@@ -13,15 +13,11 @@
 	    android:orientation="horizontal"
     	android:layout_width="wrap_content"
     	android:layout_height="wrap_content"     	 	
-		>
+		>		
 		<Button style="@style/btn_style"
 			android:id="@+id/btn_home"	   			
-        	android:background="@drawable/btn_home"
+	        android:background="@drawable/btn_home"
 			/>
-		<Button style="@style/btn_style"
-			android:id="@+id/btn_parent"    			  		
-        	android:background="@drawable/btn_parent"
-			/>				
 		<ToggleButton  style="@style/btn_style"
 			android:id="@+id/btn_mode"     		
         	android:background="@drawable/btn_mode"
@@ -35,8 +31,12 @@
 		<Button style="@style/btn_style"
 			android:id="@+id/btn_sort"  	    		 			
         	android:background="@drawable/btn_sort"
-			/>					
-	</LinearLayout>	
+			/>		
+		<Button style="@style/btn_style"
+			android:id="@+id/btn_parent"    			  		
+        	android:background="@drawable/btn_parent"
+			/>		
+		</LinearLayout>		
 	</HorizontalScrollView>
 	<TextView
 		android:id="@+id/path"
