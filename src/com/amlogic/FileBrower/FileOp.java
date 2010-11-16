@@ -91,6 +91,6 @@ public class FileOp {
     };
     //photo
     private static final String[] photo_extensions = { "jpg","jpeg",
-    	"bmp","tif","tiff","png","mp3","gif"  	
+    	"bmp","tif","tiff","png","gif"  	
     };	
 }
