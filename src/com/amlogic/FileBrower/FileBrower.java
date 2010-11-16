@@ -139,7 +139,9 @@ public class FileBrower extends Activity {
         /* btn_home listener */
         Button btn_home = (Button) findViewById(R.id.btn_home);  
         btn_home.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {				
+			public void onClick(View v) {	
+				prev_path = cur_path;
+				cur_path = ROOT_PATH;
 				DeviceScan();
 			}        	
         });       
@@ -312,22 +314,25 @@ public class FileBrower extends Activity {
             });      
             Button sort_btn_name = (Button) sort_dialog.getWindow().findViewById(R.id.sort_btn_name);  
             sort_btn_name.setOnClickListener(new OnClickListener() {
-    			public void onClick(View v) {    				
-    				lv.setAdapter(getFileListAdapterSorted(cur_path, "by_name"));
+    			public void onClick(View v) {   
+    				if (!cur_path.equals(ROOT_PATH))
+    					lv.setAdapter(getFileListAdapterSorted(cur_path, "by_name"));
     				sort_dialog.dismiss();
     			}        	
             });  
             Button sort_btn_date = (Button) sort_dialog.getWindow().findViewById(R.id.sort_btn_date);  
             sort_btn_date.setOnClickListener(new OnClickListener() {
-    			public void onClick(View v) {    				
-    				lv.setAdapter(getFileListAdapterSorted(cur_path, "by_date"));
+    			public void onClick(View v) { 
+    				if (!cur_path.equals(ROOT_PATH))
+    					lv.setAdapter(getFileListAdapterSorted(cur_path, "by_date"));
     				sort_dialog.dismiss();
     			}        	
             });   
             Button sort_btn_size = (Button) sort_dialog.getWindow().findViewById(R.id.sort_btn_size);  
             sort_btn_size.setOnClickListener(new OnClickListener() {
-    			public void onClick(View v) {    				
-    				lv.setAdapter(getFileListAdapterSorted(cur_path, "by_size"));
+    			public void onClick(View v) {  
+    				if (!cur_path.equals(ROOT_PATH))
+    					lv.setAdapter(getFileListAdapterSorted(cur_path, "by_size"));
     				sort_dialog.dismiss();
     			}        	
             });     		
