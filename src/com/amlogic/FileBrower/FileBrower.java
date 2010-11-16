@@ -261,8 +261,49 @@ public class FileBrower extends Activity {
         	
             sort_dialog =  new AlertDialog.Builder(FileBrower.this)   
         	.setView(layout_sort)
-            .show();  
-            
+            .create(); 
+            return sort_dialog;
+
+        case EDIT_DIALOG_ID:
+	        LayoutInflater inflater1 = (LayoutInflater) FileBrower.this
+	    	.getSystemService(LAYOUT_INFLATER_SERVICE);
+	    	View layout_edit = inflater1.inflate(R.layout.edit_dialog_layout,
+	    		(ViewGroup) findViewById(R.id.layout_root_edit));
+	    	
+	    	edit_dialog = new AlertDialog.Builder(FileBrower.this)   
+	    	.setView(layout_edit)
+	        .create();             
+	    	return edit_dialog;
+        	
+        case CLICK_DIALOG_ID:
+	        LayoutInflater inflater2 = (LayoutInflater) FileBrower.this
+	    	.getSystemService(LAYOUT_INFLATER_SERVICE);
+	    	View layout_click = inflater2.inflate(R.layout.click_dialog_layout,
+	    		(ViewGroup) findViewById(R.id.layout_root_click));
+	    	
+	    	click_dialog = new AlertDialog.Builder(FileBrower.this)   
+	    	.setView(layout_click)
+	        .create();
+	    	return click_dialog;
+	    	
+        }
+        
+		return null;    	
+    }
+    @Override
+    protected void onPrepareDialog(int id, Dialog dialog) {
+        WindowManager wm = getWindowManager();
+        Display display = wm.getDefaultDisplay();
+        LayoutParams lp = dialog.getWindow().getAttributes();    	
+    	switch (id) {
+    	case SORT_DIALOG_ID:
+            if (display.getHeight() > display.getWidth()) {            	
+            	lp.width = (int) (display.getWidth() * 1.0);       	
+        	} else {        		
+        		lp.width = (int) (display.getWidth() * 0.5);            	
+        	}
+            dialog.getWindow().setAttributes(lp);   
+
             Button sort_btn_close = (Button) sort_dialog.getWindow().findViewById(R.id.sort_btn_close);  
             sort_btn_close.setOnClickListener(new OnClickListener() {
     			public void onClick(View v) {
@@ -289,19 +330,16 @@ public class FileBrower extends Activity {
     				lv.setAdapter(getFileListAdapterSorted(cur_path, "by_size"));
     				sort_dialog.dismiss();
     			}        	
-            });             
-            return sort_dialog;
+            });     		
+            break;
+    	case EDIT_DIALOG_ID:    		
+            if (display.getHeight() > display.getWidth()) {            	
+            	lp.width = (int) (display.getWidth() * 1.0);       	
+        	} else {        		
+        		lp.width = (int) (display.getWidth() * 0.5);            	
+        	}
+            dialog.getWindow().setAttributes(lp);  
 
-        case EDIT_DIALOG_ID:
-	        LayoutInflater inflater1 = (LayoutInflater) FileBrower.this
-	    	.getSystemService(LAYOUT_INFLATER_SERVICE);
-	    	View layout_edit = inflater1.inflate(R.layout.edit_dialog_layout,
-	    		(ViewGroup) findViewById(R.id.layout_root_edit));
-	    	
-	    	edit_dialog = new AlertDialog.Builder(FileBrower.this)   
-	    	.setView(layout_edit)
-	        .show();   
-	    	
             Button edit_btn_close = (Button) edit_dialog.getWindow().findViewById(R.id.edit_btn_close);  
             edit_btn_close.setOnClickListener(new OnClickListener() {
     			public void onClick(View v) {
@@ -328,73 +366,22 @@ public class FileBrower extends Activity {
     				Log.i(TAG, "do: edit_btn_delete");
     				edit_dialog.dismiss();
     			}        	
-            });             
-            
-	    	return edit_dialog;
-        	
-        case CLICK_DIALOG_ID:
-	        LayoutInflater inflater2 = (LayoutInflater) FileBrower.this
-	    	.getSystemService(LAYOUT_INFLATER_SERVICE);
-	    	View layout_click = inflater2.inflate(R.layout.click_dialog_layout,
-	    		(ViewGroup) findViewById(R.id.layout_root_click));
-	    	
-	    	click_dialog = new AlertDialog.Builder(FileBrower.this)   
-	    	.setView(layout_click)
-	        .show();    
-	    	
-	    	 Button click_btn_close = (Button) click_dialog.getWindow().findViewById(R.id.click_btn_close);  
-	    	 click_btn_close.setOnClickListener(new OnClickListener() {
-	    			public void onClick(View v) {
-	    				click_dialog.dismiss();
-	    			}        	
-	         }); 
-	    	 return click_dialog;
-	    
-        }
-        
-		return null;    	
-    }
-    @Override
-    protected void onPrepareDialog(int id, Dialog dialog) {
-    	switch (id) {
-    	case SORT_DIALOG_ID: 
-    		{
-            WindowManager wm = getWindowManager();
-            Display display = wm.getDefaultDisplay();
-            LayoutParams lp = dialog.getWindow().getAttributes();
-            if (display.getHeight() > display.getWidth()) {            	
-            	lp.width = (int) (display.getWidth() * 1.0);       	
-        	} else {        		
-        		lp.width = (int) (display.getWidth() * 0.5);            	
-        	}
-            dialog.getWindow().setAttributes(lp);   
-    		}
-            break;
-    	case EDIT_DIALOG_ID:
-    		{
-            WindowManager wm = getWindowManager();
-            Display display = wm.getDefaultDisplay();
-            LayoutParams lp = dialog.getWindow().getAttributes();
-            if (display.getHeight() > display.getWidth()) {            	
-            	lp.width = (int) (display.getWidth() * 1.0);       	
-        	} else {        		
-        		lp.width = (int) (display.getWidth() * 0.5);            	
-        	}
-            dialog.getWindow().setAttributes(lp);  
-    		}
+            }); 
     		break;
     	case CLICK_DIALOG_ID:
-			{
-            WindowManager wm = getWindowManager();
-            Display display = wm.getDefaultDisplay();
-            LayoutParams lp = dialog.getWindow().getAttributes();
             if (display.getHeight() > display.getWidth()) {            	
             	lp.width = (int) (display.getWidth() * 1.0);       	
         	} else {        		
         		lp.width = (int) (display.getWidth() * 0.5);            	
         	}
             dialog.getWindow().setAttributes(lp);  
-    		}    		
+ 
+	    	Button click_btn_close = (Button) click_dialog.getWindow().findViewById(R.id.click_btn_close);  
+	    	click_btn_close.setOnClickListener(new OnClickListener() {
+	    		public void onClick(View v) {
+	    			click_dialog.dismiss();
+	    		}        	
+	        }); 			
     		break;
     	}
     }  
