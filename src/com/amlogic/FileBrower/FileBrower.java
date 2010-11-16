@@ -308,6 +308,32 @@ public class FileBrower extends Activity {
             sort_lv = (ListView) sort_dialog.getWindow().findViewById(R.id.sort_listview);  
             sort_lv.setAdapter(getDialogListAdapter(SORT_DIALOG_ID));	
             
+            sort_lv.setOnItemClickListener(new OnItemClickListener() {
+            	public void onItemClick(AdapterView<?> parent, View view, int pos,
+    					long id) {    				
+    				
+            		if (!cur_path.equals(ROOT_PATH)) {
+            			if (pos == 0)
+            				lv.setAdapter(getFileListAdapterSorted(cur_path, "by_name"));
+            			else if (pos == 1)
+            				lv.setAdapter(getFileListAdapterSorted(cur_path, "by_date"));
+            			else if (pos == 2)
+            				lv.setAdapter(getFileListAdapterSorted(cur_path, "by_size"));
+            		}
+            		sort_dialog.dismiss();
+            		
+    				/*//todo
+    				Map<String, Object> item = (Map<String, Object>)parent.getItemAtPosition(pos);
+					if (item.get("item_sel").equals(R.drawable.dialog_item_img_unsel))
+						item.put("item_sel", R.drawable.dialog_item_img_sel);
+					else if (item.get("item_sel").equals(R.drawable.dialog_item_img_sel))
+						item.put("item_sel", R.drawable.dialog_item_img_unsel);
+					
+					((BaseAdapter) sort_lv.getAdapter()).notifyDataSetChanged();	  
+					*/  				
+    			}
+            	
+            });
 	    	Button sort_btn_close = (Button) sort_dialog.getWindow().findViewById(R.id.sort_btn_close);  
 	    	sort_btn_close.setOnClickListener(new OnClickListener() {
 	    		public void onClick(View v) {
@@ -326,6 +352,13 @@ public class FileBrower extends Activity {
             edit_lv = (ListView) edit_dialog.getWindow().findViewById(R.id.edit_listview);  
             edit_lv.setAdapter(getDialogListAdapter(EDIT_DIALOG_ID));	
             
+            edit_lv.setOnItemClickListener(new OnItemClickListener() {
+            	public void onItemClick(AdapterView<?> parent, View view, int pos,
+    					long id) {
+            		edit_dialog.dismiss();
+				
+    			}            	
+            });            
 	    	Button edit_btn_close = (Button) edit_dialog.getWindow().findViewById(R.id.edit_btn_close);  
 	    	edit_btn_close.setOnClickListener(new OnClickListener() {
 	    		public void onClick(View v) {
@@ -592,17 +625,17 @@ public class FileBrower extends Activity {
     	
     	switch (id) {
     	case SORT_DIALOG_ID:  	
-    		map = new HashMap<String, Object>(); 
+    		map = new HashMap<String, Object>();     		
         	map.put("item_type", R.drawable.dialog_item_type_default);  
         	map.put("item_name", getText(R.string.sort_dialog_name_str));            	        	
         	map.put("item_sel", R.drawable.dialog_item_img_unsel);  
         	list.add(map);
-        	map = new HashMap<String, Object>(); 
+        	map = new HashMap<String, Object>();         	
         	map.put("item_type", R.drawable.dialog_item_type_default);  
         	map.put("item_name", getText(R.string.sort_dialog_date_str));            	        	
-        	map.put("item_sel", R.drawable.dialog_item_img_sel);  
+        	map.put("item_sel", R.drawable.dialog_item_img_unsel);  
         	list.add(map);    	
-        	map = new HashMap<String, Object>(); 
+        	map = new HashMap<String, Object>();         	
         	map.put("item_type", R.drawable.dialog_item_type_default);  
         	map.put("item_name", getText(R.string.sort_dialog_size_str));            	        	
         	map.put("item_sel", R.drawable.dialog_item_img_unsel);  
@@ -610,17 +643,17 @@ public class FileBrower extends Activity {
         	break; 
         	
     	case EDIT_DIALOG_ID: 
-    		map = new HashMap<String, Object>(); 
+    		map = new HashMap<String, Object>();    		
         	map.put("item_type", R.drawable.dialog_item_type_default);  
         	map.put("item_name", getText(R.string.edit_dialog_copy_str));            	        	
         	map.put("item_sel", R.drawable.dialog_item_img_unsel);  
         	list.add(map);
-        	map = new HashMap<String, Object>(); 
+        	map = new HashMap<String, Object>();         	
         	map.put("item_type", R.drawable.dialog_item_type_default);  
         	map.put("item_name", getText(R.string.edit_dialog_paste_str));            	        	
         	map.put("item_sel", R.drawable.dialog_item_img_unsel);  
         	list.add(map);    	
-        	map = new HashMap<String, Object>(); 
+        	map = new HashMap<String, Object>();         	
         	map.put("item_type", R.drawable.dialog_item_type_default);  
         	map.put("item_name", getText(R.string.edit_dialog_delete_str));            	        	
         	map.put("item_sel", R.drawable.dialog_item_img_unsel);  
