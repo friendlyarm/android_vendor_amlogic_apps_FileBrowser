@@ -3,57 +3,26 @@
 	android:id="@+id/layout_root_edit"
 	android:orientation="vertical"
 	android:layout_width="fill_parent"
-	android:layout_height="wrap_content"
+	android:layout_height="wrap_content"	
 	>
 	<LinearLayout
 		android:orientation="horizontal"
 		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
+		android:layout_height="wrap_content"	
+		android:gravity="right"
 		>
-		<ImageView 
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="10dp"
-			android:src="@drawable/edit_dialog_icon"
-		/>
-		<TextView 
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/edit_dialog_title_str"
-			android:textStyle="bold"
-			android:textColor="@color/dialog_text_color"
-		/>
-	</LinearLayout>
-	<Button style="?android:attr/buttonStyleSmall"
-		android:id="@+id/edit_btn_copy"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"		
-		android:text="@string/edit_dialog_copy_str"
-		android:textStyle="bold"
-		android:textColor="@color/dialog_text_color"
-		/>
-	<Button style="?android:attr/buttonStyleSmall"
-		android:id="@+id/edit_btn_paste"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"		
-		android:text="@string/edit_dialog_paste_str"
-		android:textStyle="bold"
-		android:textColor="@color/dialog_text_color"
-		/>
-	<Button style="?android:attr/buttonStyleSmall"
-		android:id="@+id/edit_btn_delete"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"		
-		android:text="@string/edit_dialog_delete_str"
-		android:textStyle="bold"
-		android:textColor="@color/dialog_text_color"
-		/>
-	<Button style="?android:attr/buttonStyleSmall"
-		android:id="@+id/edit_btn_close"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:text="@string/dialog_close_str"		
-		android:textStyle="bold"
-		android:textColor="@color/dialog_text_color"		
-		/>	
+    <Button 
+    	android:id="@+id/edit_btn_close"
+    	android:layout_width="wrap_content"
+    	android:layout_height="wrap_content"     
+    	android:layout_marginRight="5dp" 	 
+    	android:background="@drawable/dialog_title_btn_right"
+    	/>	
+    </LinearLayout>	
+	<ListView
+		android:id="@+id/edit_listview"
+    	android:layout_width="fill_parent"
+    	android:layout_height="fill_parent"		
+		/>  
+
 </LinearLayout>

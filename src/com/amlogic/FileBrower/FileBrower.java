@@ -47,6 +47,9 @@ public class FileBrower extends Activity {
 	private AlertDialog sort_dialog;	
 	private AlertDialog edit_dialog;
 	private AlertDialog click_dialog;
+	private ListView sort_lv;
+	private ListView edit_lv;
+	private ListView click_lv;
 	
 	private ListView lv;
 	private TextView tv;
@@ -254,10 +257,11 @@ public class FileBrower extends Activity {
     /** Dialog */
     @Override
     protected Dialog onCreateDialog(int id) {
+    	LayoutInflater inflater = (LayoutInflater) FileBrower.this
+		.getSystemService(LAYOUT_INFLATER_SERVICE);
+    	
         switch (id) {
         case SORT_DIALOG_ID:
-        	LayoutInflater inflater = (LayoutInflater) FileBrower.this
-        		.getSystemService(LAYOUT_INFLATER_SERVICE);
         	View layout_sort = inflater.inflate(R.layout.sort_dialog_layout,
         		(ViewGroup) findViewById(R.id.layout_root_sort));
         	
@@ -267,9 +271,7 @@ public class FileBrower extends Activity {
             return sort_dialog;
 
         case EDIT_DIALOG_ID:
-	        LayoutInflater inflater1 = (LayoutInflater) FileBrower.this
-	    	.getSystemService(LAYOUT_INFLATER_SERVICE);
-	    	View layout_edit = inflater1.inflate(R.layout.edit_dialog_layout,
+	    	View layout_edit = inflater.inflate(R.layout.edit_dialog_layout,
 	    		(ViewGroup) findViewById(R.id.layout_root_edit));
 	    	
 	    	edit_dialog = new AlertDialog.Builder(FileBrower.this)   
@@ -278,16 +280,13 @@ public class FileBrower extends Activity {
 	    	return edit_dialog;
         	
         case CLICK_DIALOG_ID:
-	        LayoutInflater inflater2 = (LayoutInflater) FileBrower.this
-	    	.getSystemService(LAYOUT_INFLATER_SERVICE);
-	    	View layout_click = inflater2.inflate(R.layout.click_dialog_layout,
+	    	View layout_click = inflater.inflate(R.layout.click_dialog_layout,
 	    		(ViewGroup) findViewById(R.id.layout_root_click));
 	    	
 	    	click_dialog = new AlertDialog.Builder(FileBrower.this)   
 	    	.setView(layout_click)
 	        .create();
-	    	return click_dialog;
-	    	
+	    	return click_dialog;	    	
         }
         
 		return null;    	
@@ -305,37 +304,16 @@ public class FileBrower extends Activity {
         		lp.width = (int) (display.getWidth() * 0.5);            	
         	}
             dialog.getWindow().setAttributes(lp);   
-
-            Button sort_btn_close = (Button) sort_dialog.getWindow().findViewById(R.id.sort_btn_close);  
-            sort_btn_close.setOnClickListener(new OnClickListener() {
-    			public void onClick(View v) {
-    				sort_dialog.dismiss();
-    			}        	
-            });      
-            Button sort_btn_name = (Button) sort_dialog.getWindow().findViewById(R.id.sort_btn_name);  
-            sort_btn_name.setOnClickListener(new OnClickListener() {
-    			public void onClick(View v) {   
-    				if (!cur_path.equals(ROOT_PATH))
-    					lv.setAdapter(getFileListAdapterSorted(cur_path, "by_name"));
-    				sort_dialog.dismiss();
-    			}        	
-            });  
-            Button sort_btn_date = (Button) sort_dialog.getWindow().findViewById(R.id.sort_btn_date);  
-            sort_btn_date.setOnClickListener(new OnClickListener() {
-    			public void onClick(View v) { 
-    				if (!cur_path.equals(ROOT_PATH))
-    					lv.setAdapter(getFileListAdapterSorted(cur_path, "by_date"));
-    				sort_dialog.dismiss();
-    			}        	
-            });   
-            Button sort_btn_size = (Button) sort_dialog.getWindow().findViewById(R.id.sort_btn_size);  
-            sort_btn_size.setOnClickListener(new OnClickListener() {
-    			public void onClick(View v) {  
-    				if (!cur_path.equals(ROOT_PATH))
-    					lv.setAdapter(getFileListAdapterSorted(cur_path, "by_size"));
-    				sort_dialog.dismiss();
-    			}        	
-            });     		
+            
+            sort_lv = (ListView) sort_dialog.getWindow().findViewById(R.id.sort_listview);  
+            sort_lv.setAdapter(getDialogListAdapter(SORT_DIALOG_ID));	
+            
+	    	Button sort_btn_close = (Button) sort_dialog.getWindow().findViewById(R.id.sort_btn_close);  
+	    	sort_btn_close.setOnClickListener(new OnClickListener() {
+	    		public void onClick(View v) {
+	    			sort_dialog.dismiss();
+	    		}        	
+	        });		
             break;
     	case EDIT_DIALOG_ID:    		
             if (display.getHeight() > display.getWidth()) {            	
@@ -345,33 +323,15 @@ public class FileBrower extends Activity {
         	}
             dialog.getWindow().setAttributes(lp);  
 
-            Button edit_btn_close = (Button) edit_dialog.getWindow().findViewById(R.id.edit_btn_close);  
-            edit_btn_close.setOnClickListener(new OnClickListener() {
-    			public void onClick(View v) {
-    				edit_dialog.dismiss();
-    			}        	
-            });  
-            Button edit_btn_copy = (Button) edit_dialog.getWindow().findViewById(R.id.edit_btn_copy);  
-            edit_btn_copy.setOnClickListener(new OnClickListener() {
-    			public void onClick(View v) {
-    				Log.i(TAG, "do: edit_btn_copy");
-    				edit_dialog.dismiss();
-    			}        	
-            });   
-            Button edit_btn_paste = (Button) edit_dialog.getWindow().findViewById(R.id.edit_btn_paste);  
-            edit_btn_paste.setOnClickListener(new OnClickListener() {
-    			public void onClick(View v) {
-    				Log.i(TAG, "do: edit_btn_paste");
-    				edit_dialog.dismiss();
-    			}        	
-            });  
-            Button edit_btn_delete = (Button) edit_dialog.getWindow().findViewById(R.id.edit_btn_delete);  
-            edit_btn_delete.setOnClickListener(new OnClickListener() {
-    			public void onClick(View v) {
-    				Log.i(TAG, "do: edit_btn_delete");
-    				edit_dialog.dismiss();
-    			}        	
-            }); 
+            edit_lv = (ListView) edit_dialog.getWindow().findViewById(R.id.edit_listview);  
+            edit_lv.setAdapter(getDialogListAdapter(EDIT_DIALOG_ID));	
+            
+	    	Button edit_btn_close = (Button) edit_dialog.getWindow().findViewById(R.id.edit_btn_close);  
+	    	edit_btn_close.setOnClickListener(new OnClickListener() {
+	    		public void onClick(View v) {
+	    			edit_dialog.dismiss();
+	    		}        	
+	        }); 
     		break;
     	case CLICK_DIALOG_ID:
             if (display.getHeight() > display.getWidth()) {            	
@@ -381,6 +341,9 @@ public class FileBrower extends Activity {
         	}
             dialog.getWindow().setAttributes(lp);  
  
+            click_lv = (ListView) click_dialog.getWindow().findViewById(R.id.click_listview);  
+            click_lv.setAdapter(getDialogListAdapter(CLICK_DIALOG_ID));	
+            
 	    	Button click_btn_close = (Button) click_dialog.getWindow().findViewById(R.id.click_btn_close);  
 	    	click_btn_close.setOnClickListener(new OnClickListener() {
 	    		public void onClick(View v) {
@@ -606,4 +569,71 @@ public class FileBrower extends Activity {
     	return list;
  	}  
     
+    /** getDialogListAdapter */
+    private SimpleAdapter getDialogListAdapter(int id) {
+        return new SimpleAdapter(FileBrower.this,
+        		getDialogListData(id),
+        		R.layout.dialog_item,        		
+                new String[]{
+        	"item_type",
+        	"item_name",
+        	"item_sel",
+        	},        		
+                new int[]{
+        	R.id.dialog_item_type,
+        	R.id.dialog_item_name,
+        	R.id.dialog_item_sel,
+        	});  
+    }
+    /** getFileListData */
+    private List<Map<String, Object>> getDialogListData(int id) { 
+    	List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();  
+    	Map<String, Object> map; 
+    	
+    	switch (id) {
+    	case SORT_DIALOG_ID:  	
+    		map = new HashMap<String, Object>(); 
+        	map.put("item_type", R.drawable.dialog_item_type_default);  
+        	map.put("item_name", getText(R.string.sort_dialog_name_str));            	        	
+        	map.put("item_sel", R.drawable.dialog_item_img_unsel);  
+        	list.add(map);
+        	map = new HashMap<String, Object>(); 
+        	map.put("item_type", R.drawable.dialog_item_type_default);  
+        	map.put("item_name", getText(R.string.sort_dialog_date_str));            	        	
+        	map.put("item_sel", R.drawable.dialog_item_img_sel);  
+        	list.add(map);    	
+        	map = new HashMap<String, Object>(); 
+        	map.put("item_type", R.drawable.dialog_item_type_default);  
+        	map.put("item_name", getText(R.string.sort_dialog_size_str));            	        	
+        	map.put("item_sel", R.drawable.dialog_item_img_unsel);  
+        	list.add(map);       	
+        	break; 
+        	
+    	case EDIT_DIALOG_ID: 
+    		map = new HashMap<String, Object>(); 
+        	map.put("item_type", R.drawable.dialog_item_type_default);  
+        	map.put("item_name", getText(R.string.edit_dialog_copy_str));            	        	
+        	map.put("item_sel", R.drawable.dialog_item_img_unsel);  
+        	list.add(map);
+        	map = new HashMap<String, Object>(); 
+        	map.put("item_type", R.drawable.dialog_item_type_default);  
+        	map.put("item_name", getText(R.string.edit_dialog_paste_str));            	        	
+        	map.put("item_sel", R.drawable.dialog_item_img_unsel);  
+        	list.add(map);    	
+        	map = new HashMap<String, Object>(); 
+        	map.put("item_type", R.drawable.dialog_item_type_default);  
+        	map.put("item_name", getText(R.string.edit_dialog_delete_str));            	        	
+        	map.put("item_sel", R.drawable.dialog_item_img_unsel);  
+        	list.add(map);     		
+    		break; 
+    		
+    	case CLICK_DIALOG_ID:
+    		map = new HashMap<String, Object>(); 
+        	map.put("item_type", R.drawable.dialog_item_type_default);  
+        	map.put("item_name", "...");            	        	
+        	map.put("item_sel", R.drawable.dialog_item_img_unsel);   
+        	list.add(map); 
+    	}
+    	return list;
+    }    
 }

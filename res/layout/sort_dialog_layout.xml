@@ -3,57 +3,26 @@
 	android:id="@+id/layout_root_sort"
 	android:orientation="vertical"
 	android:layout_width="fill_parent"
-	android:layout_height="wrap_content"
+	android:layout_height="wrap_content"	
 	>
 	<LinearLayout
 		android:orientation="horizontal"
 		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
+		android:layout_height="wrap_content"	
+		android:gravity="right"
 		>
-		<ImageView 
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="10dp"
-			android:src="@drawable/sort_dialog_icon"
-		/>
-		<TextView 
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/sort_dialog_title_str"
-			android:textStyle="bold"
-			android:textColor="@color/dialog_text_color"
-		/>
-	</LinearLayout>
-	<Button style="?android:attr/buttonStyleSmall"
-		android:id="@+id/sort_btn_name"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"		
-		android:text="@string/sort_dialog_name_str"
-		android:textStyle="bold"
-		android:textColor="@color/dialog_text_color"
-		/>
-	<Button style="?android:attr/buttonStyleSmall"
-		android:id="@+id/sort_btn_date"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"		
-		android:text="@string/sort_dialog_date_str"
-		android:textStyle="bold"
-		android:textColor="@color/dialog_text_color"
-		/>
-	<Button style="?android:attr/buttonStyleSmall"
-		android:id="@+id/sort_btn_size"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"		
-		android:text="@string/sort_dialog_size_str"
-		android:textStyle="bold"
-		android:textColor="@color/dialog_text_color"
-		/>
-	<Button style="?android:attr/buttonStyleSmall"
-		android:id="@+id/sort_btn_close"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:text="@string/dialog_close_str"		
-		android:textStyle="bold"
-		android:textColor="@color/dialog_text_color"		
-		/>	
+    <Button 
+    	android:id="@+id/sort_btn_close"
+    	android:layout_width="wrap_content"
+    	android:layout_height="wrap_content"     
+    	android:layout_marginRight="5dp" 	 
+    	android:background="@drawable/dialog_title_btn_right"
+    	/>	
+    </LinearLayout>	
+	<ListView
+		android:id="@+id/sort_listview"
+    	android:layout_width="fill_parent"
+    	android:layout_height="fill_parent"		
+		/>  
+
 </LinearLayout>
