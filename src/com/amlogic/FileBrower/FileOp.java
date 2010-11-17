@@ -6,8 +6,13 @@ import java.util.List;
 
 import android.util.Log;
 
-public class FileOp {
-	
+public class FileOp {	
+	public static FileOpTodo file_op_todo = FileOpTodo.TODO_NOTHING;
+	public static enum FileOpTodo{
+		TODO_NOTHING,
+		TODO_CPY,
+		TODO_CUT
+	}
 	public static enum FileOpReturn{
 		SUCCESS,
 		ERR,
@@ -15,7 +20,7 @@ public class FileOp {
 		ERR_DEL_FAIL,
 		ERR_CPY_FAIL,
 		ERR_CUT_FAIL,
-		ERR_PASTE_FAIL,
+		ERR_PASTE_FAIL
 	}
 	
     /** getFileSizeStr */
@@ -191,7 +196,45 @@ public class FileOp {
 		return FileOpReturn.ERR; 	
     }
     public static FileOpReturn pasteSelectedFile() {
-		return FileOpReturn.ERR; 	
+    	List<String> fileList = new ArrayList<String>();
+    	
+    	if ((file_op_todo != FileOpTodo.TODO_CPY) &&
+    		(file_op_todo != FileOpTodo.TODO_CUT))
+    		return FileOpReturn.ERR; 	
+    		
+        try {        	
+        	FileBrower.myCursor = FileBrower.db.getFileMark();   
+	        if (FileBrower.myCursor.getCount() > 0) {
+	            for(int i=0; i<FileBrower.myCursor.getCount(); i++){
+	            	FileBrower.myCursor.moveToPosition(i);
+	            	fileList.add(FileBrower.myCursor.getColFilePath());
+	            }      	
+	        }
+        } finally {        	
+        	FileBrower.myCursor.close();        	
+        }  
+        
+        if (!fileList.isEmpty()) {
+        	for (String name : fileList) {
+        		File file = new File(name);
+        		if (file.exists()) {
+        			Log.i(FileBrower.TAG, "paste file: " + name);
+        			try {
+        			//todo 
+        				if (file_op_todo == FileOpTodo.TODO_CPY) {
+        					Log.i(FileBrower.TAG, "copy and paste file: " + name);
+        				} else if (file_op_todo == FileOpTodo.TODO_CUT) {
+        					Log.i(FileBrower.TAG, "cut and paste file: " + name);
+        				}
+        			} catch (Exception e) {
+        				Log.e("Exception when delete file", e.toString());
+        			}
+        		}
+        	}
+        	return FileOpReturn.SUCCESS;
+        } else
+        	return FileOpReturn.ERR; 	
+        
     }   
     public static FileOpReturn deleteSelectedFile() {
     	List<String> fileList = new ArrayList<String>();
@@ -212,7 +255,11 @@ public class FileOp {
         		File file = new File(name);
         		if (file.exists()) {
         			Log.i(FileBrower.TAG, "delete file: " + name);
+        			try {
         			file.delete();
+        			} catch (Exception e) {
+        				Log.e("Exception when delete file", e.toString());
+        			}
         		}
         	}
         	return FileOpReturn.SUCCESS;

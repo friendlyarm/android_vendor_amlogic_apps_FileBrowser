@@ -34,4 +34,6 @@ DROP TABLE IF EXISTS file_mark_table
 
 	<string name="Toast_msg_del_ok">Delete all selected files.</string>
 	<string name="Toast_msg_del_nofile">No file to delete.</string>
+	<string name="Toast_msg_paste_ok">Paste all selected files to current path.</string>
+	<string name="Toast_msg_paste_nofile">No file to paste.</string>
 </resources>

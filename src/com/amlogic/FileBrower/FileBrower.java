@@ -39,6 +39,7 @@ import android.widget.ToggleButton;
 
 import com.amlogic.FileBrower.FileBrowerDatabase.FileMarkCursor;
 import com.amlogic.FileBrower.FileOp.FileOpReturn;
+import com.amlogic.FileBrower.FileOp.FileOpTodo;
 
 public class FileBrower extends Activity {
 	public static final String TAG = "FileBrower";
@@ -400,14 +401,31 @@ public class FileBrower extends Activity {
             		if (!cur_path.equals(ROOT_PATH)) {
             			if (pos == 0) {
             				Log.i(TAG, "DO cut...");
+            				FileOp.file_op_todo = FileOpTodo.TODO_CUT;
             			}
             			else if (pos == 1) {
             				Log.i(TAG, "DO copy...");
+            				FileOp.file_op_todo = FileOpTodo.TODO_CPY;
             			}
             			else if (pos == 2) {
             				Log.i(TAG, "DO paste...");
+
+        					if (FileOpReturn.SUCCESS == FileOp.pasteSelectedFile()) {
+        						db.deleteAllFileMark();
+        						lv.setAdapter(getFileListAdapter(cur_path)); 
+                				Toast.makeText(FileBrower.this,
+                						getText(R.string.Toast_msg_paste_ok),
+                						Toast.LENGTH_SHORT).show();            						
+        					} else {
+            					Toast.makeText(FileBrower.this,
+            							getText(R.string.Toast_msg_paste_nofile),
+            							Toast.LENGTH_SHORT).show();            						
+        					}
+            				FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
+            				            				
             			}
             			else if (pos == 3) {
+            				FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
             				//Log.i(TAG, "DO delete...");   
             				if (FileOpReturn.SUCCESS == FileOp.deleteSelectedFile()) {
             					db.deleteAllFileMark();
