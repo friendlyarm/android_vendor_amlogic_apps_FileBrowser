@@ -694,6 +694,11 @@ public class FileBrower extends Activity {
         	
     	case EDIT_DIALOG_ID: 
     		map = new HashMap<String, Object>();    		
+        	map.put("item_type", R.drawable.dialog_item_type_cut);  
+        	map.put("item_name", getText(R.string.edit_dialog_cut_str));            	        	
+        	map.put("item_sel", R.drawable.dialog_item_img_unsel);   
+        	list.add(map);
+    		map = new HashMap<String, Object>();    		
         	map.put("item_type", R.drawable.dialog_item_type_copy);  
         	map.put("item_name", getText(R.string.edit_dialog_copy_str));            	        	
         	map.put("item_sel", R.drawable.dialog_item_img_unsel);  

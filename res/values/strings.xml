@@ -18,6 +18,7 @@
     <string name="edit_dialog_copy_str">Copy</string>
     <string name="edit_dialog_delete_str">Delete</string>
     <string name="edit_dialog_paste_str">Paste</string>
+    <string name="edit_dialog_cut_str">Cut</string>
     
     
     <string name="click_dialog_title_str">Open File</string>
