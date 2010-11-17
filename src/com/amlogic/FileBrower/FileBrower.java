@@ -13,6 +13,8 @@ import java.util.Map;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -54,6 +56,7 @@ public class FileBrower extends Activity {
 	private ListView lv;
 	private TextView tv;
 	private List<String> devList = new ArrayList<String>();
+	String open_mode[] = {"movie","music","photo","packageInstall"};
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -87,8 +90,11 @@ public class FileBrower extends Activity {
 				}
 				else {	
 					ToggleButton btn_mode = (ToggleButton) findViewById(R.id.btn_mode); 
-					if (!btn_mode.isChecked())
-						showDialog(CLICK_DIALOG_ID);	
+					if (!btn_mode.isChecked()){
+						openFile(file);
+						//showDialog(CLICK_DIALOG_ID);
+						
+					}
 					else {
 						if (item.get("item_sel").equals(R.drawable.item_img_unsel))
 							item.put("item_sel", R.drawable.item_img_sel);
@@ -174,6 +180,15 @@ public class FileBrower extends Activity {
         });           
     }
     
+    private void openFile(File f){
+        Intent intent = new Intent();
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setAction(android.content.Intent.ACTION_VIEW);
+        String type = "*/*";        
+        type = FileOp.CheckMediaType(f);
+        intent.setDataAndType(Uri.fromFile(f),type);
+        startActivity(intent); 
+      }
     private void DeviceScan() {
 		// TODO Auto-generated method stub
     	devList.clear();
@@ -661,11 +676,13 @@ public class FileBrower extends Activity {
     		break; 
     		
     	case CLICK_DIALOG_ID:
-    		map = new HashMap<String, Object>(); 
-        	map.put("item_type", R.drawable.dialog_item_img_sel);  
-        	map.put("item_name", "Open file...");            	        	
-        	map.put("item_sel", R.drawable.dialog_item_img_unsel);   
-        	list.add(map); 
+    		for(int i=0;i<open_mode.length;i++){
+    			map = new HashMap<String, Object>();  
+    			map.put("item_type", R.drawable.dialog_item_type_default);        	
+    			map.put("item_name", open_mode[i]);       	      	            	        	
+    			map.put("item_sel", R.drawable.dialog_item_img_unsel);   
+    			list.add(map); 
+    		}
     	}
     	return list;
     }    

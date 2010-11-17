@@ -1,5 +1,7 @@
 package com.amlogic.FileBrower;
 
+import java.io.File;
+
 public class FileOp {
     /** getFileSizeStr */
     public static String getFileSizeStr(long length) {
@@ -87,10 +89,45 @@ public class FileOp {
     };
     //music
     private static final String[] music_extensions = {"mp3",
-    	"wma","m4a","aac","ape","ogg","flac","alac","wav"    	
+    	"wma","m4a","aac","ape","ogg","flac","alac","wav","mid","xmf"  	
     };
     //photo
     private static final String[] photo_extensions = { "jpg","jpeg",
     	"bmp","tif","tiff","png","gif"  	
     };	
+    public static String CheckMediaType(File file){
+        String type="";
+        String fName=file.getName();
+        String end=fName.substring(fName.lastIndexOf(".")+1,fName.length()).toLowerCase();       
+        /*for(String ext: video_extensions){
+        	if(end.equals(ext.toString())){
+        		type = "video";
+        		type +="/*";
+        		return type;
+        	}
+        }*/
+        if(end.equals("3gp")||end.equals("mp4")){
+            type = "video";
+            type +="/*";
+    		return type;
+        }
+        for(String ext: music_extensions){
+        	if(end.equals(ext.toString())){
+        		type = "audio";
+        		type +="/*";
+        		return type;
+        	}
+        }
+        for(String ext:photo_extensions){
+        	if(end.equals(ext.toString())){
+        		type = "image";
+        		type +="/*";
+        		return type;
+        	}
+        }                		
+       type ="*/*";
+       return type;
+       
+    }
 }
+         

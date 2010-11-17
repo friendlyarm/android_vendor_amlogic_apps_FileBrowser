@@ -22,5 +22,6 @@
     
     <string name="click_dialog_title_str">Open File</string>
     <string name="rootDevice">Home</string>
+    <string name="openMode">Open as..</string>
     
 </resources>
