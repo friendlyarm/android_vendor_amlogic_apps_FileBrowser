@@ -34,9 +34,11 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.amlogic.FileBrower.FileBrowerDatabase.FileMarkCursor;
+import com.amlogic.FileBrower.FileOp.FileOpReturn;
 
 public class FileBrower extends Activity {
 	public static final String TAG = "FileBrower";
@@ -395,6 +397,31 @@ public class FileBrower extends Activity {
             edit_lv.setOnItemClickListener(new OnItemClickListener() {
             	public void onItemClick(AdapterView<?> parent, View view, int pos,
     					long id) {
+            		if (!cur_path.equals(ROOT_PATH)) {
+            			if (pos == 0) {
+            				Log.i(TAG, "DO cut...");
+            			}
+            			else if (pos == 1) {
+            				Log.i(TAG, "DO copy...");
+            			}
+            			else if (pos == 2) {
+            				Log.i(TAG, "DO paste...");
+            			}
+            			else if (pos == 3) {
+            				//Log.i(TAG, "DO delete...");   
+            				if (FileOpReturn.SUCCESS == FileOp.deleteSelectedFile()) {
+            					db.deleteAllFileMark();
+                				lv.setAdapter(getFileListAdapter(cur_path));  
+                				Toast.makeText(FileBrower.this,
+                						getText(R.string.Toast_msg_del_ok),
+                						Toast.LENGTH_SHORT).show();
+            				} else {
+            					Toast.makeText(FileBrower.this,
+            							getText(R.string.Toast_msg_del_nofile),
+            							Toast.LENGTH_SHORT).show();
+            				}         				          				
+            			}
+            		}            		
             		edit_dialog.dismiss();
 				
     			}            	

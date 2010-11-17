@@ -31,4 +31,7 @@ CREATE TABLE file_mark_table (_id INTEGER PRIMARY KEY AUTOINCREMENT, file_path T
     <string name="FileBrowerDatabase_onUpgrade">"
 DROP TABLE IF EXISTS file_mark_table
 "</string>    
+
+	<string name="Toast_msg_del_ok">Delete all selected files.</string>
+	<string name="Toast_msg_del_nofile">No file to delete.</string>
 </resources>

@@ -1,8 +1,23 @@
 package com.amlogic.FileBrower;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import android.util.Log;
 
 public class FileOp {
+	
+	public static enum FileOpReturn{
+		SUCCESS,
+		ERR,
+		ERR_NO_FILE,
+		ERR_DEL_FAIL,
+		ERR_CPY_FAIL,
+		ERR_CUT_FAIL,
+		ERR_PASTE_FAIL,
+	}
+	
     /** getFileSizeStr */
     public static String getFileSizeStr(long length) {
     	int sub_index = 0;
@@ -166,6 +181,44 @@ public class FileOp {
     		FileBrower.db.deleteFileMark(file_path);
     	}
     		
+    }
+    
+    /** cut/copy/paste/delete selected files*/
+    public static FileOpReturn cutSelectedFile() {
+		return FileOpReturn.ERR;    	
+    }
+    public static FileOpReturn copySelectedFile() {
+		return FileOpReturn.ERR; 	
+    }
+    public static FileOpReturn pasteSelectedFile() {
+		return FileOpReturn.ERR; 	
+    }   
+    public static FileOpReturn deleteSelectedFile() {
+    	List<String> fileList = new ArrayList<String>();
+        try {        	
+        	FileBrower.myCursor = FileBrower.db.getFileMark();   
+	        if (FileBrower.myCursor.getCount() > 0) {
+	            for(int i=0; i<FileBrower.myCursor.getCount(); i++){
+	            	FileBrower.myCursor.moveToPosition(i);
+	            	fileList.add(FileBrower.myCursor.getColFilePath());
+	            }      	
+	        }
+        } finally {        	
+        	FileBrower.myCursor.close();        	
+        }     	
+    	
+        if (!fileList.isEmpty()) {
+        	for (String name : fileList) {
+        		File file = new File(name);
+        		if (file.exists()) {
+        			Log.i(FileBrower.TAG, "delete file: " + name);
+        			file.delete();
+        		}
+        	}
+        	return FileOpReturn.SUCCESS;
+        } else
+        	return FileOpReturn.ERR;    
+			
     }
     
 }
