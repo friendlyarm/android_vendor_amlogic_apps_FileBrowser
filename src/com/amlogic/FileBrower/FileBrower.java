@@ -36,6 +36,8 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import com.amlogic.FileBrower.FileBrowerDatabase.FileMarkCursor;
+
 public class FileBrower extends Activity {
 	public static final String TAG = "FileBrower";
 	
@@ -53,6 +55,9 @@ public class FileBrower extends Activity {
 	private ListView edit_lv;
 	private ListView click_lv;
 	
+	public static FileBrowerDatabase db;
+	public static FileMarkCursor myCursor;
+	
 	private ListView lv;
 	private TextView tv;
 	private List<String> devList = new ArrayList<String>();
@@ -62,6 +67,13 @@ public class FileBrower extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);        
         setContentView(R.layout.main);        
+        
+        /* setup database */
+        db = new FileBrowerDatabase(this); 
+
+        /* btn_mode default checked */
+        ToggleButton btn_mode = (ToggleButton) findViewById(R.id.btn_mode); 
+        btn_mode.setChecked(true);
         
         /* setup file list */
         lv = (ListView) findViewById(R.id.listview);  
@@ -96,10 +108,14 @@ public class FileBrower extends Activity {
 						
 					}
 					else {
-						if (item.get("item_sel").equals(R.drawable.item_img_unsel))
+						if (item.get("item_sel").equals(R.drawable.item_img_unsel)) {
+							FileOp.updateFileStatus(file_path, 1);
 							item.put("item_sel", R.drawable.item_img_sel);
-						else if (item.get("item_sel").equals(R.drawable.item_img_sel))
+						}
+						else if (item.get("item_sel").equals(R.drawable.item_img_sel)) {
+							FileOp.updateFileStatus(file_path, 0);
 							item.put("item_sel", R.drawable.item_img_unsel);
+						}
 						
 						((BaseAdapter) lv.getAdapter()).notifyDataSetChanged();	
 					}
@@ -179,6 +195,15 @@ public class FileBrower extends Activity {
 			}        	
         });           
     }
+    
+    /** onDestory() */
+    @Override
+    public void onDestroy() {
+    	super.onDestroy();
+    	db.deleteAllFileMark();
+    	db.close();
+    }
+    
     
     private void openFile(File f){
         Intent intent = new Intent();
@@ -434,8 +459,9 @@ public class FileBrower extends Activity {
             		if (file_path.listFiles().length > 0) {
             			for (File file : file_path.listFiles()) {    					
             	        	Map<String, Object> map = new HashMap<String, Object>();    		        	
-            	        	map.put("item_name", file.getName());            	        	
-            	        	map.put("file_path", file.getAbsolutePath());
+            	        	map.put("item_name", file.getName());   
+            	        	String file_abs_path = file.getAbsolutePath();
+            	        	map.put("file_path", file_abs_path);
             	        	
             	        	if (file.isDirectory()) {
             	        		map.put("item_sel", R.drawable.item_img_nosel);
@@ -456,7 +482,11 @@ public class FileBrower extends Activity {
             	        		map.put("file_size", file_size);	//use for sorting
             	        		map.put("item_size", " | ");            	        		
             	        	} else {
-            	        		map.put("item_sel", R.drawable.item_img_unsel);            	        		
+            	        		if (FileOp.isFileSelected(file_abs_path))
+            	        			map.put("item_sel", R.drawable.item_img_sel); 
+            	        		else
+            	        			map.put("item_sel", R.drawable.item_img_unsel); 
+            	        			
             	        		map.put("item_type", FileOp.getFileTypeImg(file.getName()));
             	        		
             	        		String rw = "-";
@@ -529,8 +559,9 @@ public class FileBrower extends Activity {
             		if (file_path.listFiles().length > 0) {
             			for (File file : file_path.listFiles()) {    					
             	        	Map<String, Object> map = new HashMap<String, Object>();    		        	
-            	        	map.put("item_name", file.getName());            	        	
-            	        	map.put("file_path", file.getAbsolutePath());
+            	        	map.put("item_name", file.getName());    
+            	        	String file_abs_path = file.getAbsolutePath();
+            	        	map.put("file_path", file_abs_path);
             	        	
             	        	if (file.isDirectory()) {
             	        		map.put("item_sel", R.drawable.item_img_nosel);
@@ -551,7 +582,11 @@ public class FileBrower extends Activity {
             	        		map.put("file_size", file_size);	//use for sorting
             	        		map.put("item_size", "");            	        		
             	        	} else {
-            	        		map.put("item_sel", R.drawable.item_img_unsel);            	        		
+            	        		if (FileOp.isFileSelected(file_abs_path))
+            	        			map.put("item_sel", R.drawable.item_img_sel); 
+            	        		else
+            	        			map.put("item_sel", R.drawable.item_img_unsel); 
+            	        		
             	        		map.put("item_type", FileOp.getFileTypeImg(file.getName()));
             	        		
             	        		String rw = "-";

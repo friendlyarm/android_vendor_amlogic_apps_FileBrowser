@@ -129,5 +129,44 @@ public class FileOp {
        return type;
        
     }
+    
+    /** check file sel status */
+    public static boolean isFileSelected(String file_path) {
+    	if (FileBrower.db == null) return false;
+        try {        	
+        	FileBrower.myCursor = FileBrower.db.getFileMarkByPath(file_path);   
+	        if (FileBrower.myCursor.getCount() > 0) {
+	        	return true;  
+	        }
+	       
+        } finally {        	
+        	FileBrower.myCursor.close();        	
+        }    	
+		return false;    	
+    } 
+    
+    /** update file sel status 
+     * 1: add to mark table 0: remove from mark table
+     */
+    public static void updateFileStatus(String file_path, int status) {
+    	if (FileBrower.db == null) return;
+    	if (status == 1) {
+            try {        	
+            	FileBrower.myCursor = FileBrower.db.getFileMarkByPath(file_path);   
+    	        if (FileBrower.myCursor.getCount() <= 0) {
+    	        	//Log.i(FileBrower.TAG, "add file: " + file_path);
+    	        	FileBrower.db.addFileMark(file_path, 1);
+    	        }
+    	       
+            } finally {        	
+            	FileBrower.myCursor.close();        	
+            }     		
+    	} else {
+    		//Log.i(FileBrower.TAG, "remove file: " + file_path);
+    		FileBrower.db.deleteFileMark(file_path);
+    	}
+    		
+    }
+    
 }
          
