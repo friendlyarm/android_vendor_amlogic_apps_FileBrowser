@@ -89,7 +89,7 @@ public class FileBrowerDatabase extends SQLiteOpenHelper {
 		}
 		/** Private factory class necessary for rawQueryWithFactory() call */
 	    private static class Factory implements SQLiteDatabase.CursorFactory{
-			@Override
+			
 			public Cursor newCursor(SQLiteDatabase db,
 					SQLiteCursorDriver driver, String editTable,
 					SQLiteQuery query) {

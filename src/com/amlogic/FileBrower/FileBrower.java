@@ -37,7 +37,7 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 public class FileBrower extends Activity {
-	private static final String TAG = "FileBrower";
+	public static final String TAG = "FileBrower";
 	
 	private static final String ROOT_PATH = "/mnt";
 	private static String cur_path = ROOT_PATH;
@@ -678,7 +678,7 @@ public class FileBrower extends Activity {
     	case CLICK_DIALOG_ID:
     		for(int i=0;i<open_mode.length;i++){
     			map = new HashMap<String, Object>();  
-    			map.put("item_type", R.drawable.dialog_item_type_default);        	
+    			map.put("item_type", R.drawable.dialog_item_img_unsel);        	
     			map.put("item_name", open_mode[i]);       	      	            	        	
     			map.put("item_sel", R.drawable.dialog_item_img_unsel);   
     			list.add(map); 
