@@ -38,6 +38,6 @@ DROP TABLE IF EXISTS file_mark_table
 	<string name="Toast_msg_paste_nofile">No file to paste.</string>
 	<string name="Toast_msg_cpy_todo">File copy, select path and paste.</string>
 	<string name="Toast_msg_cut_todo">File cut, select path and paste.</string>
-	<string name="Toast_msg_paste_wrongpath">Can paste here.</string>
+	<string name="Toast_msg_paste_wrongpath">Cannot paste here.</string>
 	
 </resources>

@@ -508,7 +508,12 @@ public class FileBrower extends Activity {
             				}         
             				edit_dialog.dismiss();
             			}
-            		} 
+            		} else {
+    					Toast.makeText(FileBrower.this,
+    							getText(R.string.Toast_msg_paste_wrongpath),
+    							Toast.LENGTH_SHORT).show();
+    					edit_dialog.dismiss();
+            		}            		
 				
     			}            	
             });            
