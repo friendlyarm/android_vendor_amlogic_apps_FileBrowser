@@ -17,6 +17,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -32,6 +34,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -60,6 +63,8 @@ public class FileBrower extends Activity {
 	
 	public static FileBrowerDatabase db;
 	public static FileMarkCursor myCursor;
+	
+	public static  Handler mProgressHandler;
 	
 	private ListView lv;
 	private TextView tv;
@@ -128,6 +133,7 @@ public class FileBrower extends Activity {
         });      
         
         /* lv OnItemLongClickListener */
+        /* TODO
         lv.setOnItemLongClickListener(new OnItemLongClickListener() {
 			
 			public boolean onItemLongClick(AdapterView<?> parent, View view, int pos,
@@ -143,7 +149,7 @@ public class FileBrower extends Activity {
 				return false;
 			}
 		});
-        
+        */
         /* btn_parent listener */
         Button btn_parent = (Button) findViewById(R.id.btn_parent);  
         btn_parent.setOnClickListener(new OnClickListener() {
@@ -196,7 +202,64 @@ public class FileBrower extends Activity {
 			public void onClick(View v) {
 				showDialog(SORT_DIALOG_ID);
 			}        	
-        });           
+        });  
+        
+        /** edit process bar handler
+         *  mProgressHandler.sendMessage(Message.obtain(mProgressHandler, msg.what, msg.arg1, msg.arg2));            
+         */
+        mProgressHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                
+                ProgressBar pb = (ProgressBar) edit_dialog.findViewById(R.id.edit_progress_bar);
+                switch(msg.what) {
+                case 0: 	//set invisible
+                    if ((edit_dialog != null) && (pb != null)) {                    	
+                	pb.setVisibility(View.INVISIBLE);
+                    }
+                	break;                
+                case 1:		//set progress_bar1 
+                	if ((edit_dialog != null) && (pb != null)) {  
+                		pb.setProgress(msg.arg1);
+                 	}
+                	break;
+                case 2:		//set progress_bar2
+                	if ((edit_dialog != null) && (pb != null)) {  
+                		pb.setSecondaryProgress(msg.arg1);  
+                	}
+                	break;
+                case 3:		//set visible
+                	if ((edit_dialog != null) && (pb != null)) {  
+	                	pb.setProgress(0);
+	                	pb.setSecondaryProgress(0);    
+	                	pb.setVisibility(View.VISIBLE);
+                	}
+                	break;
+                case 4:		//file paste ok
+        			db.deleteAllFileMark();
+        			lv.setAdapter(getFileListAdapter(cur_path)); 
+        			Toast.makeText(FileBrower.this,
+        					getText(R.string.Toast_msg_paste_ok),
+        					Toast.LENGTH_SHORT).show();       
+        			FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
+                    if (edit_dialog != null)
+                    	edit_dialog.dismiss();                    	
+                	
+                	break;
+                case 5:		//file paste err
+        			Toast.makeText(FileBrower.this,
+        					getText(R.string.Toast_msg_paste_nofile),
+        					Toast.LENGTH_SHORT).show();   
+        			FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
+                    if (edit_dialog != null)
+                    	edit_dialog.dismiss();   
+                	break;
+                }
+                
+            }
+        };
+
     }
     
     /** onDestory() */
@@ -206,7 +269,6 @@ public class FileBrower extends Activity {
     	db.deleteAllFileMark();
     	db.close();
     }
-    
     
     private void openFile(File f){
         Intent intent = new Intent();
@@ -347,7 +409,7 @@ public class FileBrower extends Activity {
         		lp.width = (int) (display.getWidth() * 0.5);            	
         	}
             dialog.getWindow().setAttributes(lp);   
-            
+           
             sort_lv = (ListView) sort_dialog.getWindow().findViewById(R.id.sort_listview);  
             sort_lv.setAdapter(getDialogListAdapter(SORT_DIALOG_ID));	
             
@@ -390,8 +452,10 @@ public class FileBrower extends Activity {
         	} else {        		
         		lp.width = (int) (display.getWidth() * 0.5);            	
         	}
-            dialog.getWindow().setAttributes(lp);  
-
+            dialog.getWindow().setAttributes(lp); 
+            
+            mProgressHandler.sendMessage(Message.obtain(mProgressHandler, 0));
+            
             edit_lv = (ListView) edit_dialog.getWindow().findViewById(R.id.edit_listview);  
             edit_lv.setAdapter(getDialogListAdapter(EDIT_DIALOG_ID));	
             
@@ -404,29 +468,28 @@ public class FileBrower extends Activity {
             				FileOp.file_op_todo = FileOpTodo.TODO_CUT;
         					Toast.makeText(FileBrower.this,
         							getText(R.string.Toast_msg_cut_todo),
-        							Toast.LENGTH_SHORT).show();             				
+        							Toast.LENGTH_SHORT).show();        
+        					edit_dialog.dismiss();
             			}
             			else if (pos == 1) {
             				Log.i(TAG, "DO copy...");
             				FileOp.file_op_todo = FileOpTodo.TODO_CPY;
         					Toast.makeText(FileBrower.this,
         							getText(R.string.Toast_msg_cpy_todo),
-        							Toast.LENGTH_SHORT).show();              				
+        							Toast.LENGTH_SHORT).show();         
+        					edit_dialog.dismiss();
             			}
             			else if (pos == 2) {
-            				Log.i(TAG, "DO paste...");            				
-        					if (FileOpReturn.SUCCESS == FileOp.pasteSelectedFile()) {
-        						db.deleteAllFileMark();
-        						lv.setAdapter(getFileListAdapter(cur_path)); 
-                				Toast.makeText(FileBrower.this,
-                						getText(R.string.Toast_msg_paste_ok),
-                						Toast.LENGTH_SHORT).show();            						
-        					} else {
-            					Toast.makeText(FileBrower.this,
-            							getText(R.string.Toast_msg_paste_nofile),
-            							Toast.LENGTH_SHORT).show();            						
-        					}
-            				FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
+            				Log.i(TAG, "DO paste...");             				
+            				new Thread () {
+            					public void run () {
+            						try {
+            							FileOp.pasteSelectedFile();
+            						} catch(Exception e) {
+            							Log.e("Exception when paste file", e.toString());
+            						}
+            					}
+            				}.start();
             				            				
             			}
             			else if (pos == 3) {
@@ -442,10 +505,10 @@ public class FileBrower extends Activity {
             					Toast.makeText(FileBrower.this,
             							getText(R.string.Toast_msg_del_nofile),
             							Toast.LENGTH_SHORT).show();
-            				}         				          				
+            				}         
+            				edit_dialog.dismiss();
             			}
-            		}            		
-            		edit_dialog.dismiss();
+            		} 
 				
     			}            	
             });            

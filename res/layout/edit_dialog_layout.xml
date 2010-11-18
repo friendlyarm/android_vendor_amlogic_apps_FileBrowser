@@ -11,6 +11,17 @@
 		android:layout_height="wrap_content"	
 		android:gravity="right"
 		>
+	<ProgressBar android:id="@+id/edit_progress_bar"		
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:max="100"
+        android:progress="0"
+        android:secondaryProgress="0"
+        />		      	
     <Button 
     	android:id="@+id/edit_btn_close"
     	android:layout_width="wrap_content"
@@ -26,3 +37,4 @@
 		/>  
 
 </LinearLayout>
+<!--    android:visibility="invisible" --> 
