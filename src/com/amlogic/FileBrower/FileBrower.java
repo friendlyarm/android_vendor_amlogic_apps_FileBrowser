@@ -181,12 +181,12 @@ public class FileBrower extends Activity {
         });       
         
         /* btn_close_listener */
-        /*Button btn_close = (Button) findViewById(R.id.btn_close);  
+        Button btn_close = (Button) findViewById(R.id.btn_close);  
         btn_close.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				finish();
 			}        	
-        });  */   
+        });    
         
         /* btn_edit_listener */
         Button btn_edit = (Button) findViewById(R.id.btn_edit);  
