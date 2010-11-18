@@ -45,7 +45,7 @@ public class FileBrower extends Activity {
 	public static final String TAG = "FileBrower";
 	
 	private static final String ROOT_PATH = "/mnt";
-	private static String cur_path = ROOT_PATH;
+	public static String cur_path = ROOT_PATH;
 	private static String prev_path = ROOT_PATH;
 	
 	private static final int SORT_DIALOG_ID = 0;
@@ -402,14 +402,19 @@ public class FileBrower extends Activity {
             			if (pos == 0) {
             				Log.i(TAG, "DO cut...");
             				FileOp.file_op_todo = FileOpTodo.TODO_CUT;
+        					Toast.makeText(FileBrower.this,
+        							getText(R.string.Toast_msg_cut_todo),
+        							Toast.LENGTH_SHORT).show();             				
             			}
             			else if (pos == 1) {
             				Log.i(TAG, "DO copy...");
             				FileOp.file_op_todo = FileOpTodo.TODO_CPY;
+        					Toast.makeText(FileBrower.this,
+        							getText(R.string.Toast_msg_cpy_todo),
+        							Toast.LENGTH_SHORT).show();              				
             			}
             			else if (pos == 2) {
-            				Log.i(TAG, "DO paste...");
-
+            				Log.i(TAG, "DO paste...");            				
         					if (FileOpReturn.SUCCESS == FileOp.pasteSelectedFile()) {
         						db.deleteAllFileMark();
         						lv.setAdapter(getFileListAdapter(cur_path)); 

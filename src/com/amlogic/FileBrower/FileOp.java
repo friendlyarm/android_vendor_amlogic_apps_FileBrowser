@@ -1,6 +1,9 @@
 package com.amlogic.FileBrower;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -223,8 +226,44 @@ public class FileOp {
         			//todo 
         				if (file_op_todo == FileOpTodo.TODO_CPY) {
         					Log.i(FileBrower.TAG, "copy and paste file: " + name);
+        					File file_new = new File(FileBrower.cur_path + File.separator + file.getName());        					
+        					if (!file_new.exists()) {	
+	        					Log.i(FileBrower.TAG, "copy to file: " + file_new.getPath());	        					
+	        					file_new.createNewFile();
+	        					try {
+		        			        InputStream f_is = new FileInputStream(file.getAbsolutePath()); 
+		        			        FileOutputStream f_os = new FileOutputStream(file_new.getAbsolutePath());
+		        			        byte[] buffer = new byte[1024];
+		        			        int byteread;
+		        			        while ( (byteread = f_is.read(buffer)) != -1) {        			          
+		        			        	f_os.write(buffer, 0, byteread);
+		        			        }
+		        			        f_is.close();
+	        					} catch (Exception e) {
+	        						Log.e("Exception when copy file", e.toString());
+	        					} 
+        					}
         				} else if (file_op_todo == FileOpTodo.TODO_CUT) {
         					Log.i(FileBrower.TAG, "cut and paste file: " + name);
+        					File file_new = new File(FileBrower.cur_path + File.separator + file.getName());        					
+        					if (!file_new.exists()) {	
+	        					Log.i(FileBrower.TAG, "cut to file: " + file_new.getPath());	        					
+	        					file_new.createNewFile();
+	        					try {
+		        			        InputStream f_is = new FileInputStream(file.getAbsolutePath()); 
+		        			        FileOutputStream f_os = new FileOutputStream(file_new.getAbsolutePath());
+		        			        byte[] buffer = new byte[1024];
+		        			        int byteread;
+		        			        while ( (byteread = f_is.read(buffer)) != -1) {        			          
+		        			        	f_os.write(buffer, 0, byteread);
+		        			        }
+		        			        f_is.close();
+		        			        file.delete();
+	        					} catch (Exception e) {
+	        						Log.e("Exception when copy file", e.toString());
+	        					} 
+        					}
+        				
         				}
         			} catch (Exception e) {
         				Log.e("Exception when delete file", e.toString());
