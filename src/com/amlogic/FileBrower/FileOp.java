@@ -160,14 +160,14 @@ public class FileOp {
     		return type;
         }
         for(String ext: music_extensions){
-        	if(end.equals(ext.toString())){
+        	if(fName.endsWith(ext)){
         		type = "audio";
         		type +="/*";
         		return type;
         	}
         }
         for(String ext:photo_extensions){
-        	if(end.equals(ext.toString())){
+        	if(fName.endsWith(ext)){
         		type = "image";
         		type +="/*";
         		return type;
