@@ -8,8 +8,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-
 import android.os.Message;
+
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Environment;
 import android.util.Log;
 
 public class FileOp {	
@@ -58,6 +61,17 @@ public class FileOp {
     		return R.drawable.item_type_video;
     	} else
     		return R.drawable.item_type_file;
+    }
+    public static Object getThumbImage(String filename) { 
+    	if (isMusic(filename)) {
+    		return R.drawable.item_preview_music;
+    	} else if (isPhoto(filename)) {
+    		return R.drawable.item_preview_photo;
+    	} else if (isVideo(filename)) {
+    		return R.drawable.item_preview_video;
+    	} else
+    		return R.drawable.item_preview_dir;
+
     }
     
     /** get file type op*/
@@ -177,7 +191,38 @@ public class FileOp {
        return type;
        
     }
-    
+    public static int getDeviceIcon(String device_name){
+		if(device_name.equals("/mnt/usb")){
+			return R.drawable.usb_card_icon;
+		}
+		else if(device_name.equals("/mnt/flash")){
+			return R.drawable.memory_icon;
+		}
+		else if(device_name.equals("/mnt/sdcard")){
+			return R.drawable.sd_card_icon;		
+		}
+		return 0;
+		
+	}
+    public static String convertDeviceName(String name) {
+		// TODO Auto-generated method stub   	
+    		String temp_name=null;
+    		if(name.equals("Internal Memory"))
+    			temp_name="/mnt/flash";
+    		else if(name.equals("SD Card"))
+    			temp_name="/mnt/sdcard";
+    		else if(name.equals("USB"))
+    			temp_name="/mnt/usb";
+    		return temp_name;  
+	}
+    public static boolean deviceExist(String string) {
+		// TODO Auto-generated method stub
+		if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+			 File sdCardDir = Environment.getExternalStorageDirectory();
+		}
+		return true;
+	}
+     
     /** check file sel status */
     public static boolean isFileSelected(String file_path) {
     	if (FileBrower.db == null) return false;
@@ -232,7 +277,7 @@ public class FileOp {
         			FileBrower.mProgressHandler, 5)); 
         	return FileOpReturn.ERR; 
     	}    			
-    	
+    		
         try {        	
         	FileBrower.myCursor = FileBrower.db.getFileMark();   
 	        if (FileBrower.myCursor.getCount() > 0) {
@@ -244,7 +289,7 @@ public class FileOp {
         } finally {        	
         	FileBrower.myCursor.close();        	
         }  
-       
+        
         if (!fileList.isEmpty()) {
         	FileBrower.mProgressHandler.sendMessage(Message.obtain(
         			FileBrower.mProgressHandler, 3));  

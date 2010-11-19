@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation = "vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+<LinearLayout
+	    android:orientation="horizontal"
+    	android:layout_width="wrap_content"
+    	android:layout_height="wrap_content"     	 	
+		>		
+		<Button style="@style/btn_style"
+			android:id="@+id/btn_thumbhome"	   			
+	        android:background="@drawable/btn_home"
+			/>
+		<ToggleButton  style="@style/btn_style"
+			android:id="@+id/btn_thumbmode"     		
+        	android:background="@drawable/btn_mode"
+        	android:textOn=""
+        	android:textOff=""
+			/>			
+		<Button style="@style/btn_style"
+			android:id="@+id/btn_thumbedit"  		    		  		  		  		
+        	android:background="@drawable/btn_edit"
+			/>		
+		<Button style="@style/btn_style"
+			android:id="@+id/btn_thumbsort"  	    		 			
+        	android:background="@drawable/btn_sort"
+			/>		
+		<Button style="@style/btn_style"
+			android:id="@+id/btn_thumbparent"    			  		
+        	android:background="@drawable/btn_parent"
+			/>
+		<Button style="@style/btn_style"
+			android:id="@+id/btn_thumbclose"    			  		
+        	android:background="@drawable/btn_close"
+		/>			
+		<Button style="@style/btn_style"
+			android:id="@+id/btn_thumbswitch"    			  		
+        	android:background="@drawable/btn_thumbswitch"
+		/>						
+		</LinearLayout>	
+<TextView
+		android:id="@+id/thumb_path"
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"    	
+    	android:textColor="@color/path_bar_text_color"  
+    	android:textStyle="italic|bold"  	
+    	android:background="@drawable/btn_bar_bg" 
+		/>  	
+<GridView
+	android:id= "@+id/mygridview"
+	android:layout_width= "fill_parent"	
+	android:columnWidth= "160px"
+	android:layout_height= "fill_parent"
+	android:numColumns= "auto_fit"
+	android:verticalSpacing="10px"   
+    android:horizontalSpacing="10px">  <!--  -->
+	</GridView>
+</LinearLayout>
+

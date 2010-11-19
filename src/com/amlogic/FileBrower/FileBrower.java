@@ -65,17 +65,18 @@ public class FileBrower extends Activity {
 	public static FileMarkCursor myCursor;
 	
 	public static  Handler mProgressHandler;
-	
 	private ListView lv;
 	private TextView tv;
 	private List<String> devList = new ArrayList<String>();
+	private int request_code = 1550;
+	
+
 	String open_mode[] = {"movie","music","photo","packageInstall"};
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);        
         setContentView(R.layout.main);        
-        
         /* setup database */
         db = new FileBrowerDatabase(this); 
 
@@ -89,7 +90,14 @@ public class FileBrower extends Activity {
         //lv.setAdapter(getFileListAdapter(ROOT_PATH));
     	cur_path = ROOT_PATH;
     	prev_path = ROOT_PATH;
-        DeviceScan();
+        if(cur_path.equals(ROOT_PATH)){
+        	
+        	 DeviceScan();
+        }
+        else{
+        	lv.setAdapter(getFileListAdapter(cur_path));
+        }
+        
         
         /* lv OnItemClickListener */
         lv.setOnItemClickListener(new OnItemClickListener() {
@@ -216,8 +224,27 @@ public class FileBrower extends Activity {
         					Toast.LENGTH_SHORT).show();  					
 				}
 			}        	
-        });  
+        });   
         
+    
+        		
+  
+    /*Button btn_listswitch = (Button) findViewById(R.id.btn_listswitch);  
+    btn_listswitch.setOnClickListener(new OnClickListener() {
+		public void onClick(View v) {
+			Intent intent = new Intent();
+			intent.setClass(FileBrower.this, ThumbnailView.class);
+			/*  */
+			/*Bundle mybundle = new Bundle();
+			
+			mybundle.putString("cur_path", cur_path);
+			intent.putExtras(mybundle);
+			startActivityForResult(intent,request_code);
+			/*  */
+			//FileBrower.this.finish();   	
+		//}*/
+		   			       		
+    //}); */
         /** edit process bar handler
          *  mProgressHandler.sendMessage(Message.obtain(mProgressHandler, msg.what, msg.arg1, msg.arg2));            
          */
@@ -275,7 +302,6 @@ public class FileBrower extends Activity {
         };
 
     }
-    
     /** onDestory() */
     @Override
     public void onDestroy() {
@@ -284,21 +310,42 @@ public class FileBrower extends Activity {
     	db.close();
     }
     
-    private void openFile(File f){
+protected void openFile(File f) {
+		// TODO Auto-generated method stub	
         Intent intent = new Intent();
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setAction(android.content.Intent.ACTION_VIEW);
         String type = "*/*";        
         type = FileOp.CheckMediaType(f);
         intent.setDataAndType(Uri.fromFile(f),type);
-        startActivity(intent); 
-      }
+        startActivity(intent);      		
+	}
+protected void onActivityResult(int requestCode, int resultCode,Intent data) {
+// TODO Auto-generated method stub
+	 super.onActivityResult(requestCode, resultCode, data);
+	 switch (resultCode) {
+	 case RESULT_OK:
+		 /* */
+		 Bundle bundle = data.getExtras();
+		 cur_path = bundle.getString("cur_path");
+		 break;
+	 default:
+		 break;
+	 }
+}
+
+
+	/** onDestory() */
+    
+    
+    
+    
     private void DeviceScan() {
 		// TODO Auto-generated method stub
     	devList.clear();
     	String DeviceArray[]={"Internal Memory","SD Card","USB"};   	
     	for(int i=0;i<DeviceArray.length;i++){
-    		if(deviceExist(DeviceArray[i])){
+    		if(FileOp.deviceExist(DeviceArray[i])){
     			devList.add(DeviceArray[i]);
     		}
     	} 
@@ -331,48 +378,18 @@ public class FileBrower extends Activity {
     	for(int i = 0; i < this.devList.size(); i++) {   
     		Map<String, Object> map = new HashMap<String, Object>();    		
     		map.put("item_name", this.devList.get(i)); 
-    		file_path = convertDeviceName(this.devList.get(i));
+    		file_path = FileOp.convertDeviceName(this.devList.get(i));
     		map.put("file_path", file_path);         
     		map.put("item_size", null);
     		map.put("item_rw", null);
-    		map.put("item_type", getDeviceIcon(file_path));    		
+    		map.put("item_type", FileOp.getDeviceIcon(file_path));    		
     		list.add(map); 
     	}
     	device = getString(R.string.rootDevice);
     	updatePathShow(device);
     	return list; 
 	}
-	private int getDeviceIcon(String device_name){
-		if(device_name.equals("/mnt/usb")){
-			return R.drawable.usb_card_icon;
-		}
-		else if(device_name.equals("/mnt/flash")){
-			return R.drawable.memory_icon;
-		}
-		else if(device_name.equals("/mnt/sdcard")){
-			return R.drawable.sd_card_icon;		
-		}
-		return 0;
-		
-	}
-	protected String convertDeviceName(String name) {
-		// TODO Auto-generated method stub   	
-    		String temp_name=null;
-    		if(name.equals("Internal Memory"))
-    			temp_name="/mnt/flash";
-    		else if(name.equals("SD Card"))
-    			temp_name="/mnt/sdcard";
-    		else if(name.equals("USB"))
-    			temp_name="/mnt/usb";
-    		return temp_name;  
-	}
-	private boolean deviceExist(String string) {
-		// TODO Auto-generated method stub
-		if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
-			 File sdCardDir = Environment.getExternalStorageDirectory();
-		}
-		return true;
-	}
+	
     /** Dialog */
     @Override
     protected Dialog onCreateDialog(int id) {
@@ -423,7 +440,7 @@ public class FileBrower extends Activity {
         		lp.width = (int) (display.getWidth() * 0.5);            	
         	}
             dialog.getWindow().setAttributes(lp);   
-           
+            
             sort_lv = (ListView) sort_dialog.getWindow().findViewById(R.id.sort_listview);  
             sort_lv.setAdapter(getDialogListAdapter(SORT_DIALOG_ID));	
             
@@ -466,10 +483,9 @@ public class FileBrower extends Activity {
         	} else {        		
         		lp.width = (int) (display.getWidth() * 0.5);            	
         	}
-            dialog.getWindow().setAttributes(lp); 
-            
+            dialog.getWindow().setAttributes(lp);  
+
             mProgressHandler.sendMessage(Message.obtain(mProgressHandler, 0));
-            
             edit_lv = (ListView) edit_dialog.getWindow().findViewById(R.id.edit_listview);  
             edit_lv.setAdapter(getDialogListAdapter(EDIT_DIALOG_ID));	
             
@@ -545,7 +561,7 @@ public class FileBrower extends Activity {
             					Toast.makeText(FileBrower.this,
             							getText(R.string.Toast_msg_del_nofile),
             							Toast.LENGTH_SHORT).show();
-            				}         
+            				}         				          				
             				edit_dialog.dismiss();
             			}
             		} else {
@@ -616,8 +632,8 @@ public class FileBrower extends Activity {
         		if (file_path.listFiles() != null) {
             		if (file_path.listFiles().length > 0) {
             			for (File file : file_path.listFiles()) {    					
-            	        	Map<String, Object> map = new HashMap<String, Object>();             	        	
-            	        	map.put("item_name", file.getName());             	        	
+            	        	Map<String, Object> map = new HashMap<String, Object>();    		        	
+            	        	map.put("item_name", file.getName());   
             	        	String file_abs_path = file.getAbsolutePath();
             	        	map.put("file_path", file_abs_path);
             	        	
@@ -717,7 +733,7 @@ public class FileBrower extends Activity {
             		if (file_path.listFiles().length > 0) {
             			for (File file : file_path.listFiles()) {    					
             	        	Map<String, Object> map = new HashMap<String, Object>();    		        	
-            	        	map.put("item_name", file.getName());             	        	
+            	        	map.put("item_name", file.getName());    
             	        	String file_abs_path = file.getAbsolutePath();
             	        	map.put("file_path", file_abs_path);
             	        	
