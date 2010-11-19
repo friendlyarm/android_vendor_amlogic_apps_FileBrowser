@@ -87,6 +87,8 @@ public class FileBrower extends Activity {
         lv = (ListView) findViewById(R.id.listview);  
         
         //lv.setAdapter(getFileListAdapter(ROOT_PATH));
+    	cur_path = ROOT_PATH;
+    	prev_path = ROOT_PATH;
         DeviceScan();
         
         /* lv OnItemClickListener */
