@@ -192,7 +192,13 @@ public class FileBrower extends Activity {
         Button btn_edit = (Button) findViewById(R.id.btn_edit);  
         btn_edit.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				showDialog(EDIT_DIALOG_ID);
+				if (!cur_path.equals(ROOT_PATH))
+					showDialog(EDIT_DIALOG_ID);
+				else {
+        			Toast.makeText(FileBrower.this,
+        					getText(R.string.Toast_msg_edit_noopen),
+        					Toast.LENGTH_SHORT).show();  	
+        		}	
 			}        	
         });         
         
@@ -200,7 +206,13 @@ public class FileBrower extends Activity {
         Button btn_sort = (Button) findViewById(R.id.btn_sort);  
         btn_sort.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				showDialog(SORT_DIALOG_ID);
+				if (!cur_path.equals(ROOT_PATH))
+					showDialog(SORT_DIALOG_ID);
+				else {
+        			Toast.makeText(FileBrower.this,
+        					getText(R.string.Toast_msg_sort_noopen),
+        					Toast.LENGTH_SHORT).show();  					
+				}
 			}        	
         });  
         
@@ -464,23 +476,46 @@ public class FileBrower extends Activity {
     					long id) {
             		if (!cur_path.equals(ROOT_PATH)) {
             			if (pos == 0) {
-            				Log.i(TAG, "DO cut...");
+            				//Log.i(TAG, "DO cut...");
             				FileOp.file_op_todo = FileOpTodo.TODO_CUT;
-        					Toast.makeText(FileBrower.this,
-        							getText(R.string.Toast_msg_cut_todo),
-        							Toast.LENGTH_SHORT).show();        
+            		        try {        	
+            		        	myCursor = db.getFileMark();   
+            			        if (myCursor.getCount() > 0) {
+                					Toast.makeText(FileBrower.this,
+                							getText(R.string.Toast_msg_cut_todo),
+                							Toast.LENGTH_SHORT).show();  
+            			        } else {
+                					Toast.makeText(FileBrower.this,
+                							getText(R.string.Toast_msg_cut_nofile),
+                							Toast.LENGTH_SHORT).show();              			        	
+            			        }
+            		        } finally {        	
+            		        	myCursor.close();        	
+            		        }  
+      
         					edit_dialog.dismiss();
             			}
             			else if (pos == 1) {
-            				Log.i(TAG, "DO copy...");
+            				//Log.i(TAG, "DO copy...");
             				FileOp.file_op_todo = FileOpTodo.TODO_CPY;
-        					Toast.makeText(FileBrower.this,
-        							getText(R.string.Toast_msg_cpy_todo),
-        							Toast.LENGTH_SHORT).show();         
+            		        try {        	
+            		        	myCursor = db.getFileMark();   
+            			        if (myCursor.getCount() > 0) {
+                					Toast.makeText(FileBrower.this,
+                							getText(R.string.Toast_msg_cpy_todo),
+                							Toast.LENGTH_SHORT).show();  
+            			        } else {
+                					Toast.makeText(FileBrower.this,
+                							getText(R.string.Toast_msg_cpy_nofile),
+                							Toast.LENGTH_SHORT).show();              			        	
+            			        }
+            		        } finally {        	
+            		        	myCursor.close();        	
+            		        }       
         					edit_dialog.dismiss();
             			}
             			else if (pos == 2) {
-            				Log.i(TAG, "DO paste...");             				
+            				//Log.i(TAG, "DO paste...");             				
             				new Thread () {
             					public void run () {
             						try {
@@ -576,8 +611,8 @@ public class FileBrower extends Activity {
         		if (file_path.listFiles() != null) {
             		if (file_path.listFiles().length > 0) {
             			for (File file : file_path.listFiles()) {    					
-            	        	Map<String, Object> map = new HashMap<String, Object>();    		        	
-            	        	map.put("item_name", file.getName());   
+            	        	Map<String, Object> map = new HashMap<String, Object>();             	        	
+            	        	map.put("item_name", file.getName());             	        	
             	        	String file_abs_path = file.getAbsolutePath();
             	        	map.put("file_path", file_abs_path);
             	        	
@@ -677,7 +712,7 @@ public class FileBrower extends Activity {
             		if (file_path.listFiles().length > 0) {
             			for (File file : file_path.listFiles()) {    					
             	        	Map<String, Object> map = new HashMap<String, Object>();    		        	
-            	        	map.put("item_name", file.getName());    
+            	        	map.put("item_name", file.getName());             	        	
             	        	String file_abs_path = file.getAbsolutePath();
             	        	map.put("file_path", file_abs_path);
             	        	

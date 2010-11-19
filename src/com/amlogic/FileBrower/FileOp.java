@@ -247,12 +247,12 @@ public class FileOp {
         		String name = fileList.get(i);
         		File file = new File(name);
         		if (file.exists()) {
-        			Log.i(FileBrower.TAG, "paste file: " + name);
+        			//Log.i(FileBrower.TAG, "paste file: " + name);
         			try {            			
-    					Log.i(FileBrower.TAG, "copy and paste file: " + name);
+    					//Log.i(FileBrower.TAG, "copy and paste file: " + name);
     					File file_new = new File(FileBrower.cur_path + File.separator + file.getName());        					
     					if (!file_new.exists()) {	
-        					Log.i(FileBrower.TAG, "copy to file: " + file_new.getPath());	        					
+        					//Log.i(FileBrower.TAG, "copy to file: " + file_new.getPath());	        					
         					file_new.createNewFile();
         					try {
 	        			        InputStream f_is = new FileInputStream(file.getAbsolutePath()); 
@@ -311,7 +311,7 @@ public class FileOp {
         	for (String name : fileList) {
         		File file = new File(name);
         		if (file.exists()) {
-        			Log.i(FileBrower.TAG, "delete file: " + name);
+        			//Log.i(FileBrower.TAG, "delete file: " + name);
         			try {
         			file.delete();
         			} catch (Exception e) {

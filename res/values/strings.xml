@@ -36,8 +36,12 @@ DROP TABLE IF EXISTS file_mark_table
 	<string name="Toast_msg_del_nofile">No file to delete.</string>
 	<string name="Toast_msg_paste_ok">Paste all selected files to current path.</string>
 	<string name="Toast_msg_paste_nofile">No file to paste.</string>
+	<string name="Toast_msg_cpy_nofile">No file to copy.</string>
+	<string name="Toast_msg_cut_nofile">No file to cut.</string>
 	<string name="Toast_msg_cpy_todo">File copy, select path and paste.</string>
 	<string name="Toast_msg_cut_todo">File cut, select path and paste.</string>
 	<string name="Toast_msg_paste_wrongpath">Cannot paste here.</string>
+	<string name="Toast_msg_edit_noopen">Cannot edit here.</string>
+	<string name="Toast_msg_sort_noopen">Cannot sort here.</string>
 	
 </resources>

@@ -118,6 +118,7 @@ public class FileBrowerDatabase extends SQLiteOpenHelper {
     /** Returns a Cursor for file_mark_table query by file_path 
      */
     public FileMarkCursor getFileMarkByPath(String file_path) {
+    	file_path = file_path.replace("'", "''");
     	String sql =  String.format(
     			FileMarkCursor.QUERY +
     			"WHERE file_path = '%s' ",
@@ -135,6 +136,7 @@ public class FileBrowerDatabase extends SQLiteOpenHelper {
     /** add entry to database */
 	public void addFileMark(String file_path, int is_sel){
 		//Log.w(FileBrower.TAG, "addFileMark: " + file_path);
+		file_path = file_path.replace("'", "''");
 		String sql = String.format(
 			"INSERT INTO file_mark_table (_id, file_path, is_sel) " +
 			"VALUES (NULL, '%s', '%d')",
@@ -149,6 +151,7 @@ public class FileBrowerDatabase extends SQLiteOpenHelper {
 	/** delete entry */
 	public void deleteFileMark(String file_path) {
 		//Log.w(FileBrower.TAG, "deleteFileMark: " + file_path);
+		file_path = file_path.replace("'", "''");
 		String sql = String.format(
 				"DELETE FROM file_mark_table " +
 				"WHERE file_path = '%s' ",
@@ -162,7 +165,7 @@ public class FileBrowerDatabase extends SQLiteOpenHelper {
 	
 	/** delete all entry */
 	public void deleteAllFileMark() {
-		//Log.w(FileBrower.TAG, "deleteAllFileMark: ");
+		//Log.w(FileBrower.TAG, "deleteAllFileMark: ");		
 		String sql = String.format(
 				"DELETE FROM file_mark_table "				
 				);
@@ -176,6 +179,7 @@ public class FileBrowerDatabase extends SQLiteOpenHelper {
 	/** update entry */
 	public void updateFileMark(String file_path, int is_sel) {
 		//Log.w(FileBrower.TAG, "updateFileMark: " + file_path);
+		file_path = file_path.replace("'", "''");
 		String sql = String.format(
 				"UPDATE file_mark_table " +
 				"SET is_sel = '%d', "+				
