@@ -476,18 +476,19 @@ public class FileBrower extends Activity {
     					long id) {
             		if (!cur_path.equals(ROOT_PATH)) {
             			if (pos == 0) {
-            				//Log.i(TAG, "DO cut...");
-            				FileOp.file_op_todo = FileOpTodo.TODO_CUT;
+            				//Log.i(TAG, "DO cut...");            				
             		        try {        	
             		        	myCursor = db.getFileMark();   
             			        if (myCursor.getCount() > 0) {
                 					Toast.makeText(FileBrower.this,
                 							getText(R.string.Toast_msg_cut_todo),
                 							Toast.LENGTH_SHORT).show();  
+                					FileOp.file_op_todo = FileOpTodo.TODO_CUT;
             			        } else {
                 					Toast.makeText(FileBrower.this,
                 							getText(R.string.Toast_msg_cut_nofile),
-                							Toast.LENGTH_SHORT).show();              			        	
+                							Toast.LENGTH_SHORT).show();    
+                					FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
             			        }
             		        } finally {        	
             		        	myCursor.close();        	
@@ -496,18 +497,19 @@ public class FileBrower extends Activity {
         					edit_dialog.dismiss();
             			}
             			else if (pos == 1) {
-            				//Log.i(TAG, "DO copy...");
-            				FileOp.file_op_todo = FileOpTodo.TODO_CPY;
+            				//Log.i(TAG, "DO copy...");            				
             		        try {        	
             		        	myCursor = db.getFileMark();   
             			        if (myCursor.getCount() > 0) {
                 					Toast.makeText(FileBrower.this,
                 							getText(R.string.Toast_msg_cpy_todo),
                 							Toast.LENGTH_SHORT).show();  
+                					FileOp.file_op_todo = FileOpTodo.TODO_CPY;
             			        } else {
                 					Toast.makeText(FileBrower.this,
                 							getText(R.string.Toast_msg_cpy_nofile),
-                							Toast.LENGTH_SHORT).show();              			        	
+                							Toast.LENGTH_SHORT).show();     
+                					FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
             			        }
             		        } finally {        	
             		        	myCursor.close();        	
@@ -515,7 +517,8 @@ public class FileBrower extends Activity {
         					edit_dialog.dismiss();
             			}
             			else if (pos == 2) {
-            				//Log.i(TAG, "DO paste...");             				
+            				//Log.i(TAG, "DO paste...");     
+            				
             				new Thread () {
             					public void run () {
             						try {

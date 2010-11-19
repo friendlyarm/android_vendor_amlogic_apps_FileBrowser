@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import android.os.Message;
@@ -225,8 +227,11 @@ public class FileOp {
     	List<String> fileList = new ArrayList<String>();
     	
     	if ((file_op_todo != FileOpTodo.TODO_CPY) &&
-    		(file_op_todo != FileOpTodo.TODO_CUT))
-    		return FileOpReturn.ERR; 	
+    		(file_op_todo != FileOpTodo.TODO_CUT)) {
+        	FileBrower.mProgressHandler.sendMessage(Message.obtain(
+        			FileBrower.mProgressHandler, 5)); 
+        	return FileOpReturn.ERR; 
+    	}    			
     	
         try {        	
         	FileBrower.myCursor = FileBrower.db.getFileMark();   
@@ -250,7 +255,14 @@ public class FileOp {
         			//Log.i(FileBrower.TAG, "paste file: " + name);
         			try {            			
     					//Log.i(FileBrower.TAG, "copy and paste file: " + name);
-    					File file_new = new File(FileBrower.cur_path + File.separator + file.getName());        					
+    					File file_new = new File(FileBrower.cur_path + File.separator + file.getName()); 
+    					
+    					if (file_new.exists()) {
+        	        		String date = new SimpleDateFormat("yyyyMMddHHmmss_")
+    	        			.format(Calendar.getInstance().getTime());    						
+    						file_new = new File(FileBrower.cur_path + File.separator + date + file.getName()); 
+    					}
+    					
     					if (!file_new.exists()) {	
         					//Log.i(FileBrower.TAG, "copy to file: " + file_new.getPath());	        					
         					file_new.createNewFile();
@@ -288,7 +300,7 @@ public class FileOp {
         	return FileOpReturn.SUCCESS;
         } else {
         	FileBrower.mProgressHandler.sendMessage(Message.obtain(
-        			FileBrower.mProgressHandler, 5));        	
+        			FileBrower.mProgressHandler, 5));  
         	return FileOpReturn.ERR; 	
         }
         
