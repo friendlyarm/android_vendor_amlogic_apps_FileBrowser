@@ -1,18 +1,19 @@
 package com.amlogic.FileBrower;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import android.os.Message;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Environment;
+import android.os.Message;
 import android.util.Log;
 
 public class FileOp {	
@@ -311,9 +312,82 @@ public class FileOp {
     public static FileOpReturn copySelectedFile() {
 		return FileOpReturn.ERR; 	
     }
+    private static void nioTransferCopy(File source, File target) {
+        FileChannel in = null;
+        FileChannel out = null;
+
+        FileInputStream inStream = null;
+        FileOutputStream outStream = null;
+
+        try {
+            inStream = new FileInputStream(source);
+            outStream = new FileOutputStream(target);
+
+            in = inStream.getChannel();
+            out = outStream.getChannel();
+
+            in.transferTo(0, in.size(), out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            close(inStream);
+            close(in);
+            close(outStream);
+            close(out);
+        }
+    }
+    private static void nioBufferCopy(File source, File target, String cur_page, int buf_size) {
+        FileChannel in = null;
+        FileChannel out = null;
+
+        FileInputStream inStream = null;
+        FileOutputStream outStream = null;
+
+        try {
+            inStream = new FileInputStream(source);
+            outStream = new FileOutputStream(target);
+
+            in = inStream.getChannel();
+            out = outStream.getChannel();
+
+            ByteBuffer buffer = ByteBuffer.allocate(1024 * buf_size);
+            long bytecount = 0;	
+            int byteread = 0;
+            while ((byteread = in.read(buffer)) != -1) {
+                buffer.flip();
+                out.write(buffer);
+                buffer.clear();
+                bytecount += byteread;
+	        	if(cur_page.equals("list")){
+	        		FileBrower.mProgressHandler.sendMessage(Message.obtain(
+	            			FileBrower.mProgressHandler, 1, (int)(bytecount * 100 / source.length()), 0));
+	        	}
+	        	else{
+	        		ThumbnailView.mProgressHandler.sendMessage(Message.obtain(
+	        				ThumbnailView.mProgressHandler, 1, (int)(bytecount * 100 / source.length()), 0));
+	        	}                
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            close(inStream);
+            close(in);
+            close(outStream);
+            close(out);
+        }
+    }
+    private static void close(Closeable closable) {
+        if (closable != null) {
+            try {
+                closable.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
     public static FileOpReturn pasteSelectedFile(String cur_page) {
     	List<String> fileList = new ArrayList<String>();
-   	
+    	//long copy_time_start=0, copy_time_end = 0;
     	if ((file_op_todo != FileOpTodo.TODO_CPY) &&
     		(file_op_todo != FileOpTodo.TODO_CUT)) {
     		if(cur_page.equals("list")){
@@ -401,26 +475,16 @@ public class FileOp {
         					//Log.i(FileBrower.TAG, "copy to file: " + file_new.getPath());	        					
         					file_new.createNewFile();
         					try {
-	        			        InputStream f_is = new FileInputStream(file.getAbsolutePath()); 
-	        			        FileOutputStream f_os = new FileOutputStream(file_new.getAbsolutePath());
-	        			        byte[] buffer = new byte[1024];
-	        			        int byteread = 0;
-	        			        long bytecount = 0;	        			       
-	        			        while ( (byteread = f_is.read(buffer)) != -1) {        			          
-	        			        	f_os.write(buffer, 0, byteread);
-	        			        	bytecount += byteread;	
-	        			        	if(cur_page.equals("list")){
-	        			        		FileBrower.mProgressHandler.sendMessage(Message.obtain(
-		        		            			FileBrower.mProgressHandler, 1, (int)(bytecount * 100 / file.length()), 0));
-	        			        	}
-	        			        	else{
-	        			        		ThumbnailView.mProgressHandler.sendMessage(Message.obtain(
-	        			        				ThumbnailView.mProgressHandler, 1, (int)(bytecount * 100 / file.length()), 0));
-	        			        	}
-	        			        	
-	        			        }		        			        
-	        			        f_is.close();
-	        			        
+        						//copy_time_start = Calendar.getInstance().getTimeInMillis();
+        						if (file.length() < 1024*1024*10)
+        							nioBufferCopy(file, file_new, cur_page, 4);
+        						else if (file.length() < 1024*1024*100)
+        							nioBufferCopy(file, file_new, cur_page, 1024);
+        						else 
+        							nioBufferCopy(file, file_new, cur_page, 1024*10);
+        						//nioTransferCopy(file, file_new);
+        						//copy_time_end = Calendar.getInstance().getTimeInMillis();
+        						
 	        			        if (file_op_todo == FileOpTodo.TODO_CUT)
 	        			        	file.delete();
 	        			        
