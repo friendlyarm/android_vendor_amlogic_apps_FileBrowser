@@ -16,7 +16,6 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -29,7 +28,6 @@ import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListAdapter;
@@ -50,16 +48,17 @@ public class FileBrower extends Activity {
 	private static final String ROOT_PATH = "/mnt";
 	public static String cur_path = ROOT_PATH;
 	private static String prev_path = ROOT_PATH;
-	
 	private static final int SORT_DIALOG_ID = 0;
 	private static final int EDIT_DIALOG_ID = 1;
 	private static final int CLICK_DIALOG_ID = 2;
+	private static String exit_path = ROOT_PATH;
 	private AlertDialog sort_dialog;	
 	private AlertDialog edit_dialog;
 	private AlertDialog click_dialog;
 	private ListView sort_lv;
 	private ListView edit_lv;
 	private ListView click_lv;
+	private boolean switch_mode = false;
 	
 	public static FileBrowerDatabase db;
 	public static FileMarkCursor myCursor;
@@ -76,7 +75,7 @@ public class FileBrower extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);        
-        setContentView(R.layout.main);        
+        setContentView(R.layout.main);
         /* setup database */
         db = new FileBrowerDatabase(this); 
 
@@ -87,18 +86,20 @@ public class FileBrower extends Activity {
         /* setup file list */
         lv = (ListView) findViewById(R.id.listview);  
         
-        //lv.setAdapter(getFileListAdapter(ROOT_PATH));
-    	cur_path = ROOT_PATH;
-    	prev_path = ROOT_PATH;
-        if(cur_path.equals(ROOT_PATH)){
+        //lv.setAdapter(getFileListAdapter(ROOT_PATH)); 
+        if(switch_mode){
+        	cur_path = ROOT_PATH;
+        	prev_path = ROOT_PATH;
         	
+        }         	
+        if(cur_path.equals(ROOT_PATH)){       	
         	 DeviceScan();
         }
         else{
         	lv.setAdapter(getFileListAdapter(cur_path));
         }
         
-        
+        switch_mode = false;
         /* lv OnItemClickListener */
         lv.setOnItemClickListener(new OnItemClickListener() {
 			
@@ -127,11 +128,11 @@ public class FileBrower extends Activity {
 					}
 					else {
 						if (item.get("item_sel").equals(R.drawable.item_img_unsel)) {
-							FileOp.updateFileStatus(file_path, 1);
+							FileOp.updateFileStatus(file_path, 1,"list");
 							item.put("item_sel", R.drawable.item_img_sel);
 						}
 						else if (item.get("item_sel").equals(R.drawable.item_img_sel)) {
-							FileOp.updateFileStatus(file_path, 0);
+							FileOp.updateFileStatus(file_path, 0,"list");
 							item.put("item_sel", R.drawable.item_img_unsel);
 						}
 						
@@ -229,22 +230,23 @@ public class FileBrower extends Activity {
     
         		
   
-    /*Button btn_listswitch = (Button) findViewById(R.id.btn_listswitch);  
+    Button btn_listswitch = (Button) findViewById(R.id.btn_listswitch);  
     btn_listswitch.setOnClickListener(new OnClickListener() {
 		public void onClick(View v) {
+			switch_mode = true;
 			Intent intent = new Intent();
 			intent.setClass(FileBrower.this, ThumbnailView.class);
 			/*  */
-			/*Bundle mybundle = new Bundle();
+			Bundle mybundle = new Bundle();
 			
 			mybundle.putString("cur_path", cur_path);
-			intent.putExtras(mybundle);
+			intent.putExtras(mybundle);			
 			startActivityForResult(intent,request_code);
 			/*  */
-			//FileBrower.this.finish();   	
-		//}*/
+			FileBrower.this.finish();   	
+		}
 		   			       		
-    //}); */
+    }); 
         /** edit process bar handler
          *  mProgressHandler.sendMessage(Message.obtain(mProgressHandler, msg.what, msg.arg1, msg.arg2));            
          */
@@ -306,8 +308,13 @@ public class FileBrower extends Activity {
     @Override
     public void onDestroy() {
     	super.onDestroy();
-    	db.deleteAllFileMark();
-    	db.close();
+    	if(!switch_mode){
+    		db.deleteAllFileMark();  
+    		cur_path = ROOT_PATH;
+    		
+    	}    	
+    	switch_mode = false;   	  	
+    	db.close();    	    	   	
     }
     
 protected void openFile(File f) {
@@ -326,19 +333,14 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 	 switch (resultCode) {
 	 case RESULT_OK:
 		 /* */
+		 switch_mode = true;
 		 Bundle bundle = data.getExtras();
-		 cur_path = bundle.getString("cur_path");
+		 cur_path = bundle.getString("cur_path");		
 		 break;
 	 default:
 		 break;
 	 }
-}
-
-
-	/** onDestory() */
-    
-    
-    
+}   
     
     private void DeviceScan() {
 		// TODO Auto-generated method stub
@@ -540,7 +542,7 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
             				new Thread () {
             					public void run () {
             						try {
-            							FileOp.pasteSelectedFile();
+            							FileOp.pasteSelectedFile("list");
             						} catch(Exception e) {
             							Log.e("Exception when paste file", e.toString());
             						}
@@ -551,7 +553,7 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
             			else if (pos == 3) {
             				FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
             				//Log.i(TAG, "DO delete...");   
-            				if (FileOpReturn.SUCCESS == FileOp.deleteSelectedFile()) {
+            				if (FileOpReturn.SUCCESS == FileOp.deleteSelectedFile("list")) {
             					db.deleteAllFileMark();
                 				lv.setAdapter(getFileListAdapter(cur_path));  
                 				Toast.makeText(FileBrower.this,
@@ -656,7 +658,7 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
             	        		map.put("file_size", file_size);	//use for sorting
             	        		map.put("item_size", " | ");            	        		
             	        	} else {
-            	        		if (FileOp.isFileSelected(file_abs_path))
+            	        		if (FileOp.isFileSelected(file_abs_path,"list"))
             	        			map.put("item_sel", R.drawable.item_img_sel); 
             	        		else
             	        			map.put("item_sel", R.drawable.item_img_unsel); 
@@ -756,7 +758,7 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
             	        		map.put("file_size", file_size);	//use for sorting
             	        		map.put("item_size", "");            	        		
             	        	} else {
-            	        		if (FileOp.isFileSelected(file_abs_path))
+            	        		if (FileOp.isFileSelected(file_abs_path,"list"))
             	        			map.put("item_sel", R.drawable.item_img_sel); 
             	        		else
             	        			map.put("item_sel", R.drawable.item_img_unsel); 

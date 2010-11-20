@@ -21,6 +21,8 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -33,9 +35,9 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.ListAdapter;
+
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,22 +47,23 @@ import android.widget.AdapterView.OnItemLongClickListener;
 
     /** Called when the activity is first created. */
 public class ThumbnailView extends Activity{
-	public static final String TAG = "ThumbnailView";	
+	public static final String TAG = "ThumbnailView";
+	private static final String ROOT_PATH = "/mnt";
+	public static String cur_path = ROOT_PATH;
 	protected static final int SORT_DIALOG_ID = 0;
 	protected static final int EDIT_DIALOG_ID = 1;
+	protected static  String cur_sort_type = null;
 	private AlertDialog sort_dialog;	
 	private AlertDialog edit_dialog;
 	private ListView sort_lv;
 	private ListView edit_lv;
-	
-	
+	private boolean switch_mode = false;
+	public static  Handler mProgressHandler;
 	public static FileBrowerDatabase db;
 	public static FileMarkCursor myCursor;
 	private List<String> filelist = new ArrayList<String>();
 	
-	GridView ThumbnailView;	
-	String ROOT_PATH = "/mnt";
-	String cur_path = ROOT_PATH;
+	GridView ThumbnailView;		
 	int request_code = 1550;
 	
 	
@@ -68,28 +71,22 @@ public class ThumbnailView extends Activity{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);         
         setContentView(R.layout.thumbnail);       
-        ThumbnailView = (GridView)findViewById(R.id.mygridview);
-        
+        ThumbnailView = (GridView)findViewById(R.id.mygridview);       
         /*get cur path form listview*/
         Intent intent = this.getIntent();
-        Bundle bundle = intent.getExtras();        
+        Bundle bundle = intent.getExtras();  
         cur_path = bundle.getString("cur_path");
-          
+        /* setup database */
+        db = new FileBrowerDatabase(this); 
         
         if(cur_path.equals(ROOT_PATH)){
         	DeviceScan();
         	
         }
         else{
-        	ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,null)); 
-        }
-        
-        
-       
-        
-        /* setup database */
-        db = new FileBrowerDatabase(this); 
-
+        	ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type)); 
+        }     
+        switch_mode = false;
         /* btn_mode default checked */
         ToggleButton btn_mode = (ToggleButton) findViewById(R.id.btn_thumbmode); 
         btn_mode.setChecked(true);
@@ -109,7 +106,7 @@ public class ThumbnailView extends Activity{
 
 				if (file.isDirectory()) {						
 					cur_path = file_path;
-					ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,null)); 
+					ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type)); 
 				}
 				else{
 					ToggleButton btn_mode = (ToggleButton) findViewById(R.id.btn_thumbmode); 
@@ -120,11 +117,11 @@ public class ThumbnailView extends Activity{
 					}
 					else {
 						if (item.get("item_mark").equals(R.drawable.item_img_unsel)) {
-							FileOp.updateFileStatus(file_path, 1);
+							FileOp.updateFileStatus(file_path, 1,"thumbnail");
 							item.put("item_mark", R.drawable.item_img_sel);
 						}
 						else if (item.get("item_mark").equals(R.drawable.item_img_sel)) {
-							FileOp.updateFileStatus(file_path, 0);
+							FileOp.updateFileStatus(file_path, 0,"thumbnail");
 							item.put("item_mark", R.drawable.item_img_unsel);
 						}
 						
@@ -137,7 +134,7 @@ public class ThumbnailView extends Activity{
         });
         
         /* lv OnItemLongClickListener */
-        ThumbnailView.setOnItemLongClickListener(new OnItemLongClickListener() {
+      /*  ThumbnailView.setOnItemLongClickListener(new OnItemLongClickListener() {
 			
 			public boolean onItemLongClick(AdapterView<?> parent, View view, int pos,
 					long id) {
@@ -151,7 +148,7 @@ public class ThumbnailView extends Activity{
 				}
 				return false;
 			}
-		});
+		});*/
         
         //button click listener
         /*home button*/
@@ -179,7 +176,7 @@ public class ThumbnailView extends Activity{
 					}
 					else{
 						 cur_path = parent_path;
-						 ThumbnailView.setAdapter(getThumbnailAdapter(parent_path,null)); 
+						 ThumbnailView.setAdapter(getThumbnailAdapter(parent_path,cur_sort_type)); 
 					
 					}
 				}
@@ -205,14 +202,15 @@ public class ThumbnailView extends Activity{
         /*switch_button*/
         Button btn_thumbswitch = (Button) findViewById(R.id.btn_thumbswitch); 
         btn_thumbswitch.setOnClickListener(new OnClickListener() {
-    		public void onClick(View v) {
+    		public void onClick(View v) {  
+    			switch_mode = true;
     			Intent intent = new Intent();
     			intent.setClass(ThumbnailView.this, FileBrower.class);
     			/* Activity */
     			Bundle mybundle = new Bundle();   			
     			mybundle.putString("cur_path", cur_path);
-    			intent.putExtras(mybundle);
-    			startActivityForResult(intent,request_code);
+    			intent.putExtras(mybundle);   	  			
+    			startActivityForResult(intent,request_code);  			
     			/* Activity */
     			ThumbnailView.this.finish();   	
     		}
@@ -221,14 +219,83 @@ public class ThumbnailView extends Activity{
         /*close button*/
         Button btn_thumbclose = (Button) findViewById(R.id.btn_thumbclose); 
         btn_thumbclose.setOnClickListener(new OnClickListener() {
-   		public void onClick(View v) {  
+   		public void onClick(View v) {  			
+   			
    			finish();
    		}
    		   			       		
        }); 
         
+        
+        /** edit process bar handler
+         *  mProgressHandler.sendMessage(Message.obtain(mProgressHandler, msg.what, msg.arg1, msg.arg2));            
+         */
+        mProgressHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                
+                ProgressBar pb = (ProgressBar) edit_dialog.findViewById(R.id.edit_progress_bar);
+                switch(msg.what) {
+                case 0: 	//set invisible
+                    if ((edit_dialog != null) && (pb != null)) {                    	
+                	pb.setVisibility(View.INVISIBLE);
+                    }
+                	break;                
+                case 1:		//set progress_bar1 
+                	if ((edit_dialog != null) && (pb != null)) {  
+                		pb.setProgress(msg.arg1);
+                 	}
+                	break;
+                case 2:		//set progress_bar2
+                	if ((edit_dialog != null) && (pb != null)) {  
+                		pb.setSecondaryProgress(msg.arg1);  
+                	}
+                	break;
+                case 3:		//set visible
+                	if ((edit_dialog != null) && (pb != null)) {  
+	                	pb.setProgress(0);
+	                	pb.setSecondaryProgress(0);    
+	                	pb.setVisibility(View.VISIBLE);
+                	}
+                	break;
+                case 4:		//file paste ok
+        			db.deleteAllFileMark();
+        			ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type)); 
+        			Toast.makeText(ThumbnailView.this,
+        					getText(R.string.Toast_msg_paste_ok),
+        					Toast.LENGTH_SHORT).show();       
+        			FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
+                    if (edit_dialog != null)
+                    	edit_dialog.dismiss();                    	
+                	
+                	break;
+                case 5:		//file paste err
+        			Toast.makeText(ThumbnailView.this,
+        					getText(R.string.Toast_msg_paste_nofile),
+        					Toast.LENGTH_SHORT).show();   
+        			FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
+                    if (edit_dialog != null)
+                    	edit_dialog.dismiss();   
+                	break;
+                }
+                
+            }
+        };
+        
     }
     
+    
+    @Override
+    public void onDestroy() {
+    	super.onDestroy(); 
+    	if(!switch_mode){
+    		db.deleteAllFileMark();
+    		
+    	}
+    	switch_mode = false;
+    	db.close();
+    }
     protected void DeviceScan() {
     	// TODO Auto-generated method stub
     	filelist.clear();
@@ -239,7 +306,7 @@ public class ThumbnailView extends Activity{
     		}
     	} 
     	cur_path = ROOT_PATH;
-    	ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,null));   	
+    	ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type));   	
 	}	
 
 	protected void onActivityResult(int requestCode, int resultCode,Intent data) {
@@ -247,9 +314,10 @@ public class ThumbnailView extends Activity{
     		 super.onActivityResult(requestCode, resultCode, data);
     		 switch (resultCode) {
     		 case RESULT_OK:
-    			 /* */
+    			 /* */    			
+    			 switch_mode = true;
     			 Bundle bundle = data.getExtras();
-    			 cur_path = bundle.getString("cur_path");
+    			 cur_path = bundle.getString("cur_path");   			 
     			 break;
     		 default:
     			 break;
@@ -303,7 +371,7 @@ public class ThumbnailView extends Activity{
         	        		map.put("file_size", file_size);	//use for sorting      	        		          	        
 						}
 						else{
-							if (FileOp.isFileSelected(file_abs_path))
+							if (FileOp.isFileSelected(file_abs_path,"thumbnail"))
         	        			map.put("item_mark", R.drawable.item_img_sel); 
         	        		else
         	        			map.put("item_mark", R.drawable.item_img_unsel); 
@@ -429,12 +497,20 @@ public class ThumbnailView extends Activity{
     					long id) {    				
     				
             		if (!cur_path.equals(ROOT_PATH)) {
-            			if (pos == 0)
+            			if (pos == 0){
             				ThumbnailView.setAdapter(getThumbnailAdapter(cur_path, "by_name"));
-            			else if (pos == 1)
+            				cur_sort_type = "by_name";
+            			}
+            			else if (pos == 1){
             				ThumbnailView.setAdapter(getThumbnailAdapter(cur_path, "by_date"));
-            			else if (pos == 2)
+            				cur_sort_type = "by_date";
+            				
+            			}
+            				
+            			else if (pos == 2){
             				ThumbnailView.setAdapter(getThumbnailAdapter(cur_path, "by_size"));
+            				cur_sort_type = "by_size";
+            			}
             		}
             		sort_dialog.dismiss();
     			}
@@ -448,13 +524,14 @@ public class ThumbnailView extends Activity{
 	        });		
             break;
     	case EDIT_DIALOG_ID:    		
-            if (display.getHeight() > display.getWidth()) {            	
+    		if (display.getHeight() > display.getWidth()) {            	
             	lp.width = (int) (display.getWidth() * 1.0);       	
         	} else {        		
         		lp.width = (int) (display.getWidth() * 0.5);            	
         	}
             dialog.getWindow().setAttributes(lp);  
 
+            mProgressHandler.sendMessage(Message.obtain(mProgressHandler, 0));
             edit_lv = (ListView) edit_dialog.getWindow().findViewById(R.id.edit_listview);  
             edit_lv.setAdapter(getDialogListAdapter(EDIT_DIALOG_ID));	
             
@@ -463,41 +540,66 @@ public class ThumbnailView extends Activity{
     					long id) {
             		if (!cur_path.equals(ROOT_PATH)) {
             			if (pos == 0) {
-            				Log.i(TAG, "DO cut...");
-            				FileOp.file_op_todo = FileOpTodo.TODO_CUT;
-        					Toast.makeText(ThumbnailView.this,
-        							getText(R.string.Toast_msg_cut_todo),
-        							Toast.LENGTH_SHORT).show();             				
+            				//Log.i(TAG, "DO cut...");            				
+            		        try {        	
+            		        	myCursor = db.getFileMark();   
+            			        if (myCursor.getCount() > 0) {
+                					Toast.makeText(ThumbnailView.this,
+                							getText(R.string.Toast_msg_cut_todo),
+                							Toast.LENGTH_SHORT).show();  
+                					FileOp.file_op_todo = FileOpTodo.TODO_CUT;
+            			        } else {
+                					Toast.makeText(ThumbnailView.this,
+                							getText(R.string.Toast_msg_cut_nofile),
+                							Toast.LENGTH_SHORT).show();    
+                					FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
+            			        }
+            		        } finally {        	
+            		        	myCursor.close();        	
+            		        }  
+      
+        					edit_dialog.dismiss();
             			}
             			else if (pos == 1) {
-            				Log.i(TAG, "DO copy...");
-            				FileOp.file_op_todo = FileOpTodo.TODO_CPY;
-        					Toast.makeText(ThumbnailView.this,
-        							getText(R.string.Toast_msg_cpy_todo),
-        							Toast.LENGTH_SHORT).show();              				
+            				//Log.i(TAG, "DO copy...");            				
+            		        try {        	
+            		        	myCursor = db.getFileMark();   
+            			        if (myCursor.getCount() > 0) {
+                					Toast.makeText(ThumbnailView.this,
+                							getText(R.string.Toast_msg_cpy_todo),
+                							Toast.LENGTH_SHORT).show();  
+                					FileOp.file_op_todo = FileOpTodo.TODO_CPY;
+            			        } else {
+                					Toast.makeText(ThumbnailView.this,
+                							getText(R.string.Toast_msg_cpy_nofile),
+                							Toast.LENGTH_SHORT).show();     
+                					FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
+            			        }
+            		        } finally {        	
+            		        	myCursor.close();        	
+            		        }       
+        					edit_dialog.dismiss();
             			}
             			else if (pos == 2) {
-            				Log.i(TAG, "DO paste...");            				
-        					if (FileOpReturn.SUCCESS == FileOp.pasteSelectedFile()) {
-        						db.deleteAllFileMark();
-        						ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,null)); 
-                				Toast.makeText(ThumbnailView.this,
-                						getText(R.string.Toast_msg_paste_ok),
-                						Toast.LENGTH_SHORT).show();            						
-        					} else {
-            					Toast.makeText(ThumbnailView.this,
-            							getText(R.string.Toast_msg_paste_nofile),
-            							Toast.LENGTH_SHORT).show();            						
-        					}
-            				FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
+            				//Log.i(TAG, "DO paste...");     
+            				
+            				new Thread () {
+            					public void run () {
+            						try {
+            							FileOp.pasteSelectedFile("thumbnail");
+            						} catch(Exception e) {
+            							Log.e("Exception when paste file", e.toString());
+            						}
+            					}
+            				}.start();
             				            				
             			}
             			else if (pos == 3) {
             				FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
             				//Log.i(TAG, "DO delete...");   
-            				if (FileOpReturn.SUCCESS == FileOp.deleteSelectedFile()) {
+            				if (FileOpReturn.SUCCESS == FileOp.deleteSelectedFile("thumbnail")) {
             					db.deleteAllFileMark();
-            					ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,null));  
+                				ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,null));  
                 				Toast.makeText(ThumbnailView.this,
                 						getText(R.string.Toast_msg_del_ok),
                 						Toast.LENGTH_SHORT).show();
@@ -506,9 +608,14 @@ public class ThumbnailView extends Activity{
             							getText(R.string.Toast_msg_del_nofile),
             							Toast.LENGTH_SHORT).show();
             				}         				          				
+            				edit_dialog.dismiss();
             			}
+            		} else {
+    					Toast.makeText(ThumbnailView.this,
+    							getText(R.string.Toast_msg_paste_wrongpath),
+    							Toast.LENGTH_SHORT).show();
+    					edit_dialog.dismiss();
             		}            		
-            		edit_dialog.dismiss();
 				
     			}            	
             });            

@@ -14,8 +14,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-		<activity android:name="ThumbnailView"></activity>
+		<activity android:name="ThumbnailView"
+		android:theme="@android:style/Theme.NoTitleBar"></activity>
     </application>
     <uses-sdk android:minSdkVersion="8" />
-
 </manifest> 
