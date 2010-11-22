@@ -4,6 +4,11 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
+        <HorizontalScrollView
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/btn_bar_bg"   
+    >
 <LinearLayout
 	    android:orientation="horizontal"
     	android:layout_width="wrap_content"
@@ -40,6 +45,7 @@
         	android:background="@drawable/btn_close"
 		/>					
 		</LinearLayout>	
+		</HorizontalScrollView>
 <TextView
 		android:id="@+id/thumb_path"
     	android:layout_width="fill_parent"
