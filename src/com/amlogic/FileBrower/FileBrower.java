@@ -296,7 +296,7 @@ public class FileBrower extends Activity {
         			db.deleteAllFileMark();
         			lv.setAdapter(getFileListAdapter(cur_path)); 
         			Toast.makeText(FileBrower.this,
-        					getText(R.string.Toast_msg_paste_ok),        					
+        					getText(R.string.Toast_msg_paste_ok),
         					Toast.LENGTH_SHORT).show();       
         			FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
                     if (edit_dialog != null)
@@ -437,8 +437,7 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 	    	click_dialog = new AlertDialog.Builder(FileBrower.this)   
 	    	.setView(layout_click)
 	        .create();
-	    	return click_dialog;	
-	    	
+	    	return click_dialog;	    	
         case HELP_DIALOG_ID:
 	    	View layout_help = inflater.inflate(R.layout.help_dialog_layout,
 		    		(ViewGroup) findViewById(R.id.layout_root_help));

@@ -11,6 +11,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import java.io.InputStream;
 
 import android.os.Environment;
 import android.os.Message;
@@ -67,7 +70,7 @@ public class FileOp {
     	if (isMusic(filename)) {
     		return R.drawable.item_preview_music;
     	} else if (isPhoto(filename)) {
-    		return R.drawable.item_preview_photo;
+    		return null;
     	} else if (isVideo(filename)) {
     		return R.drawable.item_preview_video;
     	} else
@@ -76,7 +79,7 @@ public class FileOp {
     }
     
     /** get file type op*/
-    private static boolean isVideo(String filename) {     
+    public static boolean isVideo(String filename) {     
     	String name = filename.toLowerCase();
         for (String ext : video_extensions) {
             if (name.endsWith(ext))
@@ -84,7 +87,7 @@ public class FileOp {
         }
         return false;
     }
-    private static boolean isMusic(String filename) {  
+    public static boolean isMusic(String filename) {  
     	String name = filename.toLowerCase();
         for (String ext : music_extensions) {
             if (name.endsWith(ext))
@@ -92,7 +95,7 @@ public class FileOp {
         }
         return false;
     }
-    private  static boolean isPhoto(String filename) {   
+    public  static boolean isPhoto(String filename) {   
     	String name = filename.toLowerCase();
         for (String ext : photo_extensions) {
             if (name.endsWith(ext))
@@ -102,7 +105,7 @@ public class FileOp {
     } 
     /* file type extensions */
     //video from com.amlogic.amplayer
-    private static final String[] video_extensions = { ".3gp",
+    public static final String[] video_extensions = { ".3gp",
         ".divx",
         ".h264",
         ".avi",
@@ -205,6 +208,18 @@ public class FileOp {
 		return 0;
 		
 	}
+    public static int getThumbDeviceIcon(String device_name){
+    	if(device_name.equals("Internal Memory")){
+			return R.drawable.memory_default;
+		}
+		else if(device_name.equals("SD Card")){
+			return R.drawable.sdcard_default;
+		}
+		else if(device_name.equals("USB")){
+			return R.drawable.sdcard_default;		
+		}
+		return R.drawable.txt_default;
+    }
     public static String convertDeviceName(String name) {
 		// TODO Auto-generated method stub   	
     		String temp_name=null;
@@ -256,6 +271,25 @@ public class FileOp {
 		return false;    	
     } 
     
+    public static Bitmap fitSizePic(File f){ 
+        Bitmap resizeBmp = null;
+        BitmapFactory.Options opts = new BitmapFactory.Options(); 
+        if(f.length()<20480){         //0-20k
+          opts.inSampleSize = 1;
+        }else if(f.length()<51200){   //20-50k
+          opts.inSampleSize = 2;
+        }else if(f.length()<307200){  //50-300k
+          opts.inSampleSize = 4;
+        }else if(f.length()<819200){  //300-800k
+          opts.inSampleSize = 6;
+        }else if(f.length()<1048576){ //800-1024k
+          opts.inSampleSize = 8;
+        }else{
+          opts.inSampleSize = 10;
+        }
+        resizeBmp = BitmapFactory.decodeFile(f.getPath(),opts);
+        return resizeBmp; 
+      }
     /** update file sel status 
      * 1: add to mark table 0: remove from mark table
      */

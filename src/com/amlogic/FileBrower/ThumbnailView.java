@@ -8,7 +8,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import com.amlogic.FileBrower.FileBrowerDatabase.FileMarkCursor;
+import com.amlogic.FileBrower.FileOp.FileOpReturn;
+import com.amlogic.FileBrower.FileOp.FileOpTodo;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -65,25 +67,25 @@ public class ThumbnailView extends Activity{
 	GridView ThumbnailView;		
 	int request_code = 1550;
 	
-	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);         
         setContentView(R.layout.thumbnail);       
-        ThumbnailView = (GridView)findViewById(R.id.mygridview);       
+        ThumbnailView = (GridView)findViewById(R.id.mygridview);   
         /*get cur path form listview*/
         Intent intent = this.getIntent();
         Bundle bundle = intent.getExtras();  
         cur_path = bundle.getString("cur_path");
         /* setup database */
         db = new FileBrowerDatabase(this); 
-        
+        GetCurrentFilelist(cur_path,cur_sort_type);
         if(cur_path.equals(ROOT_PATH)){
         	DeviceScan();
         	
         }
         else{
-        	ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type)); 
+        	ThumbnailView.setAdapter(new ThumbnailAdapter(this,filelist)); 
+        	//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type)); 
         }     
         switch_mode = false;
         /* btn_mode default checked */
@@ -95,8 +97,9 @@ public class ThumbnailView extends Activity{
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
 				// TODO Auto-generated method stutus
-				Map<String, Object> item = (Map<String, Object>)ThumbnailView.getItemAtPosition((int)arg3);
-				String file_path = (String)item.get("file_path");;
+				//Map<String, Object> item = (Map<String, Object>)ThumbnailView.getItemAtPosition((int)arg3);
+				//String file_path = (String)(item).get("file_path");	
+				String file_path = (String)filelist.get((int)arg3);
 				File file = new File(file_path);
 				if(!file.exists()){
 					//finish();
@@ -105,25 +108,24 @@ public class ThumbnailView extends Activity{
 
 				if (file.isDirectory()) {						
 					cur_path = file_path;
-					ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type)); 
+					GetCurrentFilelist(cur_path,cur_sort_type);
+					ThumbnailView.setAdapter(new ThumbnailAdapter(getBaseContext(),filelist));  
+					//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type)); 
 				}
 				else{
 					ToggleButton btn_mode = (ToggleButton) findViewById(R.id.btn_thumbmode); 
 					if (!btn_mode.isChecked()){
 						openFile(cur_path);
-						//showDialog(CLICK_DIALOG_ID);
 						
 					}
-					else {
-						if (item.get("item_mark").equals(R.drawable.item_img_unsel)) {
-							FileOp.updateFileStatus(file_path, 1,"thumbnail");
-							item.put("item_mark", R.drawable.item_img_sel);
+					else {						
+						    if(FileOp.isFileSelected(file_path, "thumbnail")){
+						    	
+						    	FileOp.updateFileStatus(file_path, 0,"thumbnail");						
 						}
-						else if (item.get("item_mark").equals(R.drawable.item_img_sel)) {
-							FileOp.updateFileStatus(file_path, 0,"thumbnail");
-							item.put("item_mark", R.drawable.item_img_unsel);
-						}
-						
+						    else{						    							
+							FileOp.updateFileStatus(file_path, 1,"thumbnail");							
+						}						
 						((BaseAdapter) ThumbnailView.getAdapter()).notifyDataSetChanged();	
 					}
 				}
@@ -175,7 +177,9 @@ public class ThumbnailView extends Activity{
 					}
 					else{
 						 cur_path = parent_path;
-						 ThumbnailView.setAdapter(getThumbnailAdapter(parent_path,cur_sort_type)); 
+						 GetCurrentFilelist(cur_path,cur_sort_type);
+						 ThumbnailView.setAdapter(new ThumbnailAdapter(getBaseContext(),filelist));
+						 //ThumbnailView.setAdapter(getThumbnailAdapter(parent_path,cur_sort_type)); 
 					
 					}
 				}
@@ -267,7 +271,9 @@ public class ThumbnailView extends Activity{
                 	break;
                 case 4:		//file paste ok
         			db.deleteAllFileMark();
-        			ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type)); 
+        			GetCurrentFilelist(cur_path,cur_sort_type);
+					ThumbnailView.setAdapter(new ThumbnailAdapter(getBaseContext(),filelist));
+        			//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type)); 
         			Toast.makeText(ThumbnailView.this,
         					getText(R.string.Toast_msg_paste_ok),
         					Toast.LENGTH_SHORT).show();       
@@ -292,7 +298,59 @@ public class ThumbnailView extends Activity{
     }
     
     
-    @Override
+    private void GetCurrentFilelist(String file_path, String sort_type) {
+		// TODO Auto-generated method stub
+    	File path = new File(file_path);
+		filelist.clear();
+		if(!file_path.equals(ROOT_PATH)){
+			if(path.listFiles() != null){				
+				for(File files: path.listFiles()){					
+					String file_abs_path = files.getAbsolutePath();
+					filelist.add(file_abs_path);
+					if(!filelist.isEmpty()){						
+						
+						if(sort_type != null){
+							if(sort_type.equals("by_name")){							
+								Collections.sort(filelist, new Comparator<String>(){
+									public int compare(String object1,
+											String object2) {	
+										return ((String) object1).compareTo((String) object2);													
+									}																	
+								}); 								
+							}
+							else if(sort_type.equals("by_date")){							
+									Collections.sort(filelist, new Comparator<String>(){
+										public int compare(String object1,
+												String object2) {	
+											File file1 =new File(object1);
+											File file2 =new File(object2);
+											long file_date1 = file1.lastModified(); 
+											long file_date2 = file2.lastModified(); 
+											return ((Long) file_date1).compareTo((Long) file_date2);					
+										}																	
+								}); 
+							}
+							else if(sort_type.equals("by_size")){							
+								Collections.sort(filelist, new Comparator<String>(){
+									public int compare(String object1,
+											String object2) {
+										File file1 =new File(object1);
+										File file2 =new File(object2);
+										long file_size1 = file1.length(); 
+										long file_size2 = file2.length(); 										
+										return ((Long) file_size1).compareTo((Long) file_size2);			
+									}																	
+								}); 
+							}
+						}
+					}
+				}
+			}
+		}		
+		updatePathShow(cur_path);
+	}
+
+
     public void onDestroy() {
     	super.onDestroy(); 
     	if(!switch_mode){
@@ -304,15 +362,20 @@ public class ThumbnailView extends Activity{
     }
     protected void DeviceScan() {
     	// TODO Auto-generated method stub
+    	List<String> dev_list = new ArrayList<String>();
     	filelist.clear();
     	String DeviceArray[]={"Internal Memory","SD Card","USB"};   	
     	for(int i=0;i<DeviceArray.length;i++){
     		if(FileOp.deviceExist(DeviceArray[i])){
-    			filelist.add(DeviceArray[i]);
+    			dev_list.add(DeviceArray[i]);
+    			String dev_path = FileOp.convertDeviceName(DeviceArray[i]);
+    			filelist.add(dev_path);
     		}
     	} 
     	cur_path = ROOT_PATH;
-    	ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type));   	
+    	//GetCurrentFilelist(cur_path,cur_sort_type);
+		ThumbnailView.setAdapter(new ThumbnailAdapter(getBaseContext(),dev_list));
+    	//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type));   	
 	}	
 
 	protected void onActivityResult(int requestCode, int resultCode,Intent data) {
@@ -329,7 +392,7 @@ public class ThumbnailView extends Activity{
     			 break;
     		 }
 }
-    private SimpleAdapter getThumbnailAdapter(String path,String sort_type) {
+   /* private SimpleAdapter getThumbnailAdapter(String path,String sort_type) {
 		// TODO Auto-generated method stub
 		return new SimpleAdapter(ThumbnailView.this,
         		getThumbData(path,sort_type),
@@ -432,6 +495,40 @@ public class ThumbnailView extends Activity{
 		updatePathShow(cur_path);
 		return list;
 	}
+	*/
+/*private byte[] Bitmap2Bytes(Bitmap bm){
+
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+		bm.compress(Bitmap.CompressFormat.PNG, 100, baos);
+
+		return baos.toByteArray();
+
+}
+
+	
+	public static int BytetoInteger(byte[] bitmap_byte)
+	{
+		int s = 0;
+		for (int i = 0; i < 3; i++)
+		{
+			if (bitmap_byte[i] > 0)
+				s = s + bitmap_byte[i];
+			else
+				s = s + 256 + bitmap_byte[i];
+			s = s * 256;
+		}
+
+		if (bitmap_byte[3] > 0)
+			s = s + bitmap_byte[3];
+		else
+			s = s + 256 + bitmap_byte[3];
+
+		return s;
+}
+
+*/
+
 	private void updatePathShow(String device) {
 		// TODO Auto-generated method stub		 	
 		TextView tv = (TextView) findViewById(R.id.thumb_path); 
@@ -511,17 +608,23 @@ public class ThumbnailView extends Activity{
     				
             		if (!cur_path.equals(ROOT_PATH)) {
             			if (pos == 0){
-            				ThumbnailView.setAdapter(getThumbnailAdapter(cur_path, "by_name"));
+            				GetCurrentFilelist(cur_path,"by_name");
+            				ThumbnailView.setAdapter(new ThumbnailAdapter(getBaseContext(),filelist)); 
+            				//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path, "by_name"));
             				cur_sort_type = "by_name";
             			}
             			else if (pos == 1){
-            				ThumbnailView.setAdapter(getThumbnailAdapter(cur_path, "by_date"));
+            				GetCurrentFilelist(cur_path,"by_date");
+            				ThumbnailView.setAdapter(new ThumbnailAdapter(getBaseContext(),filelist));
+            				//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path, "by_date"));
             				cur_sort_type = "by_date";
             				
             			}
             				
             			else if (pos == 2){
-            				ThumbnailView.setAdapter(getThumbnailAdapter(cur_path, "by_size"));
+            				GetCurrentFilelist(cur_path,"by_size");
+            				ThumbnailView.setAdapter(new ThumbnailAdapter(getBaseContext(),filelist));
+            				//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path, "by_size"));
             				cur_sort_type = "by_size";
             			}
             		}
@@ -612,7 +715,9 @@ public class ThumbnailView extends Activity{
             				//Log.i(TAG, "DO delete...");   
             				if (FileOpReturn.SUCCESS == FileOp.deleteSelectedFile("thumbnail")) {
             					db.deleteAllFileMark();
-                				ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,null));  
+            					GetCurrentFilelist(cur_path,cur_sort_type);
+            					ThumbnailView.setAdapter(new ThumbnailAdapter(getBaseContext(),filelist));
+                				//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,null));  
                 				Toast.makeText(ThumbnailView.this,
                 						getText(R.string.Toast_msg_del_ok),
                 						Toast.LENGTH_SHORT).show();
