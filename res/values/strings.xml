@@ -44,4 +44,11 @@ DROP TABLE IF EXISTS file_mark_table
 	<string name="Toast_msg_edit_noopen">Cannot edit here.</string>
 	<string name="Toast_msg_sort_noopen">Cannot sort here.</string>
 	
+	<string name="dialog_help_item_home_str">Show home page</string>
+	<string name="dialog_help_item_edit_str">Show edit dialog</string>
+	<string name="dialog_help_item_mode_str">Select/open mode</string>
+	<string name="dialog_help_item_sort_str">Show sort dialog</string>
+	<string name="dialog_help_item_parent_str">Back to parent dir</string>
+	<string name="dialog_help_item_thumb_str">View by thumbnail </string>
+	<string name="dialog_help_item_list_str">View by list</string>
 </resources>

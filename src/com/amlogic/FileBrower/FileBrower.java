@@ -51,13 +51,16 @@ public class FileBrower extends Activity {
 	private static final int SORT_DIALOG_ID = 0;
 	private static final int EDIT_DIALOG_ID = 1;
 	private static final int CLICK_DIALOG_ID = 2;
+	private static final int HELP_DIALOG_ID = 3;
 	private static String exit_path = ROOT_PATH;
 	private AlertDialog sort_dialog;	
 	private AlertDialog edit_dialog;
 	private AlertDialog click_dialog;
+	private AlertDialog help_dialog;
 	private ListView sort_lv;
 	private ListView edit_lv;
 	private ListView click_lv;
+	private ListView help_lv;
 	private boolean switch_mode = false;
 	
 	public static FileBrowerDatabase db;
@@ -76,6 +79,9 @@ public class FileBrower extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);        
         setContentView(R.layout.main);
+        
+        //Log.i(TAG, "category =" + getIntent().getCategories());
+        
         /* setup database */
         db = new FileBrowerDatabase(this); 
 
@@ -227,26 +233,33 @@ public class FileBrower extends Activity {
 			}        	
         });   
         
-    
-        		
-  
-    Button btn_listswitch = (Button) findViewById(R.id.btn_listswitch);  
-    btn_listswitch.setOnClickListener(new OnClickListener() {
-		public void onClick(View v) {
-			switch_mode = true;
-			Intent intent = new Intent();
-			intent.setClass(FileBrower.this, ThumbnailView.class);
-			/*  */
-			Bundle mybundle = new Bundle();
-			
-			mybundle.putString("cur_path", cur_path);
-			intent.putExtras(mybundle);			
-			startActivityForResult(intent,request_code);
-			/*  */
-			FileBrower.this.finish();   	
-		}
-		   			       		
-    }); 
+        /* btn_help_listener */
+        Button btn_help = (Button) findViewById(R.id.btn_help);  
+        btn_help.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				showDialog(HELP_DIALOG_ID);
+			}
+        });  
+		
+        /* btn_istswitch_listener */
+        Button btn_listswitch = (Button) findViewById(R.id.btn_listswitch);  
+        btn_listswitch.setOnClickListener(new OnClickListener() {
+    		public void onClick(View v) {
+    			switch_mode = true;
+    			Intent intent = new Intent();
+    			intent.setClass(FileBrower.this, ThumbnailView.class);
+    			/*  */
+    			Bundle mybundle = new Bundle();
+    			
+    			mybundle.putString("cur_path", cur_path);
+    			intent.putExtras(mybundle);			
+    			startActivityForResult(intent,request_code);
+    			/*  */
+    			FileBrower.this.finish();   	
+    		}
+    		   			       		
+        }); 
+        
         /** edit process bar handler
          *  mProgressHandler.sendMessage(Message.obtain(mProgressHandler, msg.what, msg.arg1, msg.arg2));            
          */
@@ -283,7 +296,7 @@ public class FileBrower extends Activity {
         			db.deleteAllFileMark();
         			lv.setAdapter(getFileListAdapter(cur_path)); 
         			Toast.makeText(FileBrower.this,
-        					getText(R.string.Toast_msg_paste_ok),
+        					getText(R.string.Toast_msg_paste_ok),        					
         					Toast.LENGTH_SHORT).show();       
         			FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
                     if (edit_dialog != null)
@@ -424,7 +437,16 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 	    	click_dialog = new AlertDialog.Builder(FileBrower.this)   
 	    	.setView(layout_click)
 	        .create();
-	    	return click_dialog;	    	
+	    	return click_dialog;	
+	    	
+        case HELP_DIALOG_ID:
+	    	View layout_help = inflater.inflate(R.layout.help_dialog_layout,
+		    		(ViewGroup) findViewById(R.id.layout_root_help));
+		    	
+		    	help_dialog = new AlertDialog.Builder(FileBrower.this)   
+		    	.setView(layout_help)
+		        .create();
+		    return help_dialog;	
         }
         
 		return null;    	
@@ -599,6 +621,31 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 	    			click_dialog.dismiss();
 	    		}        	
 	        }); 			
+    		break;
+    	case HELP_DIALOG_ID:
+            if (display.getHeight() > display.getWidth()) {            	
+            	lp.width = (int) (display.getWidth() * 1.0);       	
+        	} else {        		
+        		lp.width = (int) (display.getWidth() * 0.5);            	
+        	}
+            dialog.getWindow().setAttributes(lp);   
+            
+            help_lv = (ListView) help_dialog.getWindow().findViewById(R.id.help_listview);  
+            help_lv.setAdapter(getDialogListAdapter(HELP_DIALOG_ID));	
+            
+            help_lv.setOnItemClickListener(new OnItemClickListener() {
+            	public void onItemClick(AdapterView<?> parent, View view, int pos,
+    					long id) { 
+            		help_dialog.dismiss();				
+    			}
+            	
+            });
+	    	Button help_btn_close = (Button) help_dialog.getWindow().findViewById(R.id.help_btn_close);  
+	    	help_btn_close.setOnClickListener(new OnClickListener() {
+	    		public void onClick(View v) {
+	    			help_dialog.dismiss();
+	    		}        	
+	        });	    		
     		break;
     	}
     }  
@@ -899,6 +946,44 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
     			map.put("item_sel", R.drawable.dialog_item_img_unsel);   
     			list.add(map); 
     		}
+    		break;
+    	case HELP_DIALOG_ID:
+    		map = new HashMap<String, Object>();    		
+        	map.put("item_type", R.drawable.dialog_help_item_home);  
+        	map.put("item_name", getText(R.string.dialog_help_item_home_str));            	        	
+        	map.put("item_sel", R.drawable.dialog_item_img_unsel);   
+        	list.add(map);    	
+    		map = new HashMap<String, Object>();    		
+        	map.put("item_type", R.drawable.dialog_help_item_mode);  
+        	map.put("item_name", getText(R.string.dialog_help_item_mode_str));            	        	
+        	map.put("item_sel", R.drawable.dialog_item_img_unsel);   
+        	list.add(map);  
+    		map = new HashMap<String, Object>();    		
+        	map.put("item_type", R.drawable.dialog_help_item_edit);  
+        	map.put("item_name", getText(R.string.dialog_help_item_edit_str));            	        	
+        	map.put("item_sel", R.drawable.dialog_item_img_unsel);   
+        	list.add(map);   
+    		map = new HashMap<String, Object>();    		
+        	map.put("item_type", R.drawable.dialog_help_item_sort);  
+        	map.put("item_name", getText(R.string.dialog_help_item_sort_str));            	        	
+        	map.put("item_sel", R.drawable.dialog_item_img_unsel);   
+        	list.add(map);    
+    		map = new HashMap<String, Object>();    		
+        	map.put("item_type", R.drawable.dialog_help_item_parent);  
+        	map.put("item_name", getText(R.string.dialog_help_item_parent_str));            	        	
+        	map.put("item_sel", R.drawable.dialog_item_img_unsel);   
+        	list.add(map);      
+    		map = new HashMap<String, Object>();    		
+        	map.put("item_type", R.drawable.dialog_help_item_thumb);  
+        	map.put("item_name", getText(R.string.dialog_help_item_thumb_str));            	        	
+        	map.put("item_sel", R.drawable.dialog_item_img_unsel);   
+        	list.add(map); 
+    		map = new HashMap<String, Object>();    		
+        	map.put("item_type", R.drawable.dialog_help_item_list);  
+        	map.put("item_name", getText(R.string.dialog_help_item_list_str));            	        	
+        	map.put("item_sel", R.drawable.dialog_item_img_unsel);   
+        	list.add(map);           	
+    		break;
     	}
     	return list;
     }    

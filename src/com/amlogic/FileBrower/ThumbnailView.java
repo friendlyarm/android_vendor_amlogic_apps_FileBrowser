@@ -2,18 +2,12 @@ package com.amlogic.FileBrower;
 
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.amlogic.FileBrower.FileBrowerDatabase.FileMarkCursor;
-import com.amlogic.FileBrower.FileOp.FileOpReturn;
-import com.amlogic.FileBrower.FileOp.FileOpTodo;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -27,23 +21,25 @@ import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.View.OnClickListener;
 import android.view.WindowManager.LayoutParams;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.GridView;
-
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
+
+import com.amlogic.FileBrower.FileBrowerDatabase.FileMarkCursor;
+import com.amlogic.FileBrower.FileOp.FileOpReturn;
+import com.amlogic.FileBrower.FileOp.FileOpTodo;
 
     /** Called when the activity is first created. */
 public class ThumbnailView extends Activity{
@@ -52,11 +48,14 @@ public class ThumbnailView extends Activity{
 	public static String cur_path = ROOT_PATH;
 	protected static final int SORT_DIALOG_ID = 0;
 	protected static final int EDIT_DIALOG_ID = 1;
+	private static final int HELP_DIALOG_ID = 3;
 	protected static  String cur_sort_type = null;
 	private AlertDialog sort_dialog;	
 	private AlertDialog edit_dialog;
+	private AlertDialog help_dialog;
 	private ListView sort_lv;
 	private ListView edit_lv;
+	private ListView help_lv;
 	private boolean switch_mode = false;
 	public static  Handler mProgressHandler;
 	public static FileBrowerDatabase db;
@@ -199,6 +198,13 @@ public class ThumbnailView extends Activity{
     		}
     		   			       		
         }); 
+         /* btn_help_listener */
+         Button btn_thumbhelp = (Button) findViewById(R.id.btn_thumbhelp);  
+         btn_thumbhelp.setOnClickListener(new OnClickListener() {
+ 			public void onClick(View v) {
+ 				showDialog(HELP_DIALOG_ID);
+ 			}
+         });          
         /*switch_button*/
         Button btn_thumbswitch = (Button) findViewById(R.id.btn_thumbswitch); 
         btn_thumbswitch.setOnClickListener(new OnClickListener() {
@@ -468,7 +474,14 @@ public class ThumbnailView extends Activity{
 	        .create();             
 	    	return edit_dialog;
         	
-       
+        case HELP_DIALOG_ID:
+	    	View layout_help = inflater.inflate(R.layout.help_dialog_layout,
+		    		(ViewGroup) findViewById(R.id.layout_root_help));
+		    	
+		    	help_dialog = new AlertDialog.Builder(ThumbnailView.this)   
+		    	.setView(layout_help)
+		        .create();
+		    return help_dialog;	       
         }
         
 		return null;    	
@@ -626,6 +639,31 @@ public class ThumbnailView extends Activity{
 	    		}        	
 	        }); 
     		break;
+    	case HELP_DIALOG_ID:
+            if (display.getHeight() > display.getWidth()) {            	
+            	lp.width = (int) (display.getWidth() * 1.0);       	
+        	} else {        		
+        		lp.width = (int) (display.getWidth() * 0.5);            	
+        	}
+            dialog.getWindow().setAttributes(lp);   
+            
+            help_lv = (ListView) help_dialog.getWindow().findViewById(R.id.help_listview);  
+            help_lv.setAdapter(getDialogListAdapter(HELP_DIALOG_ID));	
+            
+            help_lv.setOnItemClickListener(new OnItemClickListener() {
+            	public void onItemClick(AdapterView<?> parent, View view, int pos,
+    					long id) { 
+            		help_dialog.dismiss();				
+    			}
+            	
+            });
+	    	Button help_btn_close = (Button) help_dialog.getWindow().findViewById(R.id.help_btn_close);  
+	    	help_btn_close.setOnClickListener(new OnClickListener() {
+	    		public void onClick(View v) {
+	    			help_dialog.dismiss();
+	    		}        	
+	        });	    		
+    		break;    		
     	}
     }
 
@@ -690,7 +728,44 @@ public class ThumbnailView extends Activity{
         	map.put("item_name", getText(R.string.edit_dialog_delete_str));            	        	
         	map.put("item_sel", R.drawable.dialog_item_img_unsel);  
         	list.add(map);     		
-    		break;     	   	
+    		break;  
+    	case HELP_DIALOG_ID:
+    		map = new HashMap<String, Object>();    		
+        	map.put("item_type", R.drawable.dialog_help_item_home);  
+        	map.put("item_name", getText(R.string.dialog_help_item_home_str));            	        	
+        	map.put("item_sel", R.drawable.dialog_item_img_unsel);   
+        	list.add(map);    	
+    		map = new HashMap<String, Object>();    		
+        	map.put("item_type", R.drawable.dialog_help_item_mode);  
+        	map.put("item_name", getText(R.string.dialog_help_item_mode_str));            	        	
+        	map.put("item_sel", R.drawable.dialog_item_img_unsel);   
+        	list.add(map);  
+    		map = new HashMap<String, Object>();    		
+        	map.put("item_type", R.drawable.dialog_help_item_edit);  
+        	map.put("item_name", getText(R.string.dialog_help_item_edit_str));            	        	
+        	map.put("item_sel", R.drawable.dialog_item_img_unsel);   
+        	list.add(map);   
+    		map = new HashMap<String, Object>();    		
+        	map.put("item_type", R.drawable.dialog_help_item_sort);  
+        	map.put("item_name", getText(R.string.dialog_help_item_sort_str));            	        	
+        	map.put("item_sel", R.drawable.dialog_item_img_unsel);   
+        	list.add(map);    
+    		map = new HashMap<String, Object>();    		
+        	map.put("item_type", R.drawable.dialog_help_item_parent);  
+        	map.put("item_name", getText(R.string.dialog_help_item_parent_str));            	        	
+        	map.put("item_sel", R.drawable.dialog_item_img_unsel);   
+        	list.add(map);      
+    		map = new HashMap<String, Object>();    		
+        	map.put("item_type", R.drawable.dialog_help_item_thumb);  
+        	map.put("item_name", getText(R.string.dialog_help_item_thumb_str));            	        	
+        	map.put("item_sel", R.drawable.dialog_item_img_unsel);   
+        	list.add(map); 
+    		map = new HashMap<String, Object>();    		
+        	map.put("item_type", R.drawable.dialog_help_item_list);  
+        	map.put("item_name", getText(R.string.dialog_help_item_list_str));            	        	
+        	map.put("item_sel", R.drawable.dialog_item_img_unsel);   
+        	list.add(map);   		
+    		break;    		
     	}
     	return list;
     }    
