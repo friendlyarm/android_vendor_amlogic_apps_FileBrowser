@@ -764,7 +764,12 @@ public class ThumbnailView extends Activity{
         	map.put("item_type", R.drawable.dialog_help_item_list);  
         	map.put("item_name", getText(R.string.dialog_help_item_list_str));            	        	
         	map.put("item_sel", R.drawable.dialog_item_img_unsel);   
-        	list.add(map);   		
+        	list.add(map);   
+    		map = new HashMap<String, Object>();    		
+        	map.put("item_type", R.drawable.dialog_help_item_close);  
+        	map.put("item_name", getText(R.string.dialog_help_item_close_str));            	        	
+        	map.put("item_sel", R.drawable.dialog_item_img_unsel);   
+        	list.add(map);          	
     		break;    		
     	}
     	return list;
