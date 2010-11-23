@@ -26,12 +26,13 @@ public class ThumbnailAdapter extends BaseAdapter{
  // private Bitmap mIcon_image;
   private List<String> items;
   private String file_path;
-  
+  Context c;
   /* MyAdapter  */  
   public ThumbnailAdapter(Context context,List<String> it){
    
     mInflater = LayoutInflater.from(context);
     items = it;  
+    c = context;
     //mIcon_folder = BitmapFactory.decodeResource(context.getResources(),R.drawable.item_preview_dir);      //
     //mIcon_file = BitmapFactory.decodeResource(context.getResources(),R.drawable.txt_default);          //
   //  mIcon_image = BitmapFactory.decodeResource(context.getResources(),R.drawable.item_preview_photo);        //
@@ -100,7 +101,7 @@ public class ThumbnailAdapter extends BaseAdapter{
     		 
     	 }
     	 else{
-    		  int icon = FileOp.getThumbDeviceIcon(file_name);   		 
+			 int icon = FileOp.getThumbDeviceIcon(c,file_name);   		 
     		  holder.f_icon.setImageResource(icon);
     	 }       
       }

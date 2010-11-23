@@ -221,6 +221,7 @@ public class ThumbnailView extends Activity{
     			mybundle.putString("cur_path", cur_path);
     			intent.putExtras(mybundle);   	  			
     			startActivityForResult(intent,request_code);  			
+    			setResult(RESULT_OK, intent);
     			/* Activity */
     			ThumbnailView.this.finish();   	
     		}
@@ -364,17 +365,23 @@ public class ThumbnailView extends Activity{
     	// TODO Auto-generated method stub
     	List<String> dev_list = new ArrayList<String>();
     	filelist.clear();
-    	String DeviceArray[]={"Internal Memory","SD Card","USB"};   	
+    	String internal = getString(R.string.memory_device_str);
+    	String sdcard = getString(R.string.sdcard_device_str);
+    	String usb = getString(R.string.usb_device_str);
+    	
+    	String DeviceArray[]={internal,sdcard,usb};   	
     	for(int i=0;i<DeviceArray.length;i++){
     		if(FileOp.deviceExist(DeviceArray[i])){
     			dev_list.add(DeviceArray[i]);
-    			String dev_path = FileOp.convertDeviceName(DeviceArray[i]);
+    			String dev_path = FileOp.convertDeviceName(this,DeviceArray[i]);
     			filelist.add(dev_path);
     		}
     	} 
     	cur_path = ROOT_PATH;
     	//GetCurrentFilelist(cur_path,cur_sort_type);
 		ThumbnailView.setAdapter(new ThumbnailAdapter(getBaseContext(),dev_list));
+		String device = getString(R.string.rootDevice);
+    	updatePathShow(device);
     	//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type));   	
 	}	
 

@@ -358,7 +358,10 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
     private void DeviceScan() {
 		// TODO Auto-generated method stub
     	devList.clear();
-    	String DeviceArray[]={"Internal Memory","SD Card","USB"};   	
+    	String internal = getString(R.string.memory_device_str);
+    	String sdcard = getString(R.string.sdcard_device_str);
+    	String usb = getString(R.string.usb_device_str);
+    	String DeviceArray[]={internal,sdcard,usb};   	
     	for(int i=0;i<DeviceArray.length;i++){
     		if(FileOp.deviceExist(DeviceArray[i])){
     			devList.add(DeviceArray[i]);
@@ -393,7 +396,7 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
     	for(int i = 0; i < this.devList.size(); i++) {   
     		Map<String, Object> map = new HashMap<String, Object>();    		
     		map.put("item_name", this.devList.get(i)); 
-    		file_path = FileOp.convertDeviceName(this.devList.get(i));
+    		file_path = FileOp.convertDeviceName(this,this.devList.get(i));
     		map.put("file_path", file_path);         
     		map.put("item_size", null);
     		map.put("item_rw", null);

@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import java.io.InputStream;
@@ -208,29 +209,35 @@ public class FileOp {
 		return 0;
 		
 	}
-    public static int getThumbDeviceIcon(String device_name){
-    	if(device_name.equals("Internal Memory")){
+    public static int getThumbDeviceIcon(Context c,String device_name){
+    	String internal = c.getString(R.string.memory_device_str);
+    	String sdcard = c.getString(R.string.sdcard_device_str);
+    	String usb = c.getString(R.string.usb_device_str);
+    	if(device_name.equals(internal)){
 			return R.drawable.memory_default;
 		}
-		else if(device_name.equals("SD Card")){
+		else if(device_name.equals(sdcard)){
 			return R.drawable.sdcard_default;
 		}
-		else if(device_name.equals("USB")){
-			return R.drawable.sdcard_default;		
+		else if(device_name.equals(usb)){
+			return R.drawable.usb_default;		
 		}
 		return R.drawable.txt_default;
-    }
-    public static String convertDeviceName(String name) {
+    }    
+	public static String convertDeviceName(Context c,String name) {
 		// TODO Auto-generated method stub   	
     		String temp_name=null;
-    		if(name.equals("Internal Memory"))
+    		String internal = c.getString(R.string.memory_device_str);
+        	String sdcard = c.getString(R.string.sdcard_device_str);
+        	String usb = c.getString(R.string.usb_device_str);
+    		if(name.equals(internal))
     			temp_name="/mnt/flash";
-    		else if(name.equals("SD Card"))
+    		else if(name.equals(sdcard))
     			temp_name="/mnt/sdcard";
-    		else if(name.equals("USB"))
+    		else if(name.equals(usb))
     			temp_name="/mnt/usb";
-    		return temp_name;  
-	}
+    		return temp_name;
+	}	
     public static boolean deviceExist(String string) {
 		// TODO Auto-generated method stub
 		if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){

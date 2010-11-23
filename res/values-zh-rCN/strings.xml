@@ -52,4 +52,7 @@ DROP TABLE IF EXISTS file_mark_table
 	<string name="dialog_help_item_thumb_str">缩略图显示文件</string>
 	<string name="dialog_help_item_list_str">列表显示文件</string>
 	<string name="dialog_help_item_close_str">关闭文件管理器</string>
+	<string name="memory_device_str">内部存储器 </string>
+	<string name="sdcard_device_str">SD卡</string>
+	<string name="usb_device_str">USB设备</string>
 </resources>
