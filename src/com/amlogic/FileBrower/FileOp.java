@@ -20,7 +20,14 @@ import android.os.Environment;
 import android.os.Message;
 import android.util.Log;
 
-public class FileOp {	
+public class FileOp {
+	public static boolean switch_mode = false;	
+	public static void SetMode(boolean value){
+		switch_mode = value;
+	}
+	public static boolean GetMode(){
+		return switch_mode;
+	}
 	public static FileOpTodo file_op_todo = FileOpTodo.TODO_NOTHING;
 	public static enum FileOpTodo{
 		TODO_NOTHING,

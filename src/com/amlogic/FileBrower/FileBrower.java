@@ -61,7 +61,6 @@ public class FileBrower extends Activity {
 	private ListView edit_lv;
 	private ListView click_lv;
 	private ListView help_lv;
-	private boolean switch_mode = false;
 	
 	public static FileBrowerDatabase db;
 	public static FileMarkCursor myCursor;
@@ -93,11 +92,17 @@ public class FileBrower extends Activity {
         lv = (ListView) findViewById(R.id.listview);  
         
         //lv.setAdapter(getFileListAdapter(ROOT_PATH)); 
-        if(switch_mode){
+        if(!(FileOp.GetMode())){
         	cur_path = ROOT_PATH;
         	prev_path = ROOT_PATH;
         	
-        }         	
+        }  
+        else{
+        	Intent intent = this.getIntent();
+            Bundle bundle = intent.getExtras();  
+            cur_path = bundle.getString("cur_path");
+        	FileOp.SetMode(false);
+        }
         if(cur_path.equals(ROOT_PATH)){       	
         	 DeviceScan();
         }
@@ -105,7 +110,6 @@ public class FileBrower extends Activity {
         	lv.setAdapter(getFileListAdapter(cur_path));
         }
         
-        switch_mode = false;
         /* lv OnItemClickListener */
         lv.setOnItemClickListener(new OnItemClickListener() {
 			
@@ -201,6 +205,7 @@ public class FileBrower extends Activity {
         Button btn_close = (Button) findViewById(R.id.btn_close);  
         btn_close.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
+				FileOp.SetMode(false);
 				finish();
 			}        	
         });    
@@ -245,7 +250,7 @@ public class FileBrower extends Activity {
         Button btn_listswitch = (Button) findViewById(R.id.btn_listswitch);  
         btn_listswitch.setOnClickListener(new OnClickListener() {
     		public void onClick(View v) {
-    			switch_mode = true;
+    			FileOp.SetMode(true);
     			Intent intent = new Intent();
     			intent.setClass(FileBrower.this, ThumbnailView.class);
     			/*  */
@@ -321,12 +326,11 @@ public class FileBrower extends Activity {
     @Override
     public void onDestroy() {
     	super.onDestroy();
-    	if(!switch_mode){
+    	if(!(FileOp.GetMode())){
     		db.deleteAllFileMark();  
     		cur_path = ROOT_PATH;
     		
-    	}    	
-    	switch_mode = false;   	  	
+    	}  	  	
     	db.close();    	    	   	
     }
     
@@ -346,7 +350,7 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 	 switch (resultCode) {
 	 case RESULT_OK:
 		 /* */
-		 switch_mode = true;
+		 //Intent intent = this.getIntent();
 		 Bundle bundle = data.getExtras();
 		 cur_path = bundle.getString("cur_path");		
 		 break;

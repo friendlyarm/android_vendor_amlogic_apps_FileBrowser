@@ -58,7 +58,6 @@ public class ThumbnailView extends Activity{
 	private ListView sort_lv;
 	private ListView edit_lv;
 	private ListView help_lv;
-	private boolean switch_mode = false;
 	public static  Handler mProgressHandler;
 	public static FileBrowerDatabase db;
 	public static FileMarkCursor myCursor;
@@ -77,6 +76,7 @@ public class ThumbnailView extends Activity{
         Bundle bundle = intent.getExtras();  
         cur_path = bundle.getString("cur_path");
         /* setup database */
+        FileOp.SetMode(false);
         db = new FileBrowerDatabase(this); 
         GetCurrentFilelist(cur_path,cur_sort_type);
         if(cur_path.equals(ROOT_PATH)){
@@ -86,8 +86,7 @@ public class ThumbnailView extends Activity{
         else{
         	ThumbnailView.setAdapter(new ThumbnailAdapter(this,filelist)); 
         	//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type)); 
-        }     
-        switch_mode = false;
+        }
         /* btn_mode default checked */
         ToggleButton btn_mode = (ToggleButton) findViewById(R.id.btn_thumbmode); 
         btn_mode.setChecked(true);
@@ -212,16 +211,16 @@ public class ThumbnailView extends Activity{
         /*switch_button*/
         Button btn_thumbswitch = (Button) findViewById(R.id.btn_thumbswitch); 
         btn_thumbswitch.setOnClickListener(new OnClickListener() {
-    		public void onClick(View v) {  
-    			switch_mode = true;
+    		public void onClick(View v) {   
+    			FileOp.SetMode(true);
     			Intent intent = new Intent();
     			intent.setClass(ThumbnailView.this, FileBrower.class);
     			/* Activity */
     			Bundle mybundle = new Bundle();   			
     			mybundle.putString("cur_path", cur_path);
     			intent.putExtras(mybundle);   	  			
-    			startActivityForResult(intent,request_code);  			
-    			setResult(RESULT_OK, intent);
+    			startActivityForResult(intent,request_code); 
+    			//setResult(RESULT_OK, intent);
     			/* Activity */
     			ThumbnailView.this.finish();   	
     		}
@@ -231,7 +230,7 @@ public class ThumbnailView extends Activity{
         Button btn_thumbclose = (Button) findViewById(R.id.btn_thumbclose); 
         btn_thumbclose.setOnClickListener(new OnClickListener() {
    		public void onClick(View v) {  			
-   			
+   			FileOp.SetMode(false);
    			finish();
    		}
    		   			       		
@@ -354,11 +353,9 @@ public class ThumbnailView extends Activity{
 
     public void onDestroy() {
     	super.onDestroy(); 
-    	if(!switch_mode){
-    		db.deleteAllFileMark();
-    		
-    	}
-    	switch_mode = false;
+    	if(!(FileOp.GetMode())){
+    		db.deleteAllFileMark();   		
+    	}    	
     	db.close();
     }
     protected void DeviceScan() {
@@ -391,7 +388,6 @@ public class ThumbnailView extends Activity{
     		 switch (resultCode) {
     		 case RESULT_OK:
     			 /* */    			
-    			 switch_mode = true;
     			 Bundle bundle = data.getExtras();
     			 cur_path = bundle.getString("cur_path");   			 
     			 break;
