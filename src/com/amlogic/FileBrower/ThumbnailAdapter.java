@@ -90,15 +90,15 @@ public class ThumbnailAdapter extends BaseAdapter{
     		 //holder.f_icon.setImageBitmap(mIcon_audio);   		 
     	 }
     	 else if(FileOp.isPhoto(file_name)){
-    		 //bitMap = FileOp.fitSizePic(f);
-    		 //if(bitMap ==null){
-    			// holder.f_icon.setImageResource(R.drawable.item_preview_photo);  			 
-    			// holder.f_icon.setImageBitmap();
-    		 //}
-    		 //else{
-    			// holder.f_icon.setImageBitmap(bitMap);
-    		 //}
-    		 holder.f_icon.setImageResource(R.drawable.item_preview_photo);
+    		 bitMap = FileOp.fitSizePic(f);
+    		 if(bitMap ==null){
+    			holder.f_icon.setImageResource(R.drawable.item_preview_photo);  			 
+    			holder.f_icon.setImageBitmap(bitMap);
+    		 }
+    		 else{
+    			 holder.f_icon.setImageBitmap(bitMap);
+    		 }
+    		 //holder.f_icon.setImageResource(R.drawable.item_preview_photo);
     		 
     	 }
     	 else{
