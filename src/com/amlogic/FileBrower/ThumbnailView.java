@@ -62,7 +62,7 @@ public class ThumbnailView extends Activity{
 	public static FileBrowerDatabase db;
 	public static FileMarkCursor myCursor;
 	private List<String> filelist = new ArrayList<String>();
-	
+	private boolean local_mode;
 	GridView ThumbnailView;		
 	int request_code = 1550;
 	
@@ -79,6 +79,7 @@ public class ThumbnailView extends Activity{
         FileOp.SetMode(false);
         db = new FileBrowerDatabase(this); 
         GetCurrentFilelist(cur_path,cur_sort_type);
+        local_mode = false;
         if(cur_path.equals(ROOT_PATH)){
         	DeviceScan();
         	
@@ -234,6 +235,7 @@ public class ThumbnailView extends Activity{
     			startActivityForResult(intent,request_code); 
     			//setResult(RESULT_OK, intent);
     			/* Activity */
+    			local_mode = true;
     			ThumbnailView.this.finish();   	
     		}
     		   			       		
@@ -365,7 +367,7 @@ public class ThumbnailView extends Activity{
 
     public void onDestroy() {
     	super.onDestroy(); 
-    	if(!(FileOp.GetMode())){
+    	if(!local_mode){
     		db.deleteAllFileMark();   		
     	}    	
     	db.close();

@@ -61,7 +61,7 @@ public class FileBrower extends Activity {
 	private ListView edit_lv;
 	private ListView click_lv;
 	private ListView help_lv;
-	
+	private boolean local_mode;
 	public static FileBrowerDatabase db;
 	public static FileMarkCursor myCursor;
 	
@@ -90,7 +90,7 @@ public class FileBrower extends Activity {
         
         /* setup file list */
         lv = (ListView) findViewById(R.id.listview);  
-        
+        local_mode = false;
         //lv.setAdapter(getFileListAdapter(ROOT_PATH)); 
         if(!(FileOp.GetMode())){
         	cur_path = ROOT_PATH;
@@ -260,6 +260,7 @@ public class FileBrower extends Activity {
     			intent.putExtras(mybundle);			
     			startActivityForResult(intent,request_code);
     			/*  */
+    			local_mode = true;
     			FileBrower.this.finish();   	
     		}
     		   			       		
@@ -326,7 +327,7 @@ public class FileBrower extends Activity {
     @Override
     public void onDestroy() {
     	super.onDestroy();
-    	if(!(FileOp.GetMode())){
+    	if(!local_mode){
     		db.deleteAllFileMark();  
     		cur_path = ROOT_PATH;
     		
