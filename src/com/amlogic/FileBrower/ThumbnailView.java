@@ -189,7 +189,13 @@ public class ThumbnailView extends Activity{
         Button btn_thumbsort = (Button) findViewById(R.id.btn_thumbsort); 
         btn_thumbsort.setOnClickListener(new OnClickListener() {
    		public void onClick(View v) {   
-   			showDialog(SORT_DIALOG_ID);
+			if (!cur_path.equals(ROOT_PATH))
+				showDialog(SORT_DIALOG_ID);
+			else {
+    			Toast.makeText(ThumbnailView.this,
+    					getText(R.string.Toast_msg_sort_noopen),
+    					Toast.LENGTH_SHORT).show();  					
+			}
    		}
    		   			       		
        }); 
@@ -197,7 +203,13 @@ public class ThumbnailView extends Activity{
          Button btn_thumbedit = (Button) findViewById(R.id.btn_thumbedit); 
          btn_thumbedit.setOnClickListener(new OnClickListener() {
     		public void onClick(View v) {   
-    			showDialog(EDIT_DIALOG_ID);
+				if (!cur_path.equals(ROOT_PATH))
+					showDialog(EDIT_DIALOG_ID);
+				else {
+        			Toast.makeText(ThumbnailView.this,
+        					getText(R.string.Toast_msg_edit_noopen),
+        					Toast.LENGTH_SHORT).show();  	
+        		}	
     		}
     		   			       		
         }); 
