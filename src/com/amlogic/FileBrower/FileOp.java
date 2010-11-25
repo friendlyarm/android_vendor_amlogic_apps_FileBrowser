@@ -217,20 +217,34 @@ public class FileOp {
 		
 	}
     public static int getThumbDeviceIcon(Context c,String device_name){
-    	String internal = c.getString(R.string.memory_device_str);
-    	String sdcard = c.getString(R.string.sdcard_device_str);
-    	String usb = c.getString(R.string.usb_device_str);
-    	if(device_name.equals(internal)){
+    	//String internal = c.getString(R.string.memory_device_str);
+    	//String sdcard = c.getString(R.string.sdcard_device_str);
+    	//String usb = c.getString(R.string.usb_device_str);
+    	if(device_name.equals("flash")){
 			return R.drawable.memory_default;
 		}
-		else if(device_name.equals(sdcard)){
+		else if(device_name.equals("sdcard")){
 			return R.drawable.sdcard_default;
 		}
-		else if(device_name.equals(usb)){
+		else if(device_name.equals("usb")){
 			return R.drawable.usb_default;		
 		}
-		return R.drawable.txt_default;
-    }    
+		return R.drawable.noname_file_default;
+    } 
+    public static String getDeviceName(Context c,String filename){
+    	String ret_str = null;
+    	if(filename.equals("/mnt/flash")){
+    		ret_str = c.getString(R.string.memory_device_str);
+    	}
+    	else if(filename.equals("/mnt/sdcard")){
+    		ret_str = c.getString(R.string.sdcard_device_str);
+    	}
+    	else if(filename.equals("/mnt/usb")){
+    		ret_str = c.getString(R.string.usb_device_str);
+    	}
+		return ret_str;
+    	
+    }
 	public static String convertDeviceName(Context c,String name) {
 		// TODO Auto-generated method stub   	
     		String temp_name=null;

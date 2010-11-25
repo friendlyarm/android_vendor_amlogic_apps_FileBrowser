@@ -1,6 +1,4 @@
 package com.amlogic.FileBrower;
-
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,12 +9,16 @@ import java.util.Map;
 import com.amlogic.FileBrower.FileBrowerDatabase.FileMarkCursor;
 import com.amlogic.FileBrower.FileOp.FileOpReturn;
 import com.amlogic.FileBrower.FileOp.FileOpTodo;
+
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -34,17 +36,13 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.GridView;
+
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-
-import com.amlogic.FileBrower.FileBrowerDatabase.FileMarkCursor;
-import com.amlogic.FileBrower.FileOp.FileOpReturn;
-import com.amlogic.FileBrower.FileOp.FileOpTodo;
-
     /** Called when the activity is first created. */
 public class ThumbnailView extends Activity{
 	public static final String TAG = "ThumbnailView";
@@ -63,12 +61,38 @@ public class ThumbnailView extends Activity{
 	public static  Handler mProgressHandler;
 	public static FileBrowerDatabase db;
 	public static FileMarkCursor myCursor;
-	private List<String> filelist = new ArrayList<String>();
+	private static List<String> filelist = new ArrayList<String>();
 	private boolean local_mode;
 	GridView ThumbnailView;		
 	int request_code = 1550;
+	DecodePhotosTask decodePhotosTask=null;	
+	ThumbnailAdapter myThumbnailAdapter;	
+	class  DecodePhotosTask  extends  AsyncTask<Void, Photo, Void>  implements    
+	PhotoDecodeListener { 		
+	protected  Void doInBackground(Void... params) {   
+		
+		
+		DecodePhoto.getInstance().decodeImage(this,filelist);
+		return null;   
+		   
+	}    
+	public   void  onPhotoDecodeListener(Photo photo) {   
+		if  (!isCancelled()) {             
+			publishProgress(photo);   
+		}   
+	}     
+	public   void  onProgressUpdate(Photo...photos) {   
+		for(Photo photo : photos) {   
+			myThumbnailAdapter.addPhoto(photo);  
+			//((ThumbnailAdapter) ThumbnailView.getAdapter()).addPhoto(photo);
+		}      
+		myThumbnailAdapter.notifyDataSetChanged();
+		
+		}
 	
-    @Override
+	
+	}	
+		
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);         
         setContentView(R.layout.thumbnail);       
@@ -79,40 +103,43 @@ public class ThumbnailView extends Activity{
         cur_path = bundle.getString("cur_path");
         /* setup database */
         FileOp.SetMode(false);
-        db = new FileBrowerDatabase(this); 
-        GetCurrentFilelist(cur_path,cur_sort_type);
+        db = new FileBrowerDatabase(this);             
         local_mode = false;
+        GetCurrentFilelist(cur_path,cur_sort_type);
+        myThumbnailAdapter = new ThumbnailAdapter(this,filelist);
         if(cur_path.equals(ROOT_PATH)){
-        	DeviceScan();
+        		DeviceScan();
         	
         }
         else{
-        	ThumbnailView.setAdapter(new ThumbnailAdapter(this,filelist)); 
-        	//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type)); 
+        		waitMediaScan(cur_sort_type);
+        	
         }
+         
+        
         /* btn_mode default checked */
+          
         ToggleButton btn_mode = (ToggleButton) findViewById(R.id.btn_thumbmode); 
         btn_mode.setChecked(true);
         
         ThumbnailView.setOnItemClickListener(new OnItemClickListener() {
 			
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) {
-				// TODO Auto-generated method stutus
-				//Map<String, Object> item = (Map<String, Object>)ThumbnailView.getItemAtPosition((int)arg3);
-				//String file_path = (String)(item).get("file_path");	
+					long arg3) {				
 				String file_path = (String)filelist.get((int)arg3);
 				File file = new File(file_path);
-				if(!file.exists()){
-					//finish();
+				if(!file.exists()){					
 					return;
 				}
-
+				
 				if (file.isDirectory()) {						
 					cur_path = file_path;
-					GetCurrentFilelist(cur_path,cur_sort_type);
-					ThumbnailView.setAdapter(new ThumbnailAdapter(getBaseContext(),filelist));  
-					//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type)); 
+					if(decodePhotosTask !=null&&(decodePhotosTask.getStatus() == AsyncTask.Status.RUNNING)){						
+						return;
+					}
+					waitMediaScan(cur_sort_type);
+					
+					
 				}
 				else{
 					ToggleButton btn_mode = (ToggleButton) findViewById(R.id.btn_thumbmode); 
@@ -127,8 +154,9 @@ public class ThumbnailView extends Activity{
 						}
 						    else{						    							
 							FileOp.updateFileStatus(file_path, 1,"thumbnail");							
-						}						
-						((BaseAdapter) ThumbnailView.getAdapter()).notifyDataSetChanged();	
+						}		
+						    
+						myThumbnailAdapter.notifyDataSetChanged();	
 					}
 				}
 				
@@ -158,6 +186,10 @@ public class ThumbnailView extends Activity{
         Button btn_thumbhome = (Button) findViewById(R.id.btn_thumbhome); 
         btn_thumbhome.setOnClickListener(new OnClickListener() {
     		public void onClick(View v) {  
+    			if(decodePhotosTask !=null&&(decodePhotosTask.getStatus() == AsyncTask.Status.RUNNING)){
+					decodePhotosTask.cancel(true);
+					//return;
+				}
     			DeviceScan();
     		}
     		   			       		
@@ -168,6 +200,10 @@ public class ThumbnailView extends Activity{
         Button btn_thumbparent = (Button) findViewById(R.id.btn_thumbparent); 
         btn_thumbparent.setOnClickListener(new OnClickListener() {
     		public void onClick(View v) {  
+    			if(decodePhotosTask !=null&&(decodePhotosTask.getStatus() == AsyncTask.Status.RUNNING)){
+					decodePhotosTask.cancel(true);
+					//return;
+				}
     			if (!cur_path.equals(ROOT_PATH)) {
 					File file = new File(cur_path);
 					String parent_path = file.getParent();
@@ -179,9 +215,7 @@ public class ThumbnailView extends Activity{
 					}
 					else{
 						 cur_path = parent_path;
-						 GetCurrentFilelist(cur_path,cur_sort_type);
-						 ThumbnailView.setAdapter(new ThumbnailAdapter(getBaseContext(),filelist));
-						 //ThumbnailView.setAdapter(getThumbnailAdapter(parent_path,cur_sort_type)); 
+						 waitMediaScan(cur_sort_type);
 					
 					}
 				}
@@ -192,6 +226,10 @@ public class ThumbnailView extends Activity{
         Button btn_thumbsort = (Button) findViewById(R.id.btn_thumbsort); 
         btn_thumbsort.setOnClickListener(new OnClickListener() {
    		public void onClick(View v) {   
+   			if(decodePhotosTask !=null&&(decodePhotosTask.getStatus() == AsyncTask.Status.RUNNING)){
+				
+				return;
+			}
 			if (!cur_path.equals(ROOT_PATH))
 				showDialog(SORT_DIALOG_ID);
 			else {
@@ -206,6 +244,10 @@ public class ThumbnailView extends Activity{
          Button btn_thumbedit = (Button) findViewById(R.id.btn_thumbedit); 
          btn_thumbedit.setOnClickListener(new OnClickListener() {
     		public void onClick(View v) {   
+    			if(decodePhotosTask !=null&&(decodePhotosTask.getStatus() == AsyncTask.Status.RUNNING)){
+					
+					return;
+				}
 				if (!cur_path.equals(ROOT_PATH))
 					showDialog(EDIT_DIALOG_ID);
 				else {
@@ -226,7 +268,11 @@ public class ThumbnailView extends Activity{
         /*switch_button*/
         Button btn_thumbswitch = (Button) findViewById(R.id.btn_thumbswitch); 
         btn_thumbswitch.setOnClickListener(new OnClickListener() {
-    		public void onClick(View v) {   
+    		public void onClick(View v) {  
+    			if(decodePhotosTask !=null&&(decodePhotosTask.getStatus() == AsyncTask.Status.RUNNING)){
+					decodePhotosTask.cancel(true);
+					//return;
+				}
     			FileOp.SetMode(true);
     			Intent intent = new Intent();
     			intent.setClass(ThumbnailView.this, FileBrower.class);
@@ -245,7 +291,11 @@ public class ThumbnailView extends Activity{
         /*close button*/
         Button btn_thumbclose = (Button) findViewById(R.id.btn_thumbclose); 
         btn_thumbclose.setOnClickListener(new OnClickListener() {
-   		public void onClick(View v) {  			
+   		public void onClick(View v) {
+   			if(decodePhotosTask !=null&&(decodePhotosTask.getStatus() == AsyncTask.Status.RUNNING)){
+				decodePhotosTask.cancel(true);
+				//return;
+			}
    			FileOp.SetMode(false);
    			finish();
    		}
@@ -287,9 +337,7 @@ public class ThumbnailView extends Activity{
                 	break;
                 case 4:		//file paste ok
         			db.deleteAllFileMark();
-        			GetCurrentFilelist(cur_path,cur_sort_type);
-					ThumbnailView.setAdapter(new ThumbnailAdapter(getBaseContext(),filelist));
-        			//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type)); 
+        			waitMediaScan(cur_sort_type);
         			Toast.makeText(ThumbnailView.this,
         					getText(R.string.Toast_msg_paste_ok),
         					Toast.LENGTH_SHORT).show();       
@@ -306,6 +354,9 @@ public class ThumbnailView extends Activity{
                     if (edit_dialog != null)
                     	edit_dialog.dismiss();   
                 	break;
+                case 6:
+                	//decodePhotosTask = (DecodePhotosTask)new DecodePhotosTask().execute();
+                	break;
                 }
                 
             }
@@ -314,7 +365,24 @@ public class ThumbnailView extends Activity{
     }
     
     
-    private void GetCurrentFilelist(String file_path, String sort_type) {
+    
+	private void waitMediaScan(String sort_type) {
+		// TODO Auto-generated method stub
+		 GetCurrentFilelist(cur_path,sort_type);
+		 myThumbnailAdapter.clear();
+		 myThumbnailAdapter = new ThumbnailAdapter(getBaseContext(),filelist);
+		 ThumbnailView.setAdapter(myThumbnailAdapter);
+		 if(decodePhotosTask !=null&&(decodePhotosTask.getStatus() == AsyncTask.Status.RUNNING)){
+				decodePhotosTask.cancel(true);
+				//return;
+			}
+		 decodePhotosTask = (DecodePhotosTask)new DecodePhotosTask().execute();
+		
+	}
+
+
+
+	private void GetCurrentFilelist(String file_path, String sort_type) {
 		// TODO Auto-generated method stub
     	File path = new File(file_path);
 		filelist.clear();
@@ -390,12 +458,17 @@ public class ThumbnailView extends Activity{
     			filelist.add(dev_path);
     		}
     	} 
-    	cur_path = ROOT_PATH;
-    	//GetCurrentFilelist(cur_path,cur_sort_type);
-		ThumbnailView.setAdapter(new ThumbnailAdapter(getBaseContext(),dev_list));
+    	cur_path = ROOT_PATH;    	
+		 myThumbnailAdapter.clear();
+		 myThumbnailAdapter = new ThumbnailAdapter(getBaseContext(),filelist);
+		 ThumbnailView.setAdapter(myThumbnailAdapter);
+		 if(decodePhotosTask !=null&&(decodePhotosTask.getStatus() == AsyncTask.Status.RUNNING)){
+				decodePhotosTask.cancel(true);				
+			}
+		 decodePhotosTask = (DecodePhotosTask)new DecodePhotosTask().execute();
 		String device = getString(R.string.rootDevice);
     	updatePathShow(device);
-    	//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type));   	
+    	
 	}	
 
 	protected void onActivityResult(int requestCode, int resultCode,Intent data) {
@@ -626,24 +699,18 @@ public class ThumbnailView extends Activity{
     					long id) {    				
     				
             		if (!cur_path.equals(ROOT_PATH)) {
-            			if (pos == 0){
-            				GetCurrentFilelist(cur_path,"by_name");
-            				ThumbnailView.setAdapter(new ThumbnailAdapter(getBaseContext(),filelist)); 
-            				//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path, "by_name"));
+            			if (pos == 0){           				
+            				waitMediaScan("by_name");
             				cur_sort_type = "by_name";
             			}
             			else if (pos == 1){
-            				GetCurrentFilelist(cur_path,"by_date");
-            				ThumbnailView.setAdapter(new ThumbnailAdapter(getBaseContext(),filelist));
-            				//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path, "by_date"));
+            				waitMediaScan("by_date");
             				cur_sort_type = "by_date";
             				
             			}
             				
             			else if (pos == 2){
-            				GetCurrentFilelist(cur_path,"by_size");
-            				ThumbnailView.setAdapter(new ThumbnailAdapter(getBaseContext(),filelist));
-            				//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path, "by_size"));
+            				waitMediaScan("by_size");
             				cur_sort_type = "by_size";
             			}
             		}
@@ -734,9 +801,7 @@ public class ThumbnailView extends Activity{
             				//Log.i(TAG, "DO delete...");   
             				if (FileOpReturn.SUCCESS == FileOp.deleteSelectedFile("thumbnail")) {
             					db.deleteAllFileMark();
-            					GetCurrentFilelist(cur_path,cur_sort_type);
-            					ThumbnailView.setAdapter(new ThumbnailAdapter(getBaseContext(),filelist));
-                				//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,null));  
+            					waitMediaScan(cur_sort_type);
                 				Toast.makeText(ThumbnailView.this,
                 						getText(R.string.Toast_msg_del_ok),
                 						Toast.LENGTH_SHORT).show();
