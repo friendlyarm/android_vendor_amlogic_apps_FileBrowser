@@ -15,6 +15,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,6 +23,7 @@ import android.os.Message;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -896,6 +898,19 @@ public class ThumbnailView extends Activity{
     	}
     	return list;
     }    
+    //option menu    
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+   	 String ver_str = null;
+   	 try {
+			ver_str = getPackageManager().getPackageInfo("com.amlogic.FileBrower", 0).versionName;			
+		} catch (NameNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        menu.add(0, 0, 0, getText(R.string.app_name) + " v" + ver_str);
+        return true;
+    }
 }
 
 
