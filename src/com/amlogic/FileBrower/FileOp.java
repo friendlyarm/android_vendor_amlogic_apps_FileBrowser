@@ -285,7 +285,8 @@ public class FileOp {
     	else{
     			if(filename.length()>18){
     				int index = filename.lastIndexOf(".");
-    				String suffix = String.copyValueOf((filename.toCharArray()), index, (filename.length()-index));
+    				if ((index != -1) && (index < filename.length())) {
+    					String suffix = String.copyValueOf((filename.toCharArray()), index, (filename.length()-index));
     	   		 	if(index>=15){
     	   		 		temp_str = String.copyValueOf((filename.toCharArray()), 0, 15);
     	   		 	}
@@ -293,7 +294,11 @@ public class FileOp {
     	   		 		temp_str = String.copyValueOf((filename.toCharArray()), 0, index);
     	   		 	}
     	   		    temp_str = temp_str + "~" + suffix;
-       	 		}
+    	   		} else {
+    	   			temp_str = String.copyValueOf((filename.toCharArray()), 0, 15);
+    	   			temp_str = temp_str + "~";
+    	   		}
+       	 	}
     			else{
         			temp_str = filename;
         		}
