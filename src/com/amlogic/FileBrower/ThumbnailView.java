@@ -14,9 +14,11 @@ import com.amlogic.FileBrower.FileOp.FileOpTodo;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -76,6 +78,21 @@ public class ThumbnailView extends Activity{
 		return null;   
 		   
 	}    
+	public void PreOnExecute( Context c,List<String> flist){
+		Bitmap bm = null;
+		String filename = null;
+		Photo photo;
+		myThumbnailAdapter.clear();
+		for(int i=0;i<flist.size();i++){
+			File f = new File(flist.get(i));
+			filename = f.getName();				
+			bm = BitmapFactory.decodeResource(c.getResources(),R.drawable.item_preview_photo);
+			photo = new Photo(bm,flist.get(i));	
+			myThumbnailAdapter.addPhoto(photo);			
+		}
+		myThumbnailAdapter.notifyDataSetChanged();
+		
+	}
 	public   void  onPhotoDecodeListener(Photo photo) {   
 		if  (!isCancelled()) {             
 			publishProgress(photo);   
@@ -83,8 +100,9 @@ public class ThumbnailView extends Activity{
 	}     
 	public   void  onProgressUpdate(Photo...photos) {   
 		for(Photo photo : photos) {   
-			myThumbnailAdapter.addPhoto(photo);  
-			//((ThumbnailAdapter) ThumbnailView.getAdapter()).addPhoto(photo);
+			myThumbnailAdapter.refreshPhoto(photo);  
+			//myThumbnailAdapter.addPhoto(photo);  
+			
 		}      
 		myThumbnailAdapter.notifyDataSetChanged();
 		
@@ -378,7 +396,9 @@ public class ThumbnailView extends Activity{
 				decodePhotosTask.cancel(true);
 				//return;
 			}
-		 decodePhotosTask = (DecodePhotosTask)new DecodePhotosTask().execute();
+		 decodePhotosTask = (DecodePhotosTask)new DecodePhotosTask();
+		 decodePhotosTask.PreOnExecute(this, filelist);
+		 decodePhotosTask.execute();
 		
 	}
 
@@ -439,6 +459,9 @@ public class ThumbnailView extends Activity{
 
     public void onDestroy() {
     	super.onDestroy(); 
+    	if(decodePhotosTask !=null&&(decodePhotosTask.getStatus() == AsyncTask.Status.RUNNING)){
+			decodePhotosTask.cancel(true);
+    	}
     	if(!local_mode){
     		db.deleteAllFileMark();   		
     	}    	
