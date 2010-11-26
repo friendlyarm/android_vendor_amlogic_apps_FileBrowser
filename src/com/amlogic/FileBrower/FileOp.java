@@ -266,7 +266,42 @@ public class FileOp {
 		}
 		return true;
 	}
-     
+    public static String getShortName(String file){
+    	
+    	File file_path = new File(file);
+    	String filename = file_path.getName();
+    	String temp_str = null;
+    	if(file_path.isDirectory()){
+    		if(filename.length()>18){   	   		
+    			 temp_str = String.copyValueOf((filename.toCharArray()), 0, 15);
+    	   		 temp_str = temp_str +"...";
+    	   		 
+       	 	}
+    		else{
+    			temp_str = filename;
+    		}
+    		
+    	}
+    	else{
+    			if(filename.length()>18){
+    				int index = filename.lastIndexOf(".");
+    				String suffix = String.copyValueOf((filename.toCharArray()), index, (filename.length()-index));
+    	   		 	if(index>=15){
+    	   		 		temp_str = String.copyValueOf((filename.toCharArray()), 0, 15);
+    	   		 	}
+    	   		 	else{
+    	   		 		temp_str = String.copyValueOf((filename.toCharArray()), 0, index);
+    	   		 	}
+    	   		    temp_str = temp_str + "~" + suffix;
+       	 		}
+    			else{
+        			temp_str = filename;
+        		}
+    	}
+   	 	
+		return temp_str;
+   	 
+    }
     /** check file sel status */
     public static boolean isFileSelected(String file_path,String cur_page) {
     	if(cur_page.equals("list")){

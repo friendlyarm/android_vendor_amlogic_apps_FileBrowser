@@ -98,7 +98,8 @@ public class ThumbnailAdapter extends BaseAdapter{
     	  holder.f_title.setText(FileOp.getDeviceName(c, file_path));
       }
       else{
-    	  holder.f_title.setText(file_name);
+    	  String tmp_file_name = FileOp.getShortName(file_path);
+    	  holder.f_title.setText(tmp_file_name);
       }
       
       

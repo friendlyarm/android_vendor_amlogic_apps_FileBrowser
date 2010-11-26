@@ -494,7 +494,8 @@ public class ThumbnailView extends Activity{
 		 if(decodePhotosTask !=null&&(decodePhotosTask.getStatus() == AsyncTask.Status.RUNNING)){
 				decodePhotosTask.cancel(true);				
 			}
-		 decodePhotosTask = (DecodePhotosTask)new DecodePhotosTask().execute();
+		decodePhotosTask = (DecodePhotosTask)new DecodePhotosTask();
+		decodePhotosTask.PreOnExecute(this, filelist);
 		String device = getString(R.string.rootDevice);
     	updatePathShow(device);
     	
