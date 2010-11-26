@@ -78,6 +78,7 @@ public class ThumbnailView extends Activity{
 		return null;   
 		   
 	}    
+	
 	public void PreOnExecute( Context c,List<String> flist){
 		Bitmap bm = null;
 		String filename = null;
@@ -130,6 +131,8 @@ public class ThumbnailView extends Activity{
         	
         }
         else{
+        	   
+        		//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type));
         		waitMediaScan(cur_sort_type);
         	
         }
@@ -317,7 +320,7 @@ public class ThumbnailView extends Activity{
    			FileOp.SetMode(false);
    			finish();
    		}
-   		   			       		
+   		
        }); 
         
         
@@ -389,6 +392,7 @@ public class ThumbnailView extends Activity{
 	private void waitMediaScan(String sort_type) {
 		// TODO Auto-generated method stub
 		 GetCurrentFilelist(cur_path,sort_type);
+		 
 		 myThumbnailAdapter.clear();
 		 myThumbnailAdapter = new ThumbnailAdapter(getBaseContext(),filelist);
 		 ThumbnailView.setAdapter(myThumbnailAdapter);
@@ -495,6 +499,8 @@ public class ThumbnailView extends Activity{
     	updatePathShow(device);
     	
 	}	
+    
+ 
 
 	protected void onActivityResult(int requestCode, int resultCode,Intent data) {
     	// TODO Auto-generated method stub

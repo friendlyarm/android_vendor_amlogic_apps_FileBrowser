@@ -56,8 +56,8 @@ public class ThumbnailAdapter extends BaseAdapter{
     return position;
   }
   
-  public   void  addPhoto(Photo photo) {   
-      images.add(photo);   
+  public   void  addPhoto(Photo photo) { 	  
+		images.add(photo); 		  	         
   }  
   public   void  refreshPhoto(Photo photo) { 
 	  String default_file,decode_file;
