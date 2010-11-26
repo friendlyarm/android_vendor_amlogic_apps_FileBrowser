@@ -82,7 +82,7 @@ public class FileOp {
     	} else if (isVideo(filename)) {
     		return R.drawable.item_preview_video;
     	} else
-    		return R.drawable.item_preview_dir;
+    		return R.drawable.txt_default;
 
     }
     
@@ -281,8 +281,7 @@ public class FileOp {
     			FileBrower.myCursor.close();        	
     		} 
     	}
-    	else{
-    		if(cur_page.equals("thumbnail")){
+    	else if(cur_page.equals("thumbnail")){
     			if (ThumbnailView.db == null) return false;
         		try {        	
         			ThumbnailView.myCursor = ThumbnailView.db.getFileMarkByPath(file_path);   
@@ -293,9 +292,20 @@ public class FileOp {
         		} finally {        	
         			ThumbnailView.myCursor.close();        	
         		} 
-    			
-    		}
-    	}
+        		
+    	} else if(cur_page.equals("thumbnail1")){
+    			if (ThumbnailView1.db == null) return false;
+        		try {        	
+        			ThumbnailView1.myCursor = ThumbnailView1.db.getFileMarkByPath(file_path);   
+        			if (ThumbnailView1.myCursor.getCount() > 0) {
+        				return true;  
+        			}
+    	       
+        		} finally {        	
+        			ThumbnailView1.myCursor.close();        	
+        		}     			
+    	}    		
+    	
 		return false;    	
     } 
     
@@ -341,8 +351,7 @@ public class FileOp {
         	}
     		
     	}
-    	else{
-    		if(cur_page.equals("thumbnail")){
+    	else if(cur_page.equals("thumbnail")){
     			if (ThumbnailView.db == null) return;
             	if (status == 1) {
                     try {        	
@@ -360,8 +369,23 @@ public class FileOp {
             		ThumbnailView.db.deleteFileMark(file_path);
             	}
     			
-    		}
-    		
+    	} else if (cur_page.equals("thumbnail1")) {
+			if (ThumbnailView1.db == null) return;
+        	if (status == 1) {
+                try {        	
+                	ThumbnailView1.myCursor = ThumbnailView1.db.getFileMarkByPath(file_path);   
+        	        if (ThumbnailView1.myCursor.getCount() <= 0) {
+        	        	//Log.i(FileBrower.TAG, "add file: " + file_path);
+        	        	ThumbnailView1.db.addFileMark(file_path, 1);
+        	        }
+        	       
+                } finally {        	
+                	ThumbnailView1.myCursor.close();        	
+                }     		
+        	} else {
+        		//Log.i(FileBrower.TAG, "remove file: " + file_path);
+        		ThumbnailView1.db.deleteFileMark(file_path);
+        	}    		
     	}
     	
     		
@@ -423,11 +447,13 @@ public class FileOp {
 	        	if(cur_page.equals("list")){
 	        		FileBrower.mProgressHandler.sendMessage(Message.obtain(
 	            			FileBrower.mProgressHandler, 1, (int)(bytecount * 100 / source.length()), 0));
-	        	}
-	        	else{
+	        	} else if (cur_page.equals("thumbnail")){
 	        		ThumbnailView.mProgressHandler.sendMessage(Message.obtain(
 	        				ThumbnailView.mProgressHandler, 1, (int)(bytecount * 100 / source.length()), 0));
-	        	}                
+	        	} else if (cur_page.equals("thumbnail1")){
+	        		ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
+	        				ThumbnailView1.mProgressHandler, 1, (int)(bytecount * 100 / source.length()), 0));
+	        	}             
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -455,10 +481,12 @@ public class FileOp {
     		if(cur_page.equals("list")){
     			FileBrower.mProgressHandler.sendMessage(Message.obtain(
     					FileBrower.mProgressHandler, 5)); 
-    		}
-    		else{
+    		} else if (cur_page.equals("thumbnail")){
     			ThumbnailView.mProgressHandler.sendMessage(Message.obtain(
     					ThumbnailView.mProgressHandler, 5)); 
+    		} else if (cur_page.equals("thumbnail1")){
+    			ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
+    					ThumbnailView1.mProgressHandler, 5)); 
     		}
         	
         	return FileOpReturn.ERR; 
@@ -473,13 +501,21 @@ public class FileOp {
     	            	fileList.add(FileBrower.myCursor.getColFilePath());
     	            }      	
     	        }       		
-        	}
-        	else{
+        	} else if (cur_page.equals("thumbnail")){
         		ThumbnailView.myCursor = ThumbnailView.db.getFileMark();   
     	        if (ThumbnailView.myCursor.getCount() > 0) {
     	            for(int i=0; i<ThumbnailView.myCursor.getCount(); i++){
     	            	ThumbnailView.myCursor.moveToPosition(i);
     	            	fileList.add(ThumbnailView.myCursor.getColFilePath());
+    	            }      	
+    	        }       	
+        		
+        	} else if (cur_page.equals("thumbnail1")){
+        		ThumbnailView1.myCursor = ThumbnailView1.db.getFileMark();   
+    	        if (ThumbnailView1.myCursor.getCount() > 0) {
+    	            for(int i=0; i<ThumbnailView1.myCursor.getCount(); i++){
+    	            	ThumbnailView1.myCursor.moveToPosition(i);
+    	            	fileList.add(ThumbnailView1.myCursor.getColFilePath());
     	            }      	
     	        }       	
         		
@@ -489,8 +525,10 @@ public class FileOp {
         	if(cur_page.equals("list")){
         		FileBrower.myCursor.close();        		
         	}
-        	else{
+        	else if (cur_page.equals("thumbnail")){
         		ThumbnailView.myCursor.close();
+        	} else if (cur_page.equals("thumbnail1")){
+        		ThumbnailView1.myCursor.close();
         	}
         	       	
         }  
@@ -500,9 +538,12 @@ public class FileOp {
         		FileBrower.mProgressHandler.sendMessage(Message.obtain(
             			FileBrower.mProgressHandler, 3)); 
         	}
-        	else{
+        	else if (cur_page.equals("thumbnail")){
         		ThumbnailView.mProgressHandler.sendMessage(Message.obtain(
         				ThumbnailView.mProgressHandler, 3)); 
+        	} else if (cur_page.equals("thumbnail1")){
+        		ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
+        				ThumbnailView1.mProgressHandler, 3)); 
         	}
         	 
         	for (int i = 0; i < fileList.size(); i++) {
@@ -511,13 +552,15 @@ public class FileOp {
         		if (file.exists()) {
         			//Log.i(FileBrower.TAG, "paste file: " + name);
         			try {  
-        				File file_new;
+        				File file_new = null;
     					//Log.i(FileBrower.TAG, "copy and paste file: " + name);
         				if(cur_page.equals("list")){
         					 file_new = new File(FileBrower.cur_path + File.separator + file.getName());  
         	        	}
-        	        	else{
+        	        	else if (cur_page.equals("thumbnail")){
         	        		 file_new = new File(ThumbnailView.cur_path + File.separator + file.getName()); 
+        	        	} else if (cur_page.equals("thumbnail1")){
+        	        		 file_new = new File(ThumbnailView1.cur_path + File.separator + file.getName()); 
         	        	}
     					
     					
@@ -527,8 +570,10 @@ public class FileOp {
         	        		if(cur_page.equals("list")){
         	        			file_new = new File(FileBrower.cur_path + File.separator + date + file.getName()); 
         	        		}
-        	        		else{
+        	        		else if (cur_page.equals("thumbnail")){
         	        			file_new = new File(ThumbnailView.cur_path + File.separator + date + file.getName()); 
+        	        		} else if (cur_page.equals("thumbnail1")){
+        	        			file_new = new File(ThumbnailView1.cur_path + File.separator + date + file.getName()); 
         	        		}
     						
     					}
@@ -563,9 +608,12 @@ public class FileOp {
         			FileBrower.mProgressHandler.sendMessage(Message.obtain(
                 			FileBrower.mProgressHandler, 2, (i+1) * 100 / fileList.size(), 0));
 	        	}
-	        	else{
+	        	else if (cur_page.equals("thumbnail")){
 	        		ThumbnailView.mProgressHandler.sendMessage(Message.obtain(
 	        				ThumbnailView.mProgressHandler, 2, (i+1) * 100 / fileList.size(), 0));
+	        	} else if (cur_page.equals("thumbnail1")){
+	        		ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
+	        				ThumbnailView1.mProgressHandler, 2, (i+1) * 100 / fileList.size(), 0));
 	        	}
         		
         		
@@ -575,9 +623,13 @@ public class FileOp {
             			FileBrower.mProgressHandler, 4));
             	return FileOpReturn.SUCCESS;
         	}
-        	else{
+        	else if (cur_page.equals("thumbnail")){
         		ThumbnailView.mProgressHandler.sendMessage(Message.obtain(
         				ThumbnailView.mProgressHandler, 4));
+            	return FileOpReturn.SUCCESS;
+        	} else if (cur_page.equals("thumbnail1")){
+        		ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
+        				ThumbnailView1.mProgressHandler, 4));
             	return FileOpReturn.SUCCESS;
         	}
         	
@@ -588,15 +640,19 @@ public class FileOp {
         		return FileOpReturn.ERR; 
         		
         	}
-        	else{
+        	else if (cur_page.equals("thumbnail")){
         		ThumbnailView.mProgressHandler.sendMessage(Message.obtain(
         				ThumbnailView.mProgressHandler, 5));  
+        		return FileOpReturn.ERR; 
+        	} else if (cur_page.equals("thumbnail1")){
+        		ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
+        				ThumbnailView1.mProgressHandler, 5));  
         		return FileOpReturn.ERR; 
         	}
         	
         		
         }
-        
+        return FileOpReturn.ERR; 
     }   
     public static FileOpReturn deleteSelectedFile(String cur_page) {
     	List<String> fileList = new ArrayList<String>();
@@ -611,12 +667,21 @@ public class FileOp {
     	        }
 
         	}
-        	else{
+        	else if (cur_page.equals("thumbnail")){
         		ThumbnailView.myCursor = ThumbnailView.db.getFileMark();   
     	        if (ThumbnailView.myCursor.getCount() > 0) {
     	            for(int i=0; i<ThumbnailView.myCursor.getCount(); i++){
     	            	ThumbnailView.myCursor.moveToPosition(i);
     	            	fileList.add(ThumbnailView.myCursor.getColFilePath());
+    	            }      	
+    	        }
+        		
+        	} else if (cur_page.equals("thumbnail1")){
+        		ThumbnailView1.myCursor = ThumbnailView1.db.getFileMark();   
+    	        if (ThumbnailView1.myCursor.getCount() > 0) {
+    	            for(int i=0; i<ThumbnailView1.myCursor.getCount(); i++){
+    	            	ThumbnailView1.myCursor.moveToPosition(i);
+    	            	fileList.add(ThumbnailView1.myCursor.getColFilePath());
     	            }      	
     	        }
         		
@@ -627,8 +692,10 @@ public class FileOp {
         		FileBrower.myCursor.close();
         		
         	}
-        	else{
+        	else if (cur_page.equals("thumbnail")){
         		ThumbnailView.myCursor.close();
+        	} else if (cur_page.equals("thumbnail1")){
+        		ThumbnailView1.myCursor.close();
         	}
         }     	
     	

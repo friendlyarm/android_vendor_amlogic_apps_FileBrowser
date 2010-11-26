@@ -277,7 +277,10 @@ public class FileBrower extends Activity {
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
                 
-                ProgressBar pb = (ProgressBar) edit_dialog.findViewById(R.id.edit_progress_bar);
+                ProgressBar pb = null;
+                if (edit_dialog != null)
+                	pb = (ProgressBar) edit_dialog.findViewById(R.id.edit_progress_bar);
+              
                 switch(msg.what) {
                 case 0: 	//set invisible
                     if ((edit_dialog != null) && (pb != null)) {                    	
