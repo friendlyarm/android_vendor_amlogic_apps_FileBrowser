@@ -349,7 +349,8 @@ public class FileOp {
 		return false;    	
     } 
     
-    public static Bitmap fitSizePic(File f){ 
+    public static Bitmap fitSizePic(File f){         
+        /*
         Bitmap resizeBmp = null;
         BitmapFactory.Options opts = new BitmapFactory.Options(); 
         if(f.length()<20480){         //0-20k
@@ -365,8 +366,20 @@ public class FileOp {
         }else{
           opts.inSampleSize = 10;
         }
-        resizeBmp = BitmapFactory.decodeFile(f.getPath(),opts);
-        return resizeBmp; 
+        */
+         BitmapFactory.Options options = new BitmapFactory.Options();
+				 options.inJustDecodeBounds = true;
+				 Bitmap bitmap = BitmapFactory.decodeFile(file_path, options);
+				 
+				 int samplesize = (int) (options.outHeight / 96);
+				 if (samplesize <= 0) samplesize = 1;
+				 
+				 
+				 options.inSampleSize = samplesize;
+				 options.inJustDecodeBounds = false;
+				 bitmap = BitmapFactory.decodeFile(file_path, options);	
+        
+        return bitmap; 
       }
     /** update file sel status 
      * 1: add to mark table 0: remove from mark table
