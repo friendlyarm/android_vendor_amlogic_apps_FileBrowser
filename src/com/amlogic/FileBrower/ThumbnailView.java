@@ -108,7 +108,10 @@ public class ThumbnailView extends Activity{
 		myThumbnailAdapter.notifyDataSetChanged();
 		
 		}
-	
+	public void OnCancelled(){
+		//Runtime.getRuntime().gc();
+		System.gc();
+	}
 	
 	}	
 		
@@ -394,6 +397,7 @@ public class ThumbnailView extends Activity{
 		 GetCurrentFilelist(cur_path,sort_type);
 		 
 		 myThumbnailAdapter.clear();
+		 System.gc();
 		 myThumbnailAdapter = new ThumbnailAdapter(getBaseContext(),filelist);
 		 ThumbnailView.setAdapter(myThumbnailAdapter);
 		 if(decodePhotosTask !=null&&(decodePhotosTask.getStatus() == AsyncTask.Status.RUNNING)){
