@@ -27,9 +27,11 @@
     
     <string name="FileBrowerDatabase_onCreate">"
 CREATE TABLE file_mark_table (_id INTEGER PRIMARY KEY AUTOINCREMENT, file_path TEXT, is_sel INTEGER);
+CREATE TABLE file_thumbnails_table (_id INTEGER PRIMARY KEY AUTOINCREMENT, file_path TEXT, file_data BLOB, dir_path TEXT );
 "</string>      
     <string name="FileBrowerDatabase_onUpgrade">"
 DROP TABLE IF EXISTS file_mark_table
+DROP TABLE IF EXISTS file_thumbnails_table
 "</string>    
 
 	<string name="Toast_msg_del_ok">Delete all selected files.</string>

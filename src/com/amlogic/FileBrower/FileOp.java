@@ -78,11 +78,11 @@ public class FileOp {
     	if (isMusic(filename)) {
     		return R.drawable.item_preview_music;
     	} else if (isPhoto(filename)) {
-    		return null;
+    		return R.drawable.item_preview_photo;
     	} else if (isVideo(filename)) {
     		return R.drawable.item_preview_video;
     	} else
-    		return R.drawable.txt_default;
+    		return R.drawable.item_preview_file;
 
     }
     

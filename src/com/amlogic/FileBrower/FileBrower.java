@@ -1,5 +1,7 @@
 package com.amlogic.FileBrower;
 
+import android.os.storage.*;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -13,8 +15,13 @@ import java.util.Map;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,7 +30,6 @@ import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -42,6 +48,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.amlogic.FileBrower.FileBrowerDatabase.FileMarkCursor;
+import com.amlogic.FileBrower.FileBrowerDatabase.ThumbnailCursor;
 import com.amlogic.FileBrower.FileOp.FileOpReturn;
 import com.amlogic.FileBrower.FileOp.FileOpTodo;
 
@@ -67,15 +74,67 @@ public class FileBrower extends Activity {
 	private boolean local_mode;
 	public static FileBrowerDatabase db;
 	public static FileMarkCursor myCursor;
-	
+	public static ThumbnailCursor myThumbCursor;
 	public static  Handler mProgressHandler;
 	private ListView lv;
 	private TextView tv;
 	private List<String> devList = new ArrayList<String>();
 	private int request_code = 1550;
-	
 
 	String open_mode[] = {"movie","music","photo","packageInstall"};
+	
+	
+    private final StorageEventListener mListener = new StorageEventListener() {
+        public void onUsbMassStorageConnectionChanged(boolean connected)
+        {
+        	//this is the action when connect to pc
+        	return ;
+        }
+        public void onStorageStateChanged(String path, String oldState, String newState)
+        {
+        	if (newState == null || path == null) 
+        		return;
+        	
+        	if(newState.compareTo("mounted") == 0)
+        	{
+        		Log.w(path, "mounted.........");
+        		ThumbnailOpUtils.updateThumbnailsForDev(getBaseContext(), path);
+        		if (cur_path.equals(ROOT_PATH)) {
+        			DeviceScan();
+        		}
+        		
+        	}
+        	else if(newState.compareTo("unmounted") == 0)
+        	{
+        		Log.w(path, "unmounted.........");
+        		if (cur_path.startsWith(path)) {
+        			cur_path = ROOT_PATH;
+        			DeviceScan();
+        		}
+        	}
+        	else if(newState.compareTo("removed") == 0)
+        	{
+        		Log.w(path, "removed.........");
+        	}
+        }
+        
+    };
+
+    /** Called when the activity is first created or resumed. */
+    @Override
+    public void onResume() {
+        super.onResume();
+        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
+		m_storagemgr.registerListener(mListener);
+    }
+    
+    @Override
+    public void onPause() {
+        super.onPause();
+        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
+        m_storagemgr.unregisterListener(mListener);
+    }
+	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -86,6 +145,12 @@ public class FileBrower extends Activity {
         
         /* setup database */
         db = new FileBrowerDatabase(this); 
+
+
+        //ThumbnailOpUtils.deleteAllThumbnails(getBaseContext(), db);        
+        ThumbnailOpUtils.cleanThumbnails(getBaseContext(), db);
+        ThumbnailOpUtils.updateThumbnailsForAllDev(getBaseContext());         
+
 
         /* btn_mode default checked */
         ToggleButton btn_mode = (ToggleButton) findViewById(R.id.btn_mode); 
@@ -255,7 +320,7 @@ public class FileBrower extends Activity {
     		public void onClick(View v) {
     			FileOp.SetMode(true);
     			Intent intent = new Intent();
-    			intent.setClass(FileBrower.this, ThumbnailView.class);
+    			intent.setClass(FileBrower.this, ThumbnailView1.class);
     			/*  */
     			Bundle mybundle = new Bundle();
     			
@@ -307,6 +372,7 @@ public class FileBrower extends Activity {
                 case 4:		//file paste ok
         			db.deleteAllFileMark();
         			lv.setAdapter(getFileListAdapter(cur_path)); 
+        			ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path);
         			Toast.makeText(FileBrower.this,
         					getText(R.string.Toast_msg_paste_ok),
         					Toast.LENGTH_SHORT).show();       
@@ -391,14 +457,16 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
         	"item_type",
         	"item_name",        	        	
         	"item_rw",
-        	"item_size"},        		
+        	"item_size"
+        	},        		
                 new int[]{
         	R.id.device_type,
         	R.id.device_name,        	
         	R.id.device_rw,       	
-        	R.id.device_size});  		
+        	R.id.device_size
+        	});  		
 	}
-
+/*
 	private List<? extends Map<String, ?>> getDeviceListData() {
 		// TODO Auto-generated method stub
 		String file_path = null;
@@ -418,7 +486,105 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
     	updatePathShow(device);
     	return list; 
 	}
-	
+	*/
+	private List<Map<String, Object>> getDeviceListData() {
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>(); 
+		Map<String, Object> map;
+		/*
+		map = new HashMap<String, Object>();
+		map.put("item_name", getText(R.string.memory_device_str));
+		map.put("file_path", "/mnt/flash");
+		map.put("item_type", R.drawable.memory_default);
+		map.put("file_date", 0);
+		map.put("file_size", 0);
+		map.put("item_sel", R.drawable.item_img_unsel);
+		list.add(map);
+		
+		map = new HashMap<String, Object>();
+		map.put("item_name", getText(R.string.sdcard_device_str));
+		map.put("file_path", "/mnt/sdcard");
+		map.put("item_type", R.drawable.sdcard_default);
+		map.put("file_date", 0);
+		map.put("file_size", 0);
+		map.put("item_sel", R.drawable.item_img_unsel);
+		list.add(map);
+		
+		map = new HashMap<String, Object>();
+		map.put("item_name", getText(R.string.usb_device_str));
+		map.put("file_path", "/mnt/usb");
+		map.put("item_type", R.drawable.usb_default);
+		map.put("file_date", 0);
+		map.put("file_size", 0);
+		map.put("item_sel", R.drawable.item_img_unsel);
+		list.add(map);		
+		*/
+        File dir = new File("/mnt");
+		if (dir.exists() && dir.isDirectory()) {
+			if (dir.listFiles() != null) {
+				if (dir.listFiles().length > 0) {
+					for (File file : dir.listFiles()) {
+						if (file.isDirectory()) {
+							String path = file.getAbsolutePath();            								
+							if (path.equals("/mnt/flash")) {
+								map = new HashMap<String, Object>();
+								map.put("item_name", getText(R.string.memory_device_str));
+								map.put("file_path", "/mnt/flash");
+								map.put("item_type", R.drawable.memory_icon);
+								map.put("file_date", 0);
+								map.put("file_size", 0);
+					    		map.put("item_size", null);
+					    		map.put("item_rw", null);
+								list.add(map);								
+							} else if (path.equals("/mnt/sdcard")) {
+								map = new HashMap<String, Object>();
+								map.put("item_name", getText(R.string.sdcard_device_str));
+								map.put("file_path", "/mnt/sdcard");
+								map.put("item_type", R.drawable.sd_card_icon);
+								map.put("file_date", 0);
+								map.put("file_size", 0);
+					    		map.put("item_size", null);
+					    		map.put("item_rw", null);
+								list.add(map);								
+							} else if (path.equals("/mnt/usb")) {
+								map = new HashMap<String, Object>();
+								map.put("item_name", getText(R.string.usb_device_str) + 
+										" " + file.getName());
+								map.put("file_path", "/mnt/usb");
+								map.put("item_type", R.drawable.usb_card_icon);
+								map.put("file_date", 0);
+								map.put("file_size", 0);
+					    		map.put("item_size", null);
+					    		map.put("item_rw", null);
+								list.add(map);									
+							} else if (path.startsWith("/mnt/sd")) {
+								map = new HashMap<String, Object>();
+								map.put("item_name", getText(R.string.usb_device_str) + 
+										" " + file.getName());
+								map.put("file_path", path);
+								map.put("item_type", R.drawable.usb_card_icon);
+								map.put("file_date", 0);
+								map.put("file_size", 0);
+					    		map.put("item_size", null);
+					    		map.put("item_rw", null);
+								list.add(map);	
+							}
+						}
+					}
+				}
+			}
+		}
+		updatePathShow(ROOT_PATH);
+    	if (!list.isEmpty()) { 
+    		Collections.sort(list, new Comparator<Map<String, Object>>() {
+				
+				public int compare(Map<String, Object> object1,
+						Map<String, Object> object2) {	
+					return ((String) object1.get("item_name")).compareTo((String) object2.get("item_name"));					
+				}    			
+    		}); 
+    }
+		return list;
+	}	
     /** Dialog */
     @Override
     protected Dialog onCreateDialog(int id) {
@@ -761,7 +927,10 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
     /** updatePathShow */
     private void updatePathShow(String path) {      	
         tv = (TextView) findViewById(R.id.path); 
-        tv.setText(path);    	
+		if (path.equals(ROOT_PATH))
+			tv.setText(getText(R.string.rootDevice));
+		else
+			tv.setText(path);   	
     }
    
     /** getFileListAdapterSorted */

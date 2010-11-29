@@ -8,13 +8,14 @@ import android.database.sqlite.SQLiteCursorDriver;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQuery;
+import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
 public class FileBrowerDatabase extends SQLiteOpenHelper {
 	/** The name of the database file on the file system */
     private static final String DATABASE_NAME = "FileBrower";
     /** The version of the database that this class understands. */
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     /** Keep track of context so that we can load SQL from string resources */
     private final Context mContext;
     
@@ -31,8 +32,9 @@ public class FileBrowerDatabase extends SQLiteOpenHelper {
      */
     private void execMultipleSQL(SQLiteDatabase db, String[] sql){
     	for( String s : sql )
-    		if (s.trim().length()>0)
+    		if (s.trim().length()>0)     			
     			db.execSQL(s);
+    		
     }
 	
     /** Called when it is time to create the database */
@@ -191,4 +193,132 @@ public class FileBrowerDatabase extends SQLiteOpenHelper {
             Log.e("Error updateFileMark", e.toString());
 		}
 	}	
+	
+	
+    /**
+     * Provides self-contained query-specific cursor for file_thumbnails_table.  
+     * The query and all accessor methods are in the class.
+     */
+    public static class ThumbnailCursor extends SQLiteCursor{
+    	/** The query for this cursor */
+    	private static final String QUERY = 
+    		"SELECT _id, file_path, file_data "+
+    		"FROM file_thumbnails_table ";
+    	/** Cursor constructor */
+		private ThumbnailCursor(SQLiteDatabase db, SQLiteCursorDriver driver,
+				String editTable, SQLiteQuery query) {
+			super(db, driver, editTable, query);
+		}
+		/** Private factory class necessary for rawQueryWithFactory() call */
+	    private static class Factory implements SQLiteDatabase.CursorFactory{
+			
+			public Cursor newCursor(SQLiteDatabase db,
+					SQLiteCursorDriver driver, String editTable,
+					SQLiteQuery query) {
+				return new ThumbnailCursor(db, driver, editTable, query);
+			}
+	    }
+	    /* Accessor functions -- one per database column */
+    	public long getColId(){return getLong(getColumnIndexOrThrow("_id"));}
+    	public String getColFilePath(){return getString(getColumnIndexOrThrow("file_path"));}
+    	public byte[] getColFileData(){return getBlob(getColumnIndexOrThrow("file_data"));}
+    }
+    
+    /** Returns a Cursor for file_thumbnails_table query by file_path 
+     */
+    public ThumbnailCursor getThumbnailByPath(String file_path) {
+    	file_path = file_path.replace("'", "''");
+    	String sql =  String.format(
+    			ThumbnailCursor.QUERY +
+    			"WHERE file_path = '%s' ",
+				file_path);
+    	SQLiteDatabase d = getReadableDatabase();
+    	ThumbnailCursor c = (ThumbnailCursor) d.rawQueryWithFactory(
+			new ThumbnailCursor.Factory(),
+			sql,
+			null,
+			null);
+    	c.moveToFirst();
+        return c;
+    }
+    public ThumbnailCursor checkThumbnailByPath(String file_path) {
+    	file_path = file_path.replace("'", "''");
+    	String sql =  String.format(
+    			"SELECT _id, file_path "+
+        		"FROM file_thumbnails_table " +
+    			"WHERE file_path = '%s' ",
+				file_path);
+    	SQLiteDatabase d = getReadableDatabase();
+    	ThumbnailCursor c = (ThumbnailCursor) d.rawQueryWithFactory(
+			new ThumbnailCursor.Factory(),
+			sql,
+			null,
+			null);
+    	c.moveToFirst();
+        return c;
+    }
+    public ThumbnailCursor checkThumbnail() {    	
+    	String sql =  
+    			"SELECT _id, file_path "+
+        		"FROM file_thumbnails_table ";
+    	SQLiteDatabase d = getReadableDatabase();
+    	ThumbnailCursor c = (ThumbnailCursor) d.rawQueryWithFactory(
+			new ThumbnailCursor.Factory(),
+			sql,
+			null,
+			null);
+    	c.moveToFirst();
+        return c;
+    }
+    
+    /** add entry to database */
+	public void addThumbnail(String file_path, byte[] file_data){
+		Log.w(FileBrower.TAG, "addThumbnail: " + file_path);
+		//file_path = file_path.replace("'", "''");
+
+		try{
+			SQLiteStatement statement = getWritableDatabase()
+				.compileStatement(
+				"INSERT INTO file_thumbnails_table (_id, file_path, file_data) " +
+				"VALUES (NULL, ?, ?)");
+			try {
+				statement.bindString(1, file_path); 
+				statement.bindBlob(2, file_data); 
+				statement.execute();
+			} finally {
+				statement.close();
+			}
+
+		} catch (SQLException e) {
+            Log.e("Error addThumbnail", e.toString());
+		} 
+	}
+	
+	/** delete entry */
+	public void deleteThumbnail(String file_path) {
+		Log.w(FileBrower.TAG, "deleteThumbnail: " + file_path);
+		file_path = file_path.replace("'", "''");
+		String sql = String.format(
+				"DELETE FROM file_thumbnails_table " +
+				"WHERE file_path = '%s' ",
+				file_path);
+		try{
+			getWritableDatabase().execSQL(sql);
+		} catch (SQLException e) {
+            Log.e("Error deleteThumbnail", e.toString());
+		}
+	}	
+	
+	/** delete all entry */
+	public void deleteAllThumbnail() {
+		Log.w(FileBrower.TAG, "deleteAllThumbnail: ");		
+		String sql = String.format(
+				"DELETE FROM file_thumbnails_table "				
+				);
+		try{
+			getWritableDatabase().execSQL(sql);
+		} catch (SQLException e) {
+            Log.e("Error deleteAllThumbnail", e.toString());
+		}
+	}	    
 }
