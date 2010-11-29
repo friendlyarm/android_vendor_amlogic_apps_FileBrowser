@@ -350,8 +350,8 @@ public class FileOp {
     } 
     
     public static Bitmap fitSizePic(File f){         
-        /*
-        Bitmap resizeBmp = null;
+        
+       /* Bitmap bitmap = null;
         BitmapFactory.Options opts = new BitmapFactory.Options(); 
         if(f.length()<20480){         //0-20k
           opts.inSampleSize = 1;
@@ -366,10 +366,10 @@ public class FileOp {
         }else{
           opts.inSampleSize = 10;
         }
-        */
+        bitmap = BitmapFactory.decodeFile(f.getPath(), opts);*/
          BitmapFactory.Options options = new BitmapFactory.Options();
 				 options.inJustDecodeBounds = true;
-				 Bitmap bitmap = BitmapFactory.decodeFile(file_path, options);
+				 Bitmap bitmap = BitmapFactory.decodeFile(f.getPath(), options);
 				 
 				 int samplesize = (int) (options.outHeight / 96);
 				 if (samplesize <= 0) samplesize = 1;
@@ -377,7 +377,7 @@ public class FileOp {
 				 
 				 options.inSampleSize = samplesize;
 				 options.inJustDecodeBounds = false;
-				 bitmap = BitmapFactory.decodeFile(file_path, options);	
+				 bitmap = BitmapFactory.decodeFile(f.getPath(), options);
         
         return bitmap; 
       }
