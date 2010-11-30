@@ -111,10 +111,20 @@ public class FileBrower extends Activity {
         			cur_path = ROOT_PATH;
         			DeviceScan();
         		}
+        		if (cur_path.equals(ROOT_PATH)) {
+        			DeviceScan();
+        		}
         	}
         	else if(newState.compareTo("removed") == 0)
         	{
         		Log.w(path, "removed.........");
+        		if (cur_path.startsWith(path)) {
+        			cur_path = ROOT_PATH;
+        			DeviceScan();
+        		}
+        		if (cur_path.equals(ROOT_PATH)) {
+        			DeviceScan();
+        		}        		
         	}
         }
         

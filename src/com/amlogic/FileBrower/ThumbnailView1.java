@@ -486,10 +486,20 @@ public class ThumbnailView1 extends Activity{
         			cur_path = ROOT_PATH;
         			ThumbnailView.setAdapter(getFileListAdapter(cur_path)); 
         		}
+        		if (cur_path.equals(ROOT_PATH)) {
+        			ThumbnailView.setAdapter(getFileListAdapter(cur_path)); 
+        		}
         	}
         	else if(newState.compareTo("removed") == 0)
         	{
         		Log.w(path, "removed.........");
+        		if (cur_path.startsWith(path)) {
+        			cur_path = ROOT_PATH;
+        			ThumbnailView.setAdapter(getFileListAdapter(cur_path)); 
+        		}
+        		if (cur_path.equals(ROOT_PATH)) {
+        			ThumbnailView.setAdapter(getFileListAdapter(cur_path)); 
+        		}        		
         	}
         }
         
