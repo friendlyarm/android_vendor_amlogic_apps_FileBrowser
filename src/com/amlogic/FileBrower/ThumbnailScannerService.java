@@ -131,7 +131,7 @@ public class ThumbnailScannerService extends Service implements Runnable {
             									path.equals("/mnt/sdcard") ||
             									path.equals("/mnt/usb") ||
             									path.startsWith("/mnt/sd")) {
-            		                			if (createThumbnailsInDir(dir_path) > 0) {
+            		                			if (createThumbnailsInDir(path) > 0) {
             		                				sendBroadcast(new Intent(ACTION_THUMBNAIL_SCANNER_FINISHED));	
             		                			}
             								}
