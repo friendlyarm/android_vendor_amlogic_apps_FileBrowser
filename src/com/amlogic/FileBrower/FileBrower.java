@@ -148,7 +148,7 @@ public class FileBrower extends Activity {
 
 
         //ThumbnailOpUtils.deleteAllThumbnails(getBaseContext(), db);        
-        ThumbnailOpUtils.cleanThumbnails(getBaseContext(), db);
+        ThumbnailOpUtils.cleanThumbnails(getBaseContext());
         ThumbnailOpUtils.updateThumbnailsForAllDev(getBaseContext());         
 
 

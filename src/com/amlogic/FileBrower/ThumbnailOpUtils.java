@@ -15,28 +15,11 @@ public class ThumbnailOpUtils {
 		
 	}
 	
-	public static void cleanThumbnails(Context context, FileBrowerDatabase db) {
-		if (db != null) {
-			 ThumbnailCursor cc = null;
-			 try {
-				 cc = db.checkThumbnail();
-				 if (cc != null && cc.moveToFirst()) {
-					 if (cc.getCount() > 0) {
-						 for (int i = 0; i < cc.getCount(); i++) {
-							 cc.moveToPosition(i);
-							 String file_path = cc.getColFilePath();
-							 if (file_path != null) {
-								 if (!new File(file_path).exists()) {
-									 db.deleteThumbnail(file_path);
-								 }
-							 }
-						 }
-					 }					 
-				 }
-			 } finally {
-				 if(cc != null) cc.close();
-			 }
-		}
+	public static void cleanThumbnails(Context context) {
+		Bundle args = new Bundle();		
+		args.putString("scan_type", "clean");
+		context.startService(
+    		new Intent(context, ThumbnailScannerService.class).putExtras(args));
 		
 	}
 	

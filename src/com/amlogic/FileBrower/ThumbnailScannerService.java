@@ -180,6 +180,13 @@ public class ThumbnailScannerService extends Service implements Runnable {
                 			}
             			}
             			
+            		} else if (scan_type.equals("clean")) {
+            	        long start_time, end_time;
+            	        start_time = System.currentTimeMillis();            			
+            			cleanThumbnails();
+            			end_time = System.currentTimeMillis();
+            			Log.w("cleanThumbnails",              					
+            					" time:" + (end_time - start_time) + "ms");            			
             		}
             	}
             } catch (Exception e) {
@@ -196,6 +203,30 @@ public class ThumbnailScannerService extends Service implements Runnable {
 		return null;
 	}
 
+	private void cleanThumbnails() {
+		if (db != null) {
+			 ThumbnailCursor cc = null;
+			 try {
+				 cc = db.checkThumbnail();
+				 if (cc != null && cc.moveToFirst()) {
+					 if (cc.getCount() > 0) {
+						 for (int i = 0; i < cc.getCount(); i++) {
+							 cc.moveToPosition(i);
+							 String file_path = cc.getColFilePath();
+							 if (file_path != null) {
+								 if (!new File(file_path).exists()) {
+									 db.deleteThumbnail(file_path);
+								 }
+							 }
+						 }
+					 }					 
+				 }
+			 } finally {
+				 if(cc != null) cc.close();
+			 }
+		}
+	}
+	
 	private int createThumbnail(String file_path) {		
 		 int count = 0;		 
 		 if (file_path != null && db != null) {
