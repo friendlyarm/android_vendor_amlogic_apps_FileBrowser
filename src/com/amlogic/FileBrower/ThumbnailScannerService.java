@@ -3,6 +3,7 @@ package com.amlogic.FileBrower;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import android.provider.MediaStore.Images;
 
 import android.app.Service;
 import android.content.Context;
@@ -118,9 +119,7 @@ public class ThumbnailScannerService extends Service implements Runnable {
             		if (scan_type.equals("all")) {
             	        long start_time, end_time;
             	        start_time = System.currentTimeMillis();
-            	        //createAllThumbnailsInDir("/mnt/flash");
-            	        //createAllThumbnailsInDir("/mnt/sdcard");
-            	        //createAllThumbnailsInDir("/mnt/usb");
+
             	        File dir = new File("/mnt");
             			if (dir.exists() && dir.isDirectory()) {
             				if (dir.listFiles() != null) {
@@ -132,7 +131,22 @@ public class ThumbnailScannerService extends Service implements Runnable {
             									path.equals("/mnt/sdcard") ||
             									path.equals("/mnt/usb") ||
             									path.startsWith("/mnt/sd")) {
+            		                			if (createThumbnailsInDir(dir_path) > 0) {
+            		                				sendBroadcast(new Intent(ACTION_THUMBNAIL_SCANNER_FINISHED));	
+            		                			}
+            								}
+            							}
+            						}
+            						
+            						for (File file : dir.listFiles()) {
+            							if (file.isDirectory()) {
+            								String path = file.getAbsolutePath();            								
+            								if (path.equals("/mnt/flash") ||
+            									path.equals("/mnt/sdcard") ||
+            									path.equals("/mnt/usb") ||
+            									path.startsWith("/mnt/sd")) {
             									createAllThumbnailsInDir(path);
+            									sendBroadcast(new Intent(ACTION_THUMBNAIL_SCANNER_FINISHED)); 
             								}
             							}
             						}
@@ -143,12 +157,15 @@ public class ThumbnailScannerService extends Service implements Runnable {
             			end_time = System.currentTimeMillis();
             			Log.w("createThumbnailsInAllDev",              					
             					" time:" + (end_time - start_time) + "ms");
-            			sendBroadcast(new Intent(ACTION_THUMBNAIL_SCANNER_FINISHED));  
+            			//sendBroadcast(new Intent(ACTION_THUMBNAIL_SCANNER_FINISHED));  
             			
             		} else if (scan_type.equals("dev")) {
             			if (dir_path != null) {
                 	        long start_time, end_time;
                 	        start_time = System.currentTimeMillis();
+                			if (createThumbnailsInDir(dir_path) > 0) {
+                				sendBroadcast(new Intent(ACTION_THUMBNAIL_SCANNER_FINISHED));	
+                			}                	        
                 			createAllThumbnailsInDir(dir_path);
                 			end_time = System.currentTimeMillis();
                 			Log.w("createThumbnailsInDev", "dev:" + dir_path +             					
@@ -180,9 +197,16 @@ public class ThumbnailScannerService extends Service implements Runnable {
 	}
 
 	private int createThumbnail(String file_path) {		
-		 int count = 0;
+		 int count = 0;		 
 		 if (file_path != null && db != null) {
-			 if (FileOp.isPhoto(file_path) && new File(file_path).exists()) {					 
+		 	 File file = new File(file_path);
+			 if (FileOp.isPhoto(file_path) &&  file != null && file.exists()) {				
+			 	
+			 	 //OutOfMemoryError, ignore file size >30MB 		 	 	 	 
+				 if (file.length() > 1024*1024*30) {
+				 		return 0;
+				 }					 
+			 		 
 				 ThumbnailCursor cc = null;
 				 try {
 					 cc = db.checkThumbnailByPath(file_path);
@@ -193,38 +217,50 @@ public class ThumbnailScannerService extends Service implements Runnable {
 				 } finally {
 					 if(cc != null) cc.close();
 				 }
-				 
+				 /*
 				 BitmapFactory.Options options = new BitmapFactory.Options();
 				 options.inJustDecodeBounds = true;
 				 Bitmap bitmap = BitmapFactory.decodeFile(file_path, options);
-				 //Log.i("old ..........size:", "w" + options.outWidth + " h" + options.outHeight);
-				 int samplesize = (int) (options.outHeight / 96);
+				 Log.i("old ..........size:", "w" + options.outWidth + " h" + options.outHeight);
+				 int samplesize = (int) ((options.outWidth > options.outHeight ? options.outWidth : options.outHeight) / 96);
 				 if (samplesize <= 0) samplesize = 1;
+
 				 //Log.i("sampleSize.........:", " " + samplesize);
 				 
 				 options.inSampleSize = samplesize;
 				 options.inJustDecodeBounds = false;
 				 bitmap = BitmapFactory.decodeFile(file_path, options);				 
-				 //Log.i("new ..........size1:", "w" + bitmap.getWidth() + " h" + bitmap.getWidth());
-				 
-				 bitmap = ThumbnailUtils.extractThumbnail(bitmap, 96, 96);
-				 //Log.i("new ..........size2:", "w" + bitmap.getWidth() + " h" + bitmap.getWidth());
-				 
-				 if (bitmap != null) {
-				     ByteArrayOutputStream os = new ByteArrayOutputStream();
-				     bitmap.compress(Bitmap.CompressFormat.PNG, 100, os);
-				     db.addThumbnail(file_path, os.toByteArray());
-				     try {
-				    	 os.close();
-				     } catch (IOException e) {
-				    	 // TODO Auto-generated catch block
-				    	 e.printStackTrace();
-				     }
-				     count++;
-				 }
+				 Log.i("new ..........size1:", "w" + bitmap.getWidth() + " h" + bitmap.getWidth());
+				 */
+				 Bitmap bitmap = null;
+				 Bitmap thumb = null;				 
+				 bitmap = ThumbnailUtils.createImageThumbnail(file_path,
+                        Images.Thumbnails.MINI_KIND);
+		         if (bitmap != null) {
+		        	 thumb = ThumbnailUtils.extractThumbnail(bitmap, 96, 96);
+		         	 if (!bitmap.isRecycled()) 
+		         	 bitmap.recycle();
+		         	      
+		         	 if (thumb != null) {
+		         		 ByteArrayOutputStream os = new ByteArrayOutputStream();
+		         		 thumb.compress(Bitmap.CompressFormat.PNG, 100, os);
+		         		 db.addThumbnail(file_path, os.toByteArray());
+		         		 count++;
+						 try {
+						    	 os.close();
+						 } catch (IOException e) {
+						    	 // TODO Auto-generated catch block
+						    	 e.printStackTrace();
+						 }
+		         	     
+						 if (!thumb.isRecycled()) 
+							 thumb.recycle();
+		         	  }  
+		         }
 			 }
-		 }
-		 return count;
+		}
+		return count;
+		 
 	}
 	
 	private int createThumbnailsInDir(String dir_path) {	
