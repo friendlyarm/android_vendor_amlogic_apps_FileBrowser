@@ -165,7 +165,7 @@ public class ThumbnailView1 extends Activity{
     				
     				public int compare(Map<String, Object> object1,
     						Map<String, Object> object2) {	
-    					return ((Long) object1.get("file_size")).compareTo((Long) object2.get("file_size"));					
+    					return ((Integer) object1.get("file_size")).compareTo((Integer) object2.get("file_size"));					
     				}    			
         		}); 
         }

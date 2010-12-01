@@ -589,7 +589,7 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 				
 				public int compare(Map<String, Object> object1,
 						Map<String, Object> object2) {	
-					return ((Long) object1.get("file_size")).compareTo((Long) object2.get("file_size"));					
+					return ((Integer) object1.get("file_size")).compareTo((Integer) object2.get("file_size"));					
 				}    			
     		}); 
     }
