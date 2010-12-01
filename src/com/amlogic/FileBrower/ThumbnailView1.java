@@ -121,7 +121,7 @@ public class ThumbnailView1 extends Activity{
 								map.put("file_path", "/mnt/flash");
 								map.put("item_type", R.drawable.memory_default);
 								map.put("file_date", 0);
-								map.put("file_size", 0);
+								map.put("file_size", 0);	//for sort
 								map.put("item_sel", R.drawable.item_img_unsel);
 								list.add(map);								
 							} else if (path.equals("/mnt/sdcard")) {
@@ -130,7 +130,7 @@ public class ThumbnailView1 extends Activity{
 								map.put("file_path", "/mnt/sdcard");
 								map.put("item_type", R.drawable.sdcard_default);
 								map.put("file_date", 0);
-								map.put("file_size", 0);
+								map.put("file_size", 1);	//for sort
 								map.put("item_sel", R.drawable.item_img_unsel);
 								list.add(map);								
 							} else if (path.equals("/mnt/usb")) {
@@ -140,7 +140,7 @@ public class ThumbnailView1 extends Activity{
 								map.put("file_path", "/mnt/usb");
 								map.put("item_type", R.drawable.usb_default);
 								map.put("file_date", 0);
-								map.put("file_size", 0);
+								map.put("file_size", 2);	//for sort
 								map.put("item_sel", R.drawable.item_img_unsel);
 								list.add(map);									
 							} else if (path.startsWith("/mnt/sd")) {
@@ -150,7 +150,7 @@ public class ThumbnailView1 extends Activity{
 								map.put("file_path", path);
 								map.put("item_type", R.drawable.usb_default);
 								map.put("file_date", 0);
-								map.put("file_size", 0);
+								map.put("file_size", 3);	//for sort
 								map.put("item_sel", R.drawable.item_img_unsel);
 								list.add(map);	
 							}
@@ -165,7 +165,7 @@ public class ThumbnailView1 extends Activity{
     				
     				public int compare(Map<String, Object> object1,
     						Map<String, Object> object2) {	
-    					return ((String) object1.get("file_path")).compareTo((String) object2.get("file_path"));					
+    					return ((Long) object1.get("file_size")).compareTo((Long) object2.get("file_size"));					
     				}    			
         		}); 
         }

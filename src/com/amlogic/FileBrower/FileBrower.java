@@ -541,7 +541,7 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 								map.put("file_path", "/mnt/flash");
 								map.put("item_type", R.drawable.memory_icon);
 								map.put("file_date", 0);
-								map.put("file_size", 0);
+								map.put("file_size", 0);	//for sort
 					    		map.put("item_size", null);
 					    		map.put("item_rw", null);
 								list.add(map);								
@@ -551,7 +551,7 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 								map.put("file_path", "/mnt/sdcard");
 								map.put("item_type", R.drawable.sd_card_icon);
 								map.put("file_date", 0);
-								map.put("file_size", 0);
+								map.put("file_size", 1);	//for sort
 					    		map.put("item_size", null);
 					    		map.put("item_rw", null);
 								list.add(map);								
@@ -562,7 +562,7 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 								map.put("file_path", "/mnt/usb");
 								map.put("item_type", R.drawable.usb_card_icon);
 								map.put("file_date", 0);
-								map.put("file_size", 0);
+								map.put("file_size", 2);	//for sort
 					    		map.put("item_size", null);
 					    		map.put("item_rw", null);
 								list.add(map);									
@@ -573,7 +573,7 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 								map.put("file_path", path);
 								map.put("item_type", R.drawable.usb_card_icon);
 								map.put("file_date", 0);
-								map.put("file_size", 0);
+								map.put("file_size", 3);	//for sort
 					    		map.put("item_size", null);
 					    		map.put("item_rw", null);
 								list.add(map);	
@@ -589,7 +589,7 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 				
 				public int compare(Map<String, Object> object1,
 						Map<String, Object> object2) {	
-					return ((String) object1.get("file_path")).compareTo((String) object2.get("file_path"));					
+					return ((Long) object1.get("file_size")).compareTo((Long) object2.get("file_size"));					
 				}    			
     		}); 
     }
