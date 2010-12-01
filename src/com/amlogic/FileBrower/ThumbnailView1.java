@@ -527,12 +527,7 @@ public class ThumbnailView1 extends Activity{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);         
-        setContentView(R.layout.thumbnail);   
-        
-        //IntentFilter intentFilter = new IntentFilter(Intent.ACTION_MEDIA_SCANNER_FINISHED);        
-        //intentFilter.addDataScheme("file");
-        //registerReceiver(mReceiver, intentFilter);
-        //updateThumbnials();
+        setContentView(R.layout.thumbnail);  
         
         ThumbnailView = (GridView)findViewById(R.id.mygridview);   
         /*get cur path form listview*/
@@ -554,6 +549,20 @@ public class ThumbnailView1 extends Activity{
         	//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type)); 
         }
         */
+        
+        if (cur_path == null) cur_path = ROOT_PATH;
+        if (cur_path.equals(ROOT_PATH)) {
+            //ThumbnailOpUtils.deleteAllThumbnails(getBaseContext(), db);        
+            ThumbnailOpUtils.cleanThumbnails(getBaseContext());
+            ThumbnailOpUtils.updateThumbnailsForAllDev(getBaseContext()); 
+        } else {
+            //ThumbnailOpUtils.deleteAllThumbnails(getBaseContext(), db);        
+            ThumbnailOpUtils.cleanThumbnails(getBaseContext());
+            ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path); 
+            ThumbnailOpUtils.updateThumbnailsForAllDev(getBaseContext()); 
+        }
+
+        
         ThumbnailView.setAdapter(getFileListAdapter(cur_path)); 
         /* btn_mode default checked */
         ToggleButton btn_mode = (ToggleButton) findViewById(R.id.btn_thumbmode); 
@@ -851,6 +860,7 @@ public class ThumbnailView1 extends Activity{
     		db.deleteAllFileMark();   		
     	}    	
     	db.close();
+    	ThumbnailOpUtils.stopThumbnailSanner(getBaseContext());
     }
     /*
     protected void DeviceScan() {

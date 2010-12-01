@@ -98,7 +98,7 @@ public class FileBrower extends Activity {
         	if(newState.compareTo("mounted") == 0)
         	{
         		Log.w(path, "mounted.........");
-        		ThumbnailOpUtils.updateThumbnailsForDev(getBaseContext(), path);
+        		//ThumbnailOpUtils.updateThumbnailsForDev(getBaseContext(), path);
         		if (cur_path.equals(ROOT_PATH)) {
         			DeviceScan();
         		}
@@ -155,12 +155,6 @@ public class FileBrower extends Activity {
         
         /* setup database */
         db = new FileBrowerDatabase(this); 
-
-
-        //ThumbnailOpUtils.deleteAllThumbnails(getBaseContext(), db);        
-        ThumbnailOpUtils.cleanThumbnails(getBaseContext());
-        ThumbnailOpUtils.updateThumbnailsForAllDev(getBaseContext());         
-
 
         /* btn_mode default checked */
         ToggleButton btn_mode = (ToggleButton) findViewById(R.id.btn_mode); 

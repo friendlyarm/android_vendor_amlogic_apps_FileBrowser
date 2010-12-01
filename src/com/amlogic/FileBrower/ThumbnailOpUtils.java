@@ -1,18 +1,15 @@
 package com.amlogic.FileBrower;
 
-import java.io.File;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-
-import com.amlogic.FileBrower.FileBrowerDatabase.ThumbnailCursor;
+import android.util.Log;
 
 public class ThumbnailOpUtils {
 	
 	public static void stopThumbnailSanner(Context context) {
 		context.stopService(new Intent(context, ThumbnailScannerService.class));
-		
+		//Log.w("stopThumbnailSanner", "..................");
 	}
 	
 	public static void cleanThumbnails(Context context) {
