@@ -97,7 +97,7 @@ public class FileBrower extends Activity {
         	
         	if(newState.compareTo("mounted") == 0)
         	{
-        		Log.w(path, "mounted.........");
+        		//Log.w(path, "mounted.........");
         		//ThumbnailOpUtils.updateThumbnailsForDev(getBaseContext(), path);
         		if (cur_path.equals(ROOT_PATH)) {
         			DeviceScan();
@@ -106,7 +106,7 @@ public class FileBrower extends Activity {
         	}
         	else if(newState.compareTo("unmounted") == 0)
         	{
-        		Log.w(path, "unmounted.........");
+        		//Log.w(path, "unmounted.........");
         		if (cur_path.startsWith(path)) {
         			cur_path = ROOT_PATH;
         			DeviceScan();
@@ -117,7 +117,7 @@ public class FileBrower extends Activity {
         	}
         	else if(newState.compareTo("removed") == 0)
         	{
-        		Log.w(path, "removed.........");
+        		//Log.w(path, "removed.........");
         		if (cur_path.startsWith(path)) {
         			cur_path = ROOT_PATH;
         			DeviceScan();

@@ -273,8 +273,8 @@ public class FileBrowerDatabase extends SQLiteOpenHelper {
     
     /** add entry to database */
 	public void addThumbnail(String file_path, byte[] file_data){
-		Log.w(FileBrower.TAG, "addThumbnail: " + file_path);
-		//file_path = file_path.replace("'", "''");
+		//Log.w(FileBrower.TAG, "addThumbnail: " + file_path);
+		
 
 		try{
 			SQLiteStatement statement = getWritableDatabase()
@@ -296,7 +296,7 @@ public class FileBrowerDatabase extends SQLiteOpenHelper {
 	
 	/** delete entry */
 	public void deleteThumbnail(String file_path) {
-		Log.w(FileBrower.TAG, "deleteThumbnail: " + file_path);
+		//Log.w(FileBrower.TAG, "deleteThumbnail: " + file_path);
 		file_path = file_path.replace("'", "''");
 		String sql = String.format(
 				"DELETE FROM file_thumbnails_table " +
@@ -311,7 +311,7 @@ public class FileBrowerDatabase extends SQLiteOpenHelper {
 	
 	/** delete all entry */
 	public void deleteAllThumbnail() {
-		Log.w(FileBrower.TAG, "deleteAllThumbnail: ");		
+		//Log.w(FileBrower.TAG, "deleteAllThumbnail: ");		
 		String sql = String.format(
 				"DELETE FROM file_thumbnails_table "				
 				);
