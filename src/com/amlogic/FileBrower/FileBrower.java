@@ -114,6 +114,7 @@ public class FileBrower extends Activity {
         		if (cur_path.equals(ROOT_PATH)) {
         			DeviceScan();
         		}
+        		FileOp.cleanFileMarks("list");
         	}
         	else if(newState.compareTo("removed") == 0)
         	{

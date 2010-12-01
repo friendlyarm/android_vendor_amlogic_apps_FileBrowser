@@ -19,6 +19,7 @@ import java.io.InputStream;
 import android.os.Environment;
 import android.os.Message;
 import android.util.Log;
+import com.amlogic.FileBrower.FileBrowerDatabase.FileMarkCursor;
 
 public class FileOp {
 	public static boolean switch_mode = false;	
@@ -384,6 +385,53 @@ public class FileOp {
     /** update file sel status 
      * 1: add to mark table 0: remove from mark table
      */
+    public static void cleanFileMarks(String cur_page) {
+    	if(cur_page.equals("list")){
+    		if (FileBrower.db != null) {
+    			FileMarkCursor cc = null;
+    			 try {
+    				 cc = FileBrower.db.getFileMark();
+    				 if (cc != null && cc.moveToFirst()) {
+    					 if (cc.getCount() > 0) {
+    						 for (int i = 0; i < cc.getCount(); i++) {
+    							 cc.moveToPosition(i);
+    							 String file_path = cc.getColFilePath();
+    							 if (file_path != null) {
+    								 if (!new File(file_path).exists()) {
+    									 FileBrower.db.deleteFileMark(file_path);
+    								 }
+    							 }
+    						 }
+    					 }					 
+    				 }
+    			 } finally {
+    				 if(cc != null) cc.close();
+    			 }
+    		}
+    	} else if(cur_page.equals("thumbnail1")){
+    		if (ThumbnailView1.db != null) {
+    			FileMarkCursor cc = null;
+    			 try {
+    				 cc = ThumbnailView1.db.getFileMark();
+    				 if (cc != null && cc.moveToFirst()) {
+    					 if (cc.getCount() > 0) {
+    						 for (int i = 0; i < cc.getCount(); i++) {
+    							 cc.moveToPosition(i);
+    							 String file_path = cc.getColFilePath();
+    							 if (file_path != null) {
+    								 if (!new File(file_path).exists()) {
+    									 ThumbnailView1.db.deleteFileMark(file_path);
+    								 }
+    							 }
+    						 }
+    					 }					 
+    				 }
+    			 } finally {
+    				 if(cc != null) cc.close();
+    			 }
+    		}    		
+    	}
+    }
     public static void updateFileStatus(String file_path, int status,String cur_page) {
     	if(cur_page.equals("list")){
     		if (FileBrower.db == null) return;

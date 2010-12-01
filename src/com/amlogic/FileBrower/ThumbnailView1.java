@@ -489,6 +489,7 @@ public class ThumbnailView1 extends Activity{
         		if (cur_path.equals(ROOT_PATH)) {
         			ThumbnailView.setAdapter(getFileListAdapter(cur_path)); 
         		}
+        		FileOp.cleanFileMarks("thumbnail1");
         	}
         	else if(newState.compareTo("removed") == 0)
         	{
