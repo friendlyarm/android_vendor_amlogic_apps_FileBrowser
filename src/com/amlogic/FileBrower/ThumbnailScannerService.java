@@ -29,6 +29,7 @@ public class ThumbnailScannerService extends Service implements Runnable {
 						= "com.amlogic.FileBrower.THUMBNAIL_SCANNER_FINISHED";
 	
 	private static FileBrowerDatabase db;
+	private static boolean stop_scanner = false;
 	
     private volatile Looper mServiceLooper;
     private volatile ServiceHandler mServiceHandler;
@@ -46,6 +47,7 @@ public class ThumbnailScannerService extends Service implements Runnable {
         // main thread, which we don't want to block.
         Thread thr = new Thread(null, this, "ThumbnailScannerService");
         thr.start();
+        stop_scanner = false;
     }
     
     @Override
@@ -78,6 +80,7 @@ public class ThumbnailScannerService extends Service implements Runnable {
     @Override
     public void onDestroy()
     {
+    	stop_scanner = true;
     	if (db != null) db.close();
         // Make sure thread has started before telling it to quit.
         while (mServiceLooper == null) {
@@ -227,14 +230,15 @@ public class ThumbnailScannerService extends Service implements Runnable {
 		}
 	}
 	
-	private int createThumbnail(String file_path) {		
+	private int createThumbnail(String file_path) throws IOException {		
+		 if (stop_scanner) return 0;
 		 int count = 0;		 
 		 if (file_path != null && db != null) {
 		 	 File file = new File(file_path);
 			 if (FileOp.isPhoto(file_path) &&  file != null && file.exists()) {				
 			 	
 			 	 //OutOfMemoryError, ignore file size >30MB 		 	 	 	 
-				 if (file.length() > 1024*1024*30) {
+				 if (file.length() > 1024*1024*30 || file.length() <= 0) {
 				 		return 0;
 				 }					 
 			 		 
@@ -275,8 +279,10 @@ public class ThumbnailScannerService extends Service implements Runnable {
 		         	 if (thumb != null) {
 		         		 ByteArrayOutputStream os = new ByteArrayOutputStream();
 		         		 thumb.compress(Bitmap.CompressFormat.PNG, 100, os);
-		         		 db.addThumbnail(file_path, os.toByteArray());
-		         		 count++;
+		         		 if (db != null) {
+		         			 db.addThumbnail(file_path, os.toByteArray());
+		         			 count++;
+		         		 }
 						 try {
 						    	 os.close();
 						 } catch (IOException e) {
@@ -313,7 +319,12 @@ public class ThumbnailScannerService extends Service implements Runnable {
 					if (dir.listFiles().length > 0) {
 						for (File file : dir.listFiles()) {
 							if (file.isFile() && FileOp.isPhoto(file.getName())) {
-								count += createThumbnail(file.getAbsolutePath());
+								try {
+									count += createThumbnail(file.getAbsolutePath());
+								} catch (IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 							}
 						}
 					}
@@ -347,7 +358,12 @@ public class ThumbnailScannerService extends Service implements Runnable {
 							if (file.isDirectory()) {
 								createAllThumbnailsInDir(file.getAbsolutePath());
 							} else if (file.isFile() && FileOp.isPhoto(file.getName())) {
-								createThumbnail(file.getAbsolutePath());
+								try {
+									createThumbnail(file.getAbsolutePath());
+								} catch (IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 							}
 						}
 					}
