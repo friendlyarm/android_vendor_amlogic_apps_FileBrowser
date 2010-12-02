@@ -1385,26 +1385,21 @@ public class ThumbnailView1 extends Activity{
         	list.add(map);   
     		map = new HashMap<String, Object>();    		
         	map.put("item_type", R.drawable.dialog_help_item_close);  
-        	map.put("item_name", getText(R.string.dialog_help_item_close_str));            	        	
+        	String ver_str = " ";
+          	try {
+          		ver_str += getPackageManager().getPackageInfo("com.amlogic.FileBrower", 0).versionName;			
+     		} catch (NameNotFoundException e) {
+     			// TODO Auto-generated catch block
+     			e.printStackTrace();
+     		}      
+        	map.put("item_name", getText(R.string.dialog_help_item_close_str) + ver_str);            	        	
         	map.put("item_sel", R.drawable.dialog_item_img_unsel);   
         	list.add(map);          	
     		break;    		
     	}
     	return list;
     }    
-    //option menu    
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
-   	 String ver_str = null;
-   	 try {
-			ver_str = getPackageManager().getPackageInfo("com.amlogic.FileBrower", 0).versionName;			
-		} catch (NameNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        menu.add(0, 0, 0, getText(R.string.app_name) + " v" + ver_str);
-        return true;
-    }
+    
 }
 
 

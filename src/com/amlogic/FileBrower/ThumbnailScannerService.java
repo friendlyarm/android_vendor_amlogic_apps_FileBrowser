@@ -318,7 +318,7 @@ public class ThumbnailScannerService extends Service implements Runnable {
 				if (dir.listFiles() != null) {
 					if (dir.listFiles().length > 0) {
 						for (File file : dir.listFiles()) {
-							if (file.isFile() && FileOp.isPhoto(file.getName())) {
+							if (file.exists() && file.isFile() && FileOp.isPhoto(file.getName())) {
 								try {
 									count += createThumbnail(file.getAbsolutePath());
 								} catch (IOException e) {
@@ -355,6 +355,7 @@ public class ThumbnailScannerService extends Service implements Runnable {
 				if (dir.listFiles() != null) {
 					if (dir.listFiles().length > 0) {
 						for (File file : dir.listFiles()) {
+							if (file.exists())
 							if (file.isDirectory()) {
 								createAllThumbnailsInDir(file.getAbsolutePath());
 							} else if (file.isFile() && FileOp.isPhoto(file.getName())) {
