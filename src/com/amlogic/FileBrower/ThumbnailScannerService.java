@@ -237,8 +237,8 @@ public class ThumbnailScannerService extends Service implements Runnable {
 		 	 File file = new File(file_path);
 			 if (FileOp.isPhoto(file_path) &&  file != null && file.exists()) {				
 			 	
-			 	 //OutOfMemoryError, ignore file size >30MB 		 	 	 	 
-				 if (file.length() > 1024*1024*30 || file.length() <= 0) {
+			 	 //OutOfMemoryError, ignore file size >15MB 		 	 	 	 
+				 if (file.length() > 1024*1024*15 || file.length() <= 0) {
 				 		return 0;
 				 }					 
 			 		 

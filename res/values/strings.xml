@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>   
     <string name="app_name">FileBrowser</string>
-    <string name="btn_home_str">Device List</string>
+    <string name="btn_home_str">Home</string>
     <string name="btn_parent_str">Back</string>
    
     <string name="btn_edit_str">Edit</string>
@@ -22,7 +22,7 @@
     
     
     <string name="click_dialog_title_str">Open File</string>
-    <string name="rootDevice">Home</string>
+    <string name="rootDevice">Device List</string>
     <string name="openMode">Open as..</string>
     
     <string name="FileBrowerDatabase_onCreate">"
