@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>   
-    <string name="app_name">FileBrower</string>
-    <string name="btn_home_str">Home</string>
+    <string name="app_name">FileBrowser</string>
+    <string name="btn_home_str">Device List</string>
     <string name="btn_parent_str">Back</string>
    
     <string name="btn_edit_str">Edit</string>
@@ -53,7 +53,7 @@ DROP TABLE IF EXISTS file_thumbnails_table
 	<string name="dialog_help_item_parent_str">Back to parent dir</string>
 	<string name="dialog_help_item_thumb_str">View by thumbnail </string>
 	<string name="dialog_help_item_list_str">View by list</string>
-	<string name="dialog_help_item_close_str">Close FileBrower</string>
+	<string name="dialog_help_item_close_str">Close FileBrowser</string>
 	<string name="memory_device_str">Internal Memory </string>
 	<string name="sdcard_device_str">SD Card</string>
 	<string name="usb_device_str">USB</string>
