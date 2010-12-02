@@ -590,7 +590,7 @@ public class ThumbnailView1 extends Activity{
 				else{
 					ToggleButton btn_mode = (ToggleButton) findViewById(R.id.btn_thumbmode); 
 					if (!btn_mode.isChecked()){
-						openFile(cur_path);
+						openFile(file_path);
 						
 					}
 					else {						

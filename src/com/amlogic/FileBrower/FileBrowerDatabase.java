@@ -277,16 +277,18 @@ public class FileBrowerDatabase extends SQLiteOpenHelper {
 		
 
 		try{
-			SQLiteStatement statement = getWritableDatabase()
+			SQLiteStatement statement = null;
+			try {
+			statement = getWritableDatabase()
 				.compileStatement(
 				"INSERT INTO file_thumbnails_table (_id, file_path, file_data) " +
 				"VALUES (NULL, ?, ?)");
-			try {
+			
 				statement.bindString(1, file_path); 
 				statement.bindBlob(2, file_data); 
 				statement.execute();
 			} finally {
-				statement.close();
+				if(statement != null) statement.close();
 			}
 
 		} catch (SQLException e) {
