@@ -38,6 +38,8 @@ DROP TABLE IF EXISTS file_thumbnails_table
 	<string name="Toast_msg_del_nofile">No file to delete.</string>
 	<string name="Toast_msg_paste_ok">Paste all selected files to current path.</string>
 	<string name="Toast_msg_paste_nofile">No file to paste.</string>
+	<string name="Toast_msg_paste_writeable">Cannot paste here, read only.</string>
+	<string name="Toast_msg_paste_nospace">Paste exit, no enough space.</string>
 	<string name="Toast_msg_cpy_nofile">No file to copy.</string>
 	<string name="Toast_msg_cut_nofile">No file to cut.</string>
 	<string name="Toast_msg_cpy_todo">File copy, select path and paste.</string>

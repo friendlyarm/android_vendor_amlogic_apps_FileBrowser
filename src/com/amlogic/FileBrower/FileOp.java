@@ -18,6 +18,7 @@ import java.io.InputStream;
 
 import android.os.Environment;
 import android.os.Message;
+import android.os.StatFs;
 import android.util.Log;
 import com.amlogic.FileBrower.FileBrowerDatabase.FileMarkCursor;
 
@@ -594,6 +595,19 @@ public class FileOp {
         	return FileOpReturn.ERR; 
     	}    			
     		
+    	if(cur_page.equals("list")){
+    		if (!checkCanWrite(FileBrower.cur_path)) {
+    			FileBrower.mProgressHandler.sendMessage(Message.obtain(
+    					FileBrower.mProgressHandler, 7)); 
+    			return FileOpReturn.ERR; 
+    		}
+    	} else if (cur_page.equals("thumbnail1")) {
+    		if (!checkCanWrite(ThumbnailView1.cur_path)) {
+    			ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
+    					ThumbnailView1.mProgressHandler, 7)); 
+    			return FileOpReturn.ERR; 
+    		}
+    	}
         try {   
         	if(cur_page.equals("list")){
         		FileBrower.myCursor = FileBrower.db.getFileMark();   
@@ -653,6 +667,19 @@ public class FileOp {
         		File file = new File(name);
         		if (file.exists()) {
         			//Log.i(FileBrower.TAG, "paste file: " + name);
+        			if(cur_page.equals("list")){
+        				if (file.length() > checkFreeSpace(FileBrower.cur_path)) {
+        	    			FileBrower.mProgressHandler.sendMessage(Message.obtain(
+        	    					FileBrower.mProgressHandler, 8)); 
+        	    			return FileOpReturn.ERR; 
+        				}
+        			} else if (cur_page.equals("thumbnail1")){
+        				if (file.length() > checkFreeSpace(ThumbnailView1.cur_path)) {
+                			ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
+                					ThumbnailView1.mProgressHandler, 8)); 
+                			return FileOpReturn.ERR; 
+        				}
+        			}
         			try {  
         				File file_new = null;
     					//Log.i(FileBrower.TAG, "copy and paste file: " + name);
@@ -819,5 +846,27 @@ public class FileOp {
 			
     }
     
+    public static long checkFreeSpace(String path) {
+    	long nSDFreeSize = 0;
+    	if (path != null) {
+        	StatFs statfs = new StatFs(path);
+
+    		long nBlocSize = statfs.getBlockSize();
+    		long nAvailaBlock = statfs.getAvailableBlocks();
+    		nSDFreeSize = nAvailaBlock * nBlocSize;
+    	}
+		return nSDFreeSize;
+    	
+    }
+    
+    public static boolean checkCanWrite(String path) {
+    	if (path != null) {
+    		File file = new File(path);
+    		if (file.exists() && file.canWrite())    			
+    			return true;    		
+    	}
+    	return false;
+    	
+    }
 }
          

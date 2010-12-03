@@ -394,6 +394,25 @@ public class FileBrower extends Activity {
                     if (edit_dialog != null)
                     	edit_dialog.dismiss();   
                 	break;
+                case 7:		//dir cannot write
+        			Toast.makeText(FileBrower.this,
+        					getText(R.string.Toast_msg_paste_writeable),
+        					Toast.LENGTH_SHORT).show();  
+        			//FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
+                    if (edit_dialog != null)
+                    	edit_dialog.dismiss();  
+                	break;
+                case 8:		//no free space
+                	db.deleteAllFileMark();
+        			lv.setAdapter(getFileListAdapter(cur_path)); 
+        			ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path);
+        			Toast.makeText(FileBrower.this,
+        					getText(R.string.Toast_msg_paste_nospace),
+        					Toast.LENGTH_SHORT).show();   
+        			FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
+                    if (edit_dialog != null)
+                    	edit_dialog.dismiss(); 
+                	break;
                 }
                 
             }

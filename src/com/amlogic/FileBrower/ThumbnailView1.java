@@ -794,6 +794,25 @@ public class ThumbnailView1 extends Activity{
                 	if (!cur_path.equals(ROOT_PATH))
                 		ThumbnailView.setAdapter(getFileListAdapter(cur_path)); 
                 	break;
+                case 7:		//dir cannot write
+        			Toast.makeText(ThumbnailView1.this,
+        					getText(R.string.Toast_msg_paste_writeable),
+        					Toast.LENGTH_SHORT).show();  
+        			//FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
+                    if (edit_dialog != null)
+                    	edit_dialog.dismiss();  
+                	break;
+                case 8:		//no free space
+        			db.deleteAllFileMark();        			     			
+					ThumbnailView.setAdapter(getFileListAdapter(cur_path));
+					ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path);
+        			Toast.makeText(ThumbnailView1.this,
+        					getText(R.string.Toast_msg_paste_nospace),
+        					Toast.LENGTH_SHORT).show();   
+        			FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
+                    if (edit_dialog != null)
+                    	edit_dialog.dismiss(); 
+                	break;                	
                 }
                 
             }
