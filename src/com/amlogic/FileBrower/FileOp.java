@@ -24,6 +24,7 @@ import com.amlogic.FileBrower.FileBrowerDatabase.FileMarkCursor;
 
 public class FileOp {
 	public static File copying_file = null;
+	public static boolean copy_cancel = false;
 	public static boolean switch_mode = false;	
 	public static void SetMode(boolean value){
 		switch_mode = value;
@@ -543,6 +544,9 @@ public class FileOp {
             long bytecount = 0;	
             int byteread = 0;
             while ((byteread = in.read(buffer)) != -1) {
+            	if(copy_cancel){
+            		break;            		
+            	}
                 buffer.flip();
                 out.write(buffer);
                 buffer.clear();
@@ -665,6 +669,19 @@ public class FileOp {
         	for (int i = 0; i < fileList.size(); i++) {
         		String name = fileList.get(i);
         		File file = new File(name);
+        		if(copy_cancel){
+            		if(cur_page.equals("list")){
+            			FileBrower.mProgressHandler.sendMessage(Message.obtain(
+            					FileBrower.mProgressHandler, 9)); 
+            		} else if (cur_page.equals("thumbnail")){
+            			ThumbnailView.mProgressHandler.sendMessage(Message.obtain(
+            					ThumbnailView.mProgressHandler, 9)); 
+            		} else if (cur_page.equals("thumbnail1")){
+            			ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
+            					ThumbnailView1.mProgressHandler, 9)); 
+            		}
+            		break;
+        		}
         		if (file.exists()) {
         			//Log.i(FileBrower.TAG, "paste file: " + name);
         			if(cur_page.equals("list")){
@@ -710,6 +727,7 @@ public class FileOp {
     					if (!file_new.exists()) {	
         					//Log.i(FileBrower.TAG, "copy to file: " + file_new.getPath());	        					
         					file_new.createNewFile();
+        					copying_file = file_new;
         					try {
         						//copy_time_start = Calendar.getInstance().getTimeInMillis();
         						if (file.length() < 1024*1024*10)

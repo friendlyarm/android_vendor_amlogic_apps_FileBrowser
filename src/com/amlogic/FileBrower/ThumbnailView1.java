@@ -813,6 +813,18 @@ public class ThumbnailView1 extends Activity{
                     if (edit_dialog != null)
                     	edit_dialog.dismiss(); 
                 	break;                	
+                case 9:		//file copy cancel                	
+                	if((FileOp.copying_file!=null)&&(FileOp.copying_file.exists()))
+	    				FileOp.copying_file.delete();
+    				Toast.makeText(ThumbnailView1.this,
+							getText(R.string.Toast_copy_fail),
+							Toast.LENGTH_SHORT).show();
+    				FileOp.copy_cancel = false;
+    				FileOp.cleanFileMarks("ThumbnailView1");
+    				FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
+                    if (edit_dialog != null)
+                    	edit_dialog.dismiss();   
+                	break;
                 }
                 
             }
@@ -1274,12 +1286,7 @@ public class ThumbnailView1 extends Activity{
 	    		public void onClick(View v) {
 	    			if ((FileOp.file_op_todo == FileOpTodo.TODO_CPY) ||
 	    		    		(FileOp.file_op_todo == FileOpTodo.TODO_CUT)) {
-	    				if((FileOp.copying_file!=null)&&(FileOp.copying_file.exists()))
-		    				FileOp.copying_file.delete();
-		    			Toast.makeText(ThumbnailView1.this,
-								getText(R.string.Toast_copy_fail),
-								Toast.LENGTH_SHORT).show();
-	    				
+	    				FileOp.copy_cancel = true;	    				
 	    			}
 	    			edit_dialog.dismiss();
 	    		}        	
