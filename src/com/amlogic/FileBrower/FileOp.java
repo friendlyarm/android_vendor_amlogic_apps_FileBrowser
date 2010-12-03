@@ -22,6 +22,7 @@ import android.util.Log;
 import com.amlogic.FileBrower.FileBrowerDatabase.FileMarkCursor;
 
 public class FileOp {
+	public static File copying_file = null;
 	public static boolean switch_mode = false;	
 	public static void SetMode(boolean value){
 		switch_mode = value;

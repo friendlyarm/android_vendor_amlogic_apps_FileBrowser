@@ -784,6 +784,11 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 	    	Button edit_btn_close = (Button) edit_dialog.getWindow().findViewById(R.id.edit_btn_close);  
 	    	edit_btn_close.setOnClickListener(new OnClickListener() {
 	    		public void onClick(View v) {
+	    			if((FileOp.copying_file!=null)&&(FileOp.copying_file.exists()))
+	    				FileOp.copying_file.delete();
+	    			Toast.makeText(FileBrower.this,
+							getText(R.string.Toast_copy_fail),
+							Toast.LENGTH_SHORT).show();
 	    			edit_dialog.dismiss();
 	    		}        	
 	        }); 
