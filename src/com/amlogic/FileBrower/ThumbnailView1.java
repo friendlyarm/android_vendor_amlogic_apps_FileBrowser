@@ -1253,11 +1253,15 @@ public class ThumbnailView1 extends Activity{
 	    	Button edit_btn_close = (Button) edit_dialog.getWindow().findViewById(R.id.edit_btn_close);  
 	    	edit_btn_close.setOnClickListener(new OnClickListener() {
 	    		public void onClick(View v) {
-	    			if((FileOp.copying_file!=null)&&(FileOp.copying_file.exists()))
-	    				FileOp.copying_file.delete();
-	    			Toast.makeText(ThumbnailView1.this,
-							getText(R.string.Toast_copy_fail),
-							Toast.LENGTH_SHORT).show();
+	    			if ((FileOp.file_op_todo == FileOpTodo.TODO_CPY) ||
+	    		    		(FileOp.file_op_todo == FileOpTodo.TODO_CUT)) {
+	    				if((FileOp.copying_file!=null)&&(FileOp.copying_file.exists()))
+		    				FileOp.copying_file.delete();
+		    			Toast.makeText(ThumbnailView1.this,
+								getText(R.string.Toast_copy_fail),
+								Toast.LENGTH_SHORT).show();
+	    				
+	    			}
 	    			edit_dialog.dismiss();
 	    		}        	
 	        }); 
