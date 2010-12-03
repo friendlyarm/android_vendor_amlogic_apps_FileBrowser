@@ -38,7 +38,7 @@ DROP TABLE IF EXISTS file_thumbnails_table
 	<string name="Toast_msg_del_nofile">没有文件被选中删除.</string>
 	<string name="Toast_msg_paste_ok">已粘贴选中的文件到当前目录.</string>
 	<string name="Toast_msg_paste_nofile">没有文件被选中粘贴.</string>
-	<string name="Toast_msg_paste_writeable">无法粘贴,改目录只读.</string>
+	<string name="Toast_msg_paste_writeable">无法粘贴,该目录只读.</string>
 	<string name="Toast_msg_paste_nospace">无法粘贴,空间不足.</string>
 	<string name="Toast_msg_cpy_nofile">没有文件被选中复制.</string>
 	<string name="Toast_msg_cut_nofile">没有文件被选中剪切.</string>
