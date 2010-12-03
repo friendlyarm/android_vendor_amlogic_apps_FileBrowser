@@ -57,4 +57,5 @@ DROP TABLE IF EXISTS file_thumbnails_table
 	<string name="memory_device_str">内部存储器 </string>
 	<string name="sdcard_device_str">SD卡</string>
 	<string name="usb_device_str">USB设备</string>
+	<string name="Toast_copy_fail">拷贝失败！</string>
 </resources>
