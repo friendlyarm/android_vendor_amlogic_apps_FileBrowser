@@ -680,7 +680,7 @@ public class FileOp {
             			ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
             					ThumbnailView1.mProgressHandler, 9)); 
             		}
-            		break;
+            		return FileOpReturn.ERR;
         		}
         		if (file.exists()) {
         			//Log.i(FileBrower.TAG, "paste file: " + name);
