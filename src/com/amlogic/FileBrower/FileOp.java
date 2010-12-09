@@ -601,12 +601,26 @@ public class FileOp {
     	}    			
     		
     	if(cur_page.equals("list")){
+    		if(FileBrower.cur_path.startsWith("/mnt/sdcard/")){
+    			if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED_READ_ONLY)){
+    				FileBrower.mProgressHandler.sendMessage(Message.obtain(
+        					FileBrower.mProgressHandler, 7)); 
+        			return FileOpReturn.ERR; 
+    			}
+    		}
     		if (!checkCanWrite(FileBrower.cur_path)) {
     			FileBrower.mProgressHandler.sendMessage(Message.obtain(
     					FileBrower.mProgressHandler, 7)); 
     			return FileOpReturn.ERR; 
     		}
     	} else if (cur_page.equals("thumbnail1")) {
+    		if(ThumbnailView1.cur_path.startsWith("/mnt/sdcard/")){
+    			if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED_READ_ONLY)){
+    				ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
+    						ThumbnailView1.mProgressHandler, 7)); 
+        			return FileOpReturn.ERR; 
+    			}
+    		}
     		if (!checkCanWrite(ThumbnailView1.cur_path)) {
     			ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
     					ThumbnailView1.mProgressHandler, 7)); 
@@ -854,7 +868,16 @@ public class FileOp {
         		if (file.exists()) {
         			//Log.i(FileBrower.TAG, "delete file: " + name);
         			try {
-        			file.delete();
+        				if(file.canWrite()){
+        					file.delete();
+        				}
+        				else{
+        					if(name.startsWith("/mnt/sdcard/")){
+        						if(!(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED_READ_ONLY))){
+        							file.delete();
+        	    				}        					
+        					}
+        				}
         			} catch (Exception e) {
         				Log.e("Exception when delete file", e.toString());
         			}
