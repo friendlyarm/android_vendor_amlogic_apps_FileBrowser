@@ -276,7 +276,10 @@ public class ThumbnailView1 extends Activity{
             	        		
             	        	}
             	        	
-            	        	list.add(map);    		        	
+            	        	//list.add(map);    
+            	        	if(!file.isHidden()){
+            	        		list.add(map);    
+            	        	}
             			}
             		}            		
         		}
@@ -344,7 +347,10 @@ public class ThumbnailView1 extends Activity{
             	        		
             	        	}
             	        	
-            	        	list.add(map);    		        	
+            	        	//list.add(map); 
+            	        	if(!file.isHidden()){
+            	        		list.add(map);    
+            	        	}
             			}
             		}            		
         		}

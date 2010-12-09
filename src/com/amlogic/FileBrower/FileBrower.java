@@ -949,8 +949,9 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
             	        		
             	        		
             	        	}
-            	        	
-            	        	list.add(map);    		        	
+            	        	if(!file.isHidden()){
+            	        		list.add(map);
+            	        	}
             			}
             		}            		
         		}
@@ -1052,8 +1053,9 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
             	        		
             	        		
             	        	}
-            	        	
-            	        	list.add(map);    		        	
+            	        	if(!file.isHidden()){
+            	        		list.add(map);    
+            	        	}
             			}
             		}            		
         		}
