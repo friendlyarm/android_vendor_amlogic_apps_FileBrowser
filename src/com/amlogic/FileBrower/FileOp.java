@@ -583,7 +583,7 @@ public class FileOp {
     public static FileOpReturn pasteSelectedFile(String cur_page) {
     	List<String> fileList = new ArrayList<String>();
     	//long copy_time_start=0, copy_time_end = 0;
-    	copying_file = null;
+    	//copying_file = null;
     	if ((file_op_todo != FileOpTodo.TODO_CPY) &&
     		(file_op_todo != FileOpTodo.TODO_CUT)) {
     		if(cur_page.equals("list")){
@@ -739,9 +739,10 @@ public class FileOp {
         							nioBufferCopy(file, file_new, cur_page, 1024*10);
         						//nioTransferCopy(file, file_new);
         						//copy_time_end = Calendar.getInstance().getTimeInMillis();
-        						
-	        			        if (file_op_todo == FileOpTodo.TODO_CUT)
-	        			        	file.delete();
+        						if(!copy_cancel){
+        							if (file_op_todo == FileOpTodo.TODO_CUT)
+        								file.delete();
+        							}
 	        			        
         					} catch (Exception e) {
         						Log.e("Exception when copy file", e.toString());

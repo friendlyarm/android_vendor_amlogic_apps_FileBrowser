@@ -420,6 +420,7 @@ public class FileBrower extends Activity {
 							getText(R.string.Toast_copy_fail),
 							Toast.LENGTH_SHORT).show();
     				FileOp.copy_cancel = false;
+    				FileOp.copying_file = null;
     				db.deleteAllFileMark();
     				FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
                     if (edit_dialog != null)
