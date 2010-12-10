@@ -757,7 +757,19 @@ public class FileOp {
         							if (file_op_todo == FileOpTodo.TODO_CUT)
         								file.delete();
         							}
-	        			        
+        						else{       							          		
+        			                	if(cur_page.equals("list")){
+        			                		FileBrower.mProgressHandler.sendMessage(Message.obtain(
+        			                				FileBrower.mProgressHandler, 9)); 
+        			                	} else if (cur_page.equals("thumbnail")){
+        			                		ThumbnailView.mProgressHandler.sendMessage(Message.obtain(
+        			                				ThumbnailView.mProgressHandler, 9)); 
+        			                	} else if (cur_page.equals("thumbnail1")){
+        			                		ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
+        			                				ThumbnailView1.mProgressHandler, 9));                		              		
+        			                	}    
+        			                	return FileOpReturn.ERR;
+        						}
         					} catch (Exception e) {
         						Log.e("Exception when copy file", e.toString());
         					} 
