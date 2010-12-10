@@ -422,6 +422,7 @@ public class FileBrower extends Activity {
     				FileOp.copy_cancel = false;
     				FileOp.copying_file = null;
     				db.deleteAllFileMark();
+    				lv.setAdapter(getFileListAdapter(cur_path));
     				FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
                     if (edit_dialog != null)
                     	edit_dialog.dismiss();   

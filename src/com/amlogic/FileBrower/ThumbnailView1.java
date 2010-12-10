@@ -828,6 +828,8 @@ public class ThumbnailView1 extends Activity{
     				FileOp.copy_cancel = false;
     				FileOp.copying_file = null;
     				db.deleteAllFileMark();
+					ThumbnailView.setAdapter(getFileListAdapter(cur_path));
+					ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path);
     				FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
                     if (edit_dialog != null)
                     	edit_dialog.dismiss();   
