@@ -276,8 +276,8 @@ public class FileOp {
     	String filename = file_path.getName();
     	String temp_str = null;
     	if(file_path.isDirectory()){
-    		if(filename.length()>18){   	   		
-    			 temp_str = String.copyValueOf((filename.toCharArray()), 0, 15);
+    		if(filename.length()>11){   	   		
+    			 temp_str = String.copyValueOf((filename.toCharArray()), 0, 8);
     	   		 temp_str = temp_str +"...";
     	   		 
        	 	}
@@ -287,19 +287,19 @@ public class FileOp {
     		
     	}
     	else{
-    			if(filename.length()>18){
+    			if(filename.length()>11){
     				int index = filename.lastIndexOf(".");
     				if ((index != -1) && (index < filename.length())) {
     					String suffix = String.copyValueOf((filename.toCharArray()), index, (filename.length()-index));
-    	   		 	if(index>=15){
-    	   		 		temp_str = String.copyValueOf((filename.toCharArray()), 0, 15);
+    	   		 	if(index>=8){
+    	   		 		temp_str = String.copyValueOf((filename.toCharArray()), 0, 8);
     	   		 	}
     	   		 	else{
     	   		 		temp_str = String.copyValueOf((filename.toCharArray()), 0, index);
     	   		 	}
     	   		    temp_str = temp_str + "~" + suffix;
     	   		} else {
-    	   			temp_str = String.copyValueOf((filename.toCharArray()), 0, 15);
+    	   			temp_str = String.copyValueOf((filename.toCharArray()), 0, 8);
     	   			temp_str = temp_str + "~";
     	   		}
        	 	}

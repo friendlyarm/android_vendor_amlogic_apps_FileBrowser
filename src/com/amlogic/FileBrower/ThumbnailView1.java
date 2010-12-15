@@ -231,8 +231,9 @@ public class ThumbnailView1 extends Activity{
         		if (file_path.listFiles() != null) {
             		if (file_path.listFiles().length > 0) {
             			for (File file : file_path.listFiles()) {    					
-            	        	Map<String, Object> map = new HashMap<String, Object>();    		        	
-            	        	map.put("item_name", file.getName());   
+            	        	Map<String, Object> map = new HashMap<String, Object>();    
+            	        	String temp_name = FileOp.getShortName(file.getName());
+            	        	map.put("item_name", temp_name);   
             	        	String file_abs_path = file.getAbsolutePath();
             	        	map.put("file_path", file_abs_path);
             	        	
@@ -302,8 +303,9 @@ public class ThumbnailView1 extends Activity{
         		if (file_path.listFiles() != null) {
             		if (file_path.listFiles().length > 0) {
             			for (File file : file_path.listFiles()) {    					
-            	        	Map<String, Object> map = new HashMap<String, Object>();    		        	
-            	        	map.put("item_name", file.getName());   
+            	        	Map<String, Object> map = new HashMap<String, Object>();  
+            	        	String temp_name = FileOp.getShortName(file.getName());
+            	        	map.put("item_name", temp_name);   
             	        	String file_abs_path = file.getAbsolutePath();
             	        	map.put("file_path", file_abs_path);
             	        	

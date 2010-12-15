@@ -12,11 +12,11 @@
     	android:layout_centerHorizontal="true"   
     >   	
     <ImageView 
-    	android:layout_height="120dp" 
     	android:id="@+id/itemImage"  
         android:layout_width="fill_parent" 
         android:layout_centerHorizontal="true"
-        android:src="@drawable/preview">   
+        android:src="@drawable/preview" 
+        android:layout_height="100dp">   
     </ImageView> 
     <ImageView 
     	android:layout_height="wrap_content" 
@@ -29,6 +29,7 @@
         android:layout_below="@+id/frameLayout" 
         android:layout_height="wrap_content"  
         android:layout_centerHorizontal="true"  
-        android:id="@+id/itemText">   
+        android:id="@+id/itemText" 
+        android:textSize="16px">   
     </TextView>   
 </RelativeLayout>   
