@@ -184,7 +184,8 @@ public class FileOp {
         		return type;
         	}
         }*/
-        if(end.equals("3gp")||end.equals("mp4")){
+         /*if(end.equals("3gp")||end.equals("mp4")){
+        for(String ext: video_extensions){
             type = "video";
             type +="/*";
     		return type;
@@ -202,7 +203,7 @@ public class FileOp {
         		type +="/*";
         		return type;
         	}
-        }                		
+        }  */              		
        type ="*/*";
        return type;
        

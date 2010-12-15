@@ -30,6 +30,6 @@
         android:layout_height="wrap_content"  
         android:layout_centerHorizontal="true"  
         android:id="@+id/itemText" 
-        android:textSize="16px">   
+        android:textSize="14px"
     </TextView>   
 </RelativeLayout>   
