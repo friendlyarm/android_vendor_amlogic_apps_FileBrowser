@@ -26,6 +26,7 @@ public class FileOp {
 	public static File copying_file = null;
 	public static boolean copy_cancel = false;
 	public static boolean switch_mode = false;	
+	public static boolean IsBusy = false;
 	public static void SetMode(boolean value){
 		switch_mode = value;
 	}
@@ -585,6 +586,7 @@ public class FileOp {
     	List<String> fileList = new ArrayList<String>();
     	//long copy_time_start=0, copy_time_end = 0;
     	//copying_file = null;
+    	IsBusy = true;
     	if ((file_op_todo != FileOpTodo.TODO_CPY) &&
     		(file_op_todo != FileOpTodo.TODO_CUT)) {
     		if(cur_page.equals("list")){
@@ -596,8 +598,8 @@ public class FileOp {
     		} else if (cur_page.equals("thumbnail1")){
     			ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
     					ThumbnailView1.mProgressHandler, 5)); 
-    		}
-        	
+    		}    
+    		IsBusy = false;
         	return FileOpReturn.ERR; 
     	}    			
     		
@@ -605,26 +607,30 @@ public class FileOp {
     		if(FileBrower.cur_path.startsWith("/mnt/sdcard/")){
     			if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED_READ_ONLY)){
     				FileBrower.mProgressHandler.sendMessage(Message.obtain(
-        					FileBrower.mProgressHandler, 7)); 
+        					FileBrower.mProgressHandler, 7));
+    				IsBusy = false;
         			return FileOpReturn.ERR; 
     			}
     		}
     		if (!checkCanWrite(FileBrower.cur_path)) {
     			FileBrower.mProgressHandler.sendMessage(Message.obtain(
     					FileBrower.mProgressHandler, 7)); 
+    			IsBusy = false;
     			return FileOpReturn.ERR; 
     		}
     	} else if (cur_page.equals("thumbnail1")) {
     		if(ThumbnailView1.cur_path.startsWith("/mnt/sdcard/")){
     			if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED_READ_ONLY)){
     				ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
-    						ThumbnailView1.mProgressHandler, 7)); 
+    						ThumbnailView1.mProgressHandler, 7));
+    				IsBusy = false;
         			return FileOpReturn.ERR; 
     			}
     		}
     		if (!checkCanWrite(ThumbnailView1.cur_path)) {
     			ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
     					ThumbnailView1.mProgressHandler, 7)); 
+    			IsBusy = false;
     			return FileOpReturn.ERR; 
     		}
     	}
@@ -696,6 +702,7 @@ public class FileOp {
             			ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
             					ThumbnailView1.mProgressHandler, 9)); 
             		}
+            		IsBusy = false;
             		return FileOpReturn.ERR;
         		}
         		if (file.exists()) {
@@ -704,12 +711,14 @@ public class FileOp {
         				if (file.length() > checkFreeSpace(FileBrower.cur_path)) {
         	    			FileBrower.mProgressHandler.sendMessage(Message.obtain(
         	    					FileBrower.mProgressHandler, 8)); 
+        	    			IsBusy = false;
         	    			return FileOpReturn.ERR; 
         				}
         			} else if (cur_page.equals("thumbnail1")){
         				if (file.length() > checkFreeSpace(ThumbnailView1.cur_path)) {
                 			ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
                 					ThumbnailView1.mProgressHandler, 8)); 
+                			IsBusy = false;
                 			return FileOpReturn.ERR; 
         				}
         			}
@@ -769,6 +778,7 @@ public class FileOp {
         			                		ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
         			                				ThumbnailView1.mProgressHandler, 9));                		              		
         			                	}    
+        			                	IsBusy = false;
         			                	return FileOpReturn.ERR;
         						}
         					} catch (Exception e) {
@@ -797,41 +807,49 @@ public class FileOp {
         	if(cur_page.equals("list")){
         		FileBrower.mProgressHandler.sendMessage(Message.obtain(
             			FileBrower.mProgressHandler, 4));
+        		IsBusy = false;
             	return FileOpReturn.SUCCESS;
         	}
         	else if (cur_page.equals("thumbnail")){
         		ThumbnailView.mProgressHandler.sendMessage(Message.obtain(
         				ThumbnailView.mProgressHandler, 4));
+        		IsBusy = false;
             	return FileOpReturn.SUCCESS;
         	} else if (cur_page.equals("thumbnail1")){
         		ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
         				ThumbnailView1.mProgressHandler, 4));
+        		IsBusy = false;
             	return FileOpReturn.SUCCESS;
         	}
         	
         } else {
         	if(cur_page.equals("list")){
         		FileBrower.mProgressHandler.sendMessage(Message.obtain(
-            			FileBrower.mProgressHandler, 5));  
+            			FileBrower.mProgressHandler, 5)); 
+        		IsBusy = false;
         		return FileOpReturn.ERR; 
         		
         	}
         	else if (cur_page.equals("thumbnail")){
         		ThumbnailView.mProgressHandler.sendMessage(Message.obtain(
         				ThumbnailView.mProgressHandler, 5));  
+        		IsBusy = false;
         		return FileOpReturn.ERR; 
         	} else if (cur_page.equals("thumbnail1")){
         		ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
         				ThumbnailView1.mProgressHandler, 5));  
+        		IsBusy = false;
         		return FileOpReturn.ERR; 
         	}
         	
         		
         }
+        IsBusy = false;
         return FileOpReturn.ERR; 
     }   
     public static FileOpReturn deleteSelectedFile(String cur_page) {
     	List<String> fileList = new ArrayList<String>();
+    	IsBusy = true;
         try {
         	if(cur_page.equals("list")){
         		FileBrower.myCursor = FileBrower.db.getFileMark();   
@@ -896,8 +914,10 @@ public class FileOp {
         			}
         		}
         	}
+        	IsBusy = false;
         	return FileOpReturn.SUCCESS;
         } else
+        	IsBusy = false;
         	return FileOpReturn.ERR;    
 			
     }

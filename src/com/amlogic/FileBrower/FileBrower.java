@@ -734,6 +734,9 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
             	public void onItemClick(AdapterView<?> parent, View view, int pos,
     					long id) {
             		if (!cur_path.equals(ROOT_PATH)) {
+            			if(FileOp.IsBusy){
+            				return;
+            			}
             			if (pos == 0) {
             				//Log.i(TAG, "DO cut...");            				
             		        try {        	
