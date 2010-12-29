@@ -158,8 +158,8 @@ public class ThumbnailScannerService extends Service implements Runnable {
             			}
             	        
             			end_time = System.currentTimeMillis();
-            			Log.w("createThumbnailsInAllDev",              					
-            					" time:" + (end_time - start_time) + "ms");
+            			//Log.w("createThumbnailsInAllDev",              					
+            			//		" time:" + (end_time - start_time) + "ms");
             			//sendBroadcast(new Intent(ACTION_THUMBNAIL_SCANNER_FINISHED));  
             			
             		} else if (scan_type.equals("dev")) {
@@ -171,8 +171,8 @@ public class ThumbnailScannerService extends Service implements Runnable {
                 			}                	        
                 			createAllThumbnailsInDir(dir_path);
                 			end_time = System.currentTimeMillis();
-                			Log.w("createThumbnailsInDev", "dev:" + dir_path +             					
-                					" time:" + (end_time - start_time) + "ms");
+                			//Log.w("createThumbnailsInDev", "dev:" + dir_path +             					
+                			//		" time:" + (end_time - start_time) + "ms");
                 			sendBroadcast(new Intent(ACTION_THUMBNAIL_SCANNER_FINISHED));  
             			}
             			
@@ -188,8 +188,8 @@ public class ThumbnailScannerService extends Service implements Runnable {
             	        start_time = System.currentTimeMillis();            			
             			cleanThumbnails();
             			end_time = System.currentTimeMillis();
-            			Log.w("cleanThumbnails",              					
-            					" time:" + (end_time - start_time) + "ms");            			
+            			//Log.w("cleanThumbnails",              					
+            			//		" time:" + (end_time - start_time) + "ms");            			
             		}
             	}
             } catch (Exception e) {
@@ -332,9 +332,9 @@ public class ThumbnailScannerService extends Service implements Runnable {
 			}
 		}
 		end_time = System.currentTimeMillis();
-		Log.w("createThumbnailsInDir", "dir:" + dir_path + 
-				" files:" + count +
-				" time:" + (end_time - start_time) + "ms");
+		//Log.w("createThumbnailsInDir", "dir:" + dir_path + 
+		//		" files:" + count +
+		//		" time:" + (end_time - start_time) + "ms");
 		mWakeLock.release();
 		return count;
 	}

@@ -481,7 +481,7 @@ public class ThumbnailView1 extends Activity{
         	if(newState.compareTo("mounted") == 0)
         	{
         		//Log.w(path, "mounted.........");
-        		ThumbnailOpUtils.updateThumbnailsForDev(getBaseContext(), path);
+        		//ThumbnailOpUtils.updateThumbnailsForDev(getBaseContext(), path);
         		if (cur_path.equals(ROOT_PATH)) {
         			ThumbnailView.setAdapter(getFileListAdapter(cur_path)); 
         		}
@@ -563,12 +563,12 @@ public class ThumbnailView1 extends Activity{
         if (cur_path.equals(ROOT_PATH)) {
             //ThumbnailOpUtils.deleteAllThumbnails(getBaseContext(), db);        
             ThumbnailOpUtils.cleanThumbnails(getBaseContext());
-            ThumbnailOpUtils.updateThumbnailsForAllDev(getBaseContext()); 
+            //ThumbnailOpUtils.updateThumbnailsForAllDev(getBaseContext()); 
         } else {
             //ThumbnailOpUtils.deleteAllThumbnails(getBaseContext(), db);        
             ThumbnailOpUtils.cleanThumbnails(getBaseContext());
-            ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path); 
-            ThumbnailOpUtils.updateThumbnailsForAllDev(getBaseContext()); 
+            //ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path); 
+            //ThumbnailOpUtils.updateThumbnailsForAllDev(getBaseContext()); 
         }
 
         
@@ -1087,6 +1087,7 @@ public class ThumbnailView1 extends Activity{
 			tv.setText(getText(R.string.rootDevice));
 		else
 			tv.setText(path); 		
+		ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), path); 
 	}
 
 	private void openFile(String file_path) {
