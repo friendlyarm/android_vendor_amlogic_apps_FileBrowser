@@ -66,7 +66,8 @@
 	android:numColumns= "5"
 	android:verticalSpacing="10dp"   
   android:horizontalSpacing="10dp"
-  android:scrollingCache="false"> 
+  android:scrollingCache="false"
+  android:fastScrollEnabled="true"> 
 	</GridView>
 </LinearLayout>
 
