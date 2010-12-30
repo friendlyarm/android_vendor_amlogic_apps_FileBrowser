@@ -60,14 +60,14 @@
 		/>  	
 <GridView
 	android:id= "@+id/mygridview"
-	android:layout_width= "fill_parent"	
-	android:columnWidth= "160dp"
+	android:layout_width= "fill_parent"		
 	android:layout_height= "fill_parent"
-	android:numColumns= "5"
-	android:verticalSpacing="10dp"   
-  android:horizontalSpacing="10dp"
-  android:scrollingCache="false"
-  android:fastScrollEnabled="true"> 
+	android:columnWidth="148dp"
+	android:numColumns="auto_fit"
+  android:stretchMode="spacingWidthUniform"
+  android:verticalSpacing="10dp"
+  android:fastScrollEnabled="true"
+  > 
 	</GridView>
 </LinearLayout>
 
