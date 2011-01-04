@@ -586,6 +586,7 @@ public class FileOp {
     	List<String> fileList = new ArrayList<String>();
     	//long copy_time_start=0, copy_time_end = 0;
     	//copying_file = null;
+    	copy_cancel = false;
     	IsBusy = true;
     	if ((file_op_todo != FileOpTodo.TODO_CPY) &&
     		(file_op_todo != FileOpTodo.TODO_CUT)) {
