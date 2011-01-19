@@ -1,4 +1,4 @@
-package com.amlogic.FileBrower;
+package com.fb.FileBrower;
 
 import android.content.Context;
 import android.content.Intent;

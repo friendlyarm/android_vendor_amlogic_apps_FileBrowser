@@ -1,4 +1,4 @@
-package com.amlogic.FileBrower;
+package com.fb.FileBrower;
 
 
 import java.io.File;

@@ -1,4 +1,4 @@
-package com.amlogic.FileBrower;
+package com.fb.FileBrower;
 
 import java.io.Closeable;
 import java.io.File;
@@ -20,7 +20,7 @@ import android.os.Environment;
 import android.os.Message;
 import android.os.StatFs;
 import android.util.Log;
-import com.amlogic.FileBrower.FileBrowerDatabase.FileMarkCursor;
+import com.fb.FileBrower.FileBrowerDatabase.FileMarkCursor;
 
 public class FileOp {
 	public static File copying_file = null;
@@ -117,7 +117,7 @@ public class FileOp {
         return false;
     } 
     /* file type extensions */
-    //video from com.amlogic.amplayer
+    //video from layer
     public static final String[] video_extensions = { ".3gp",
         ".divx",
         ".h264",

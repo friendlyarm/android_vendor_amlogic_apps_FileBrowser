@@ -1,4 +1,4 @@
-package com.amlogic.FileBrower;
+package com.fb.FileBrower;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,9 +6,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.amlogic.FileBrower.FileBrowerDatabase.FileMarkCursor;
-import com.amlogic.FileBrower.FileOp.FileOpReturn;
-import com.amlogic.FileBrower.FileOp.FileOpTodo;
+import com.fb.FileBrower.FileBrowerDatabase.FileMarkCursor;
+import com.fb.FileBrower.FileOp.FileOpReturn;
+import com.fb.FileBrower.FileOp.FileOpTodo;
 
 
 import android.app.Activity;
@@ -1004,7 +1004,7 @@ public class ThumbnailView extends Activity{
     {
    	 String ver_str = null;
    	 try {
-			ver_str = getPackageManager().getPackageInfo("com.amlogic.FileBrower", 0).versionName;			
+			ver_str = getPackageManager().getPackageInfo("com.fb.FileBrower", 0).versionName;			
 		} catch (NameNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

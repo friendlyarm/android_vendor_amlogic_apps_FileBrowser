@@ -1,4 +1,4 @@
-package com.amlogic.FileBrower;
+package com.fb.FileBrower;
 
 import android.os.storage.*;
 import java.io.File;
@@ -42,9 +42,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.amlogic.FileBrower.FileBrowerDatabase.FileMarkCursor;
-import com.amlogic.FileBrower.FileOp.FileOpReturn;
-import com.amlogic.FileBrower.FileOp.FileOpTodo;
+import com.fb.FileBrower.FileBrowerDatabase.FileMarkCursor;
+import com.fb.FileBrower.FileOp.FileOpReturn;
+import com.fb.FileBrower.FileOp.FileOpTodo;
     /** Called when the activity is first created. */
 public class ThumbnailView1 extends Activity{
 	public static final String TAG = "ThumbnailView";
@@ -1437,7 +1437,7 @@ public class ThumbnailView1 extends Activity{
         	map.put("item_type", R.drawable.dialog_help_item_close);  
         	String ver_str = " ";
           	try {
-          		ver_str += getPackageManager().getPackageInfo("com.amlogic.FileBrower", 0).versionName;			
+          		ver_str += getPackageManager().getPackageInfo("com.fb.FileBrower", 0).versionName;			
      		} catch (NameNotFoundException e) {
      			// TODO Auto-generated catch block
      			e.printStackTrace();

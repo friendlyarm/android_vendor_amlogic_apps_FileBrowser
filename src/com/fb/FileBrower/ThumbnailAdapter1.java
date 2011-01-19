@@ -1,4 +1,4 @@
-package com.amlogic.FileBrower;
+package com.fb.FileBrower;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
@@ -9,7 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 
-import com.amlogic.FileBrower.FileBrowerDatabase.ThumbnailCursor;
+import com.fb.FileBrower.FileBrowerDatabase.ThumbnailCursor;
 
 
 

@@ -1,4 +1,4 @@
-package com.amlogic.FileBrower;
+package com.fb.FileBrower;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -20,13 +20,13 @@ import android.os.PowerManager;
 import android.os.Process;
 import android.util.Log;
 
-import com.amlogic.FileBrower.FileBrowerDatabase.ThumbnailCursor;
+import com.fb.FileBrower.FileBrowerDatabase.ThumbnailCursor;
 
 public class ThumbnailScannerService extends Service implements Runnable {
 	private static final String TAG = "ThumbnailScannerService";
 	
 	public static final String ACTION_THUMBNAIL_SCANNER_FINISHED
-						= "com.amlogic.FileBrower.THUMBNAIL_SCANNER_FINISHED";
+						= "com.fb.FileBrower.THUMBNAIL_SCANNER_FINISHED";
 	
 	private static FileBrowerDatabase db;
 	private static boolean stop_scanner = false;
