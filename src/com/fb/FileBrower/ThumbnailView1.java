@@ -16,6 +16,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Bundle;
@@ -67,6 +68,7 @@ public class ThumbnailView1 extends Activity{
 	private boolean local_mode;
 	GridView ThumbnailView;		
 	int request_code = 1550;
+	private ToggleButton btn_mode;
 	
 	private void updateThumbnials() {
        // sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://"
@@ -532,6 +534,12 @@ public class ThumbnailView1 extends Activity{
         unregisterReceiver(mReceiver);
         StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
         m_storagemgr.unregisterListener(mListener);
+        //update sharedPref
+    	SharedPreferences settings = getSharedPreferences("settings", Activity.MODE_PRIVATE); 
+    	SharedPreferences.Editor editor = settings.edit();
+    	editor.putString("cur_path", cur_path);
+    	editor.putBoolean("isChecked", btn_mode.isChecked());
+    	editor.commit();           
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -540,9 +548,14 @@ public class ThumbnailView1 extends Activity{
         
         ThumbnailView = (GridView)findViewById(R.id.mygridview);   
         /*get cur path form listview*/
-        Intent intent = this.getIntent();
-        Bundle bundle = intent.getExtras();  
-        cur_path = bundle.getString("cur_path");
+        SharedPreferences settings = getSharedPreferences("settings", Activity.MODE_PRIVATE);  
+    	cur_path = settings.getString("cur_path", ROOT_PATH);        	
+    	if (cur_path != null) {
+    		File file = new File(cur_path);
+    		if (!file.exists())
+    			cur_path = ROOT_PATH;
+    	} else
+    		cur_path = ROOT_PATH; 
         /* setup database */
         FileOp.SetMode(false);
         db = new FileBrowerDatabase(this); 
@@ -574,8 +587,8 @@ public class ThumbnailView1 extends Activity{
         
         ThumbnailView.setAdapter(getFileListAdapter(cur_path)); 
         /* btn_mode default checked */
-        ToggleButton btn_mode = (ToggleButton) findViewById(R.id.btn_thumbmode); 
-        btn_mode.setChecked(true);
+        btn_mode = (ToggleButton) findViewById(R.id.btn_thumbmode); 
+        btn_mode.setChecked(settings.getBoolean("isChecked", false));
         
         ThumbnailView.setOnItemClickListener(new OnItemClickListener() {
 			
@@ -716,15 +729,9 @@ public class ThumbnailView1 extends Activity{
     			FileOp.SetMode(true);
     			Intent intent = new Intent();
     			intent.setClass(ThumbnailView1.this, FileBrower.class);
-    			/* Activity */
-    			Bundle mybundle = new Bundle();   			
-    			mybundle.putString("cur_path", cur_path);
-    			intent.putExtras(mybundle);   	  			
-    			startActivityForResult(intent,request_code); 
-    			//setResult(RESULT_OK, intent);
-    			/* Activity */
     			local_mode = true;
-    			ThumbnailView1.this.finish();   	
+    			ThumbnailView1.this.finish();  
+    			startActivity(intent);
     		}
     		   			       		
         }); 
@@ -901,9 +908,10 @@ public class ThumbnailView1 extends Activity{
     	super.onDestroy(); 
     	if(!local_mode){
     		db.deleteAllFileMark();   		
-    	}    	
-    	db.close();
+    	}   
     	ThumbnailOpUtils.stopThumbnailSanner(getBaseContext());
+    	db.close();  	
+    	
     }
     /*
     protected void DeviceScan() {

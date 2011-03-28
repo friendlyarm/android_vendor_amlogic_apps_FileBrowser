@@ -18,6 +18,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -78,6 +79,7 @@ public class FileBrower extends Activity {
 	public static  Handler mProgressHandler;
 	private ListView lv;
 	private TextView tv;
+	private ToggleButton btn_mode;
 	private List<String> devList = new ArrayList<String>();
 	private int request_code = 1550;
 
@@ -144,6 +146,12 @@ public class FileBrower extends Activity {
         super.onPause();
         StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
         m_storagemgr.unregisterListener(mListener);
+        //update sharedPref
+    	SharedPreferences settings = getSharedPreferences("settings", Activity.MODE_PRIVATE); 
+    	SharedPreferences.Editor editor = settings.edit();
+    	editor.putString("cur_path", cur_path);
+    	editor.putBoolean("isChecked", btn_mode.isChecked());
+    	editor.commit();          
     }
 	
     /** Called when the activity is first created. */
@@ -156,26 +164,24 @@ public class FileBrower extends Activity {
         
         /* setup database */
         db = new FileBrowerDatabase(this); 
+        SharedPreferences settings = getSharedPreferences("settings", Activity.MODE_PRIVATE);  
 
         /* btn_mode default checked */
-        ToggleButton btn_mode = (ToggleButton) findViewById(R.id.btn_mode); 
-        btn_mode.setChecked(true);
+        btn_mode = (ToggleButton) findViewById(R.id.btn_mode); 
+        btn_mode.setChecked(settings.getBoolean("isChecked", false));
         
         /* setup file list */
         lv = (ListView) findViewById(R.id.listview);  
         local_mode = false;
-        //lv.setAdapter(getFileListAdapter(ROOT_PATH)); 
-        if(!(FileOp.GetMode())){
-        	cur_path = ROOT_PATH;
-        	prev_path = ROOT_PATH;
-        	
-        }  
-        else{
-        	Intent intent = this.getIntent();
-            Bundle bundle = intent.getExtras();  
-            cur_path = bundle.getString("cur_path");
-        	FileOp.SetMode(false);
-        }
+        
+    	cur_path = settings.getString("cur_path", ROOT_PATH);        	
+    	if (cur_path != null) {
+    		File file = new File(cur_path);
+    		if (!file.exists())
+    			cur_path = ROOT_PATH;
+    	} else
+    		cur_path = ROOT_PATH; 
+        
         if(cur_path.equals(ROOT_PATH)){       	
         	 DeviceScan();
         }
@@ -326,15 +332,9 @@ public class FileBrower extends Activity {
     			FileOp.SetMode(true);
     			Intent intent = new Intent();
     			intent.setClass(FileBrower.this, ThumbnailView1.class);
-    			/*  */
-    			Bundle mybundle = new Bundle();
-    			
-    			mybundle.putString("cur_path", cur_path);
-    			intent.putExtras(mybundle);			
-    			startActivityForResult(intent,request_code);
-    			/*  */
     			local_mode = true;
-    			FileBrower.this.finish();   	
+    			FileBrower.this.finish();   
+    			startActivity(intent);
     		}
     		   			       		
         }); 
@@ -439,7 +439,6 @@ public class FileBrower extends Activity {
     	super.onDestroy();
     	if(!local_mode){
     		db.deleteAllFileMark();  
-    		cur_path = ROOT_PATH;
     		
     	}  	  	
     	db.close();    	    	   	
