@@ -175,38 +175,17 @@ public class FileOp {
     	".jfif"
     };	
     public static String CheckMediaType(File file){
-        String type="";
-        String fName=file.getName();
-        String end=fName.substring(fName.lastIndexOf(".")+1,fName.length()).toLowerCase();       
-        /*for(String ext: video_extensions){
-        	if(end.equals(ext.toString())){
-        		type = "video";
-        		type +="/*";
-        		return type;
-        	}
-        }*/
-         /*if(end.equals("3gp")||end.equals("mp4")){
-        for(String ext: video_extensions){
-            type = "video";
-            type +="/*";
-    		return type;
-        }
-        for(String ext: music_extensions){
-        	if(fName.endsWith(ext)){
-        		type = "audio";
-        		type +="/*";
-        		return type;
-        	}
-        }
-        for(String ext:photo_extensions){
-        	if(fName.endsWith(ext)){
-        		type = "image";
-        		type +="/*";
-        		return type;
-        	}
-        }  */              		
-       type ="*/*";
-       return type;
+        String typeStr="*/*";
+        String filename = file.getName();
+        
+        if (isVideo(filename))
+        	typeStr = "video/*";
+        else if (isMusic(filename))
+        	typeStr = "audio/*";
+        else if (isPhoto(filename))
+        	typeStr = "image/*";
+        
+        return typeStr;
        
     }
     public static int getDeviceIcon(String device_name){
