@@ -32,7 +32,9 @@
         android:layout_below="@+id/frameLayout"         
         android:layout_centerHorizontal="true"  
         android:gravity="center"        
-        android:textSize="14sp"
+        android:textSize="18sp"
+        android:textStyle="bold" 
+        android:textColor="@color/item_text_color" 
         >
     </TextView>   
 </RelativeLayout>   

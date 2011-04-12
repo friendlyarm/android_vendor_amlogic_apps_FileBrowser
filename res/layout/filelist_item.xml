@@ -23,7 +23,7 @@
 	    	android:layout_height="fill_parent"	 
 	    	android:paddingLeft="5dp"
 	    	android:gravity="bottom"
-	    	android:textSize="16sp"			    		
+	    	android:textSize="18sp"			    		
 	    	android:textStyle="bold"   
 	    	android:textColor="@color/item_text_color"  	
 	    	/>
