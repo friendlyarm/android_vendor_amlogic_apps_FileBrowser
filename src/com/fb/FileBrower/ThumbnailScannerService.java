@@ -40,7 +40,7 @@ public class ThumbnailScannerService extends Service implements Runnable {
     {
     	db = new FileBrowerDatabase(this); 
         PowerManager pm = (PowerManager)getSystemService(Context.POWER_SERVICE);
-        mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
+        mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, TAG);
 
         // Start up the thread running the service.  Note that we create a
         // separate thread because the service normally runs in the process's

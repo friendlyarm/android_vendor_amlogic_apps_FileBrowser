@@ -42,6 +42,7 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+import android.os.PowerManager;
 
 import com.fb.FileBrower.FileBrowerDatabase.FileMarkCursor;
 import com.fb.FileBrower.FileOp.FileOpReturn;
@@ -49,6 +50,8 @@ import com.fb.FileBrower.FileOp.FileOpTodo;
     /** Called when the activity is first created. */
 public class ThumbnailView1 extends Activity{
 	public static final String TAG = "ThumbnailView";
+	
+	private PowerManager.WakeLock mWakeLock;
 	private static final String ROOT_PATH = "/mnt";
 	public static String cur_path = ROOT_PATH;
 	protected static final int SORT_DIALOG_ID = 0;
@@ -539,12 +542,19 @@ public class ThumbnailView1 extends Activity{
     	SharedPreferences.Editor editor = settings.edit();
     	editor.putString("cur_path", cur_path);
     	editor.putBoolean("isChecked", btn_mode.isChecked());
-    	editor.commit();           
+    	editor.commit();     
+    	
+		FileOp.copy_cancel = true;    	
+    	if (mWakeLock.isHeld())
+    		mWakeLock.release();      	      
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);         
         setContentView(R.layout.thumbnail);  
+        
+        PowerManager pm = (PowerManager)getSystemService(Context.POWER_SERVICE);
+        mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, TAG);        
         
         ThumbnailView = (GridView)findViewById(R.id.mygridview);   
         /*get cur path form listview*/
@@ -793,7 +803,9 @@ public class ThumbnailView1 extends Activity{
         					Toast.LENGTH_SHORT).show();       
         			FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
                     if (edit_dialog != null)
-                    	edit_dialog.dismiss();                    	
+                    	edit_dialog.dismiss();    
+    				if (mWakeLock.isHeld())
+    					mWakeLock.release();                         	                	
                 	
                 	break;
                 case 5:		//file paste err
@@ -804,6 +816,8 @@ public class ThumbnailView1 extends Activity{
         			FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
                     if (edit_dialog != null)
                     	edit_dialog.dismiss();   
+    				if (mWakeLock.isHeld())
+    					mWakeLock.release();                         	
                 	break;
                 case 6:
                 	if (!cur_path.equals(ROOT_PATH))
@@ -815,7 +829,9 @@ public class ThumbnailView1 extends Activity{
         					Toast.LENGTH_SHORT).show();  
         			//FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
                     if (edit_dialog != null)
-                    	edit_dialog.dismiss();  
+                    	edit_dialog.dismiss(); 
+    				if (mWakeLock.isHeld())
+    					mWakeLock.release();                         	 
                 	break;
                 case 8:		//no free space
         			db.deleteAllFileMark();        			     			
@@ -827,6 +843,8 @@ public class ThumbnailView1 extends Activity{
         			FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
                     if (edit_dialog != null)
                     	edit_dialog.dismiss(); 
+    				if (mWakeLock.isHeld())
+    					mWakeLock.release();                         	
                 	break;                	
                 case 9:		//file copy cancel                	
                 	if((FileOp.copying_file!=null)&&(FileOp.copying_file.exists()))
@@ -842,6 +860,8 @@ public class ThumbnailView1 extends Activity{
     				FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
                     if (edit_dialog != null)
                     	edit_dialog.dismiss();   
+    				if (mWakeLock.isHeld())
+    					mWakeLock.release();                         	
                 	break;
                 }
                 
@@ -1264,7 +1284,9 @@ public class ThumbnailView1 extends Activity{
             			}
             			else if (pos == 2) {
             				//Log.i(TAG, "DO paste...");     
-            				
+					    	if (!mWakeLock.isHeld())
+						    	mWakeLock.acquire(); 
+						    	            				
             				new Thread () {
             					public void run () {
             						try {
