@@ -43,6 +43,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 import android.os.PowerManager;
+import android.content.res.Configuration;
 
 import com.fb.FileBrower.FileBrowerDatabase.FileMarkCursor;
 import com.fb.FileBrower.FileOp.FileOpReturn;
@@ -518,6 +519,12 @@ public class ThumbnailView1 extends Activity{
         }
         
     };
+
+    @Override
+    public void onConfigurationChanged(Configuration config) {
+        super.onConfigurationChanged(config);
+		//ignore orientation change
+    }
 
     /** Called when the activity is first created or resumed. */
     @Override
