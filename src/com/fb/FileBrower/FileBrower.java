@@ -1104,7 +1104,15 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
     				
     				public int compare(Map<String, Object> object1,
     						Map<String, Object> object2) {	
-    					return ((String) object1.get("item_name")).compareTo((String) object2.get("item_name"));					
+						File file1 = new File((String) object1.get("file_path"));
+						File file2 = new File((String) object2.get("file_path"));
+						
+						if (file1.isFile() && file2.isFile() || file1.isDirectory() && file2.isDirectory()) {
+							return ((String) object1.get("item_name")).toLowerCase()
+									.compareTo(((String) object2.get("item_name")).toLowerCase());						
+						} else {
+							return file1.isFile() ? 1 : -1;
+						}				
     				}    			
         		});           		
         		
