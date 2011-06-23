@@ -49,6 +49,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 import android.os.PowerManager;
 import android.content.res.Configuration;
+import android.os.Environment;
 
 import com.fb.FileBrower.FileBrowerDatabase.FileMarkCursor;
 import com.fb.FileBrower.FileBrowerDatabase.ThumbnailCursor;
@@ -148,6 +149,13 @@ public class FileBrower extends Activity {
         super.onResume();
         StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
 		m_storagemgr.registerListener(mListener);
+		
+        if(cur_path.equals(ROOT_PATH)){       	
+        	 DeviceScan();
+        }
+        else{
+        	lv.setAdapter(getFileListAdapter(cur_path));
+        }		
     }
     
     @Override
@@ -823,6 +831,8 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
             				FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
             				//Log.i(TAG, "DO delete...");   
             				if (FileOpReturn.SUCCESS == FileOp.deleteSelectedFile("list")) {
+            					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
+				    				+ Environment.getExternalStorageDirectory())));
             					db.deleteAllFileMark();
                 				lv.setAdapter(getFileListAdapter(cur_path));  
                 				Toast.makeText(FileBrower.this,

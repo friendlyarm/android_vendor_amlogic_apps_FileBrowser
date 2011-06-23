@@ -44,6 +44,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 import android.os.PowerManager;
 import android.content.res.Configuration;
+import android.os.Environment;
 
 import com.fb.FileBrower.FileBrowerDatabase.FileMarkCursor;
 import com.fb.FileBrower.FileOp.FileOpReturn;
@@ -544,6 +545,8 @@ public class ThumbnailView1 extends Activity{
         registerReceiver(mReceiver, intentFilter);
         StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
 		m_storagemgr.registerListener(mListener);
+		
+		ThumbnailView.setAdapter(getFileListAdapter(cur_path));		
     }
     
     @Override
@@ -1318,6 +1321,8 @@ public class ThumbnailView1 extends Activity{
             				//Log.i(TAG, "DO delete...");   
             				updateThumbnials();
             				if (FileOpReturn.SUCCESS == FileOp.deleteSelectedFile("thumbnail1")) {
+            					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
+				    				+ Environment.getExternalStorageDirectory())));
             					db.deleteAllFileMark();
             					//GetCurrentFilelist(cur_path,cur_sort_type);
             					ThumbnailView.setAdapter(getFileListAdapter(cur_path));
