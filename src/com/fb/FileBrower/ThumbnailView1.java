@@ -1322,7 +1322,7 @@ public class ThumbnailView1 extends Activity{
             				updateThumbnials();
             				if (FileOpReturn.SUCCESS == FileOp.deleteSelectedFile("thumbnail1")) {
             					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
-				    				+ Environment.getExternalStorageDirectory())));
+				    				+ "/mnt")));
             					db.deleteAllFileMark();
             					//GetCurrentFilelist(cur_path,cur_sort_type);
             					ThumbnailView.setAdapter(getFileListAdapter(cur_path));

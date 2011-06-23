@@ -832,7 +832,7 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
             				//Log.i(TAG, "DO delete...");   
             				if (FileOpReturn.SUCCESS == FileOp.deleteSelectedFile("list")) {
             					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
-				    				+ Environment.getExternalStorageDirectory())));
+				    				+ "/mnt")));
             					db.deleteAllFileMark();
                 				lv.setAdapter(getFileListAdapter(cur_path));  
                 				Toast.makeText(FileBrower.this,
