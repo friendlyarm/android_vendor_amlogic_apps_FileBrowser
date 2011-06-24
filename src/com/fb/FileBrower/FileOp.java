@@ -76,6 +76,8 @@ public class FileOp {
     		return R.drawable.item_type_photo;
     	} else if (isVideo(filename)) {
     		return R.drawable.item_type_video;
+    	} else if (isApk(filename)) {
+    		return R.drawable.item_type_apk;
     	} else
     		return R.drawable.item_type_file;
     }
@@ -86,6 +88,8 @@ public class FileOp {
     		return R.drawable.item_preview_photo;
     	} else if (isVideo(filename)) {
     		return R.drawable.item_preview_video;
+    	} else if (isApk(filename)) {
+    		return R.drawable.item_preview_apk;    		
     	} else
     		return R.drawable.item_preview_file;
 
@@ -116,6 +120,12 @@ public class FileOp {
         }
         return false;
     } 
+    public  static boolean isApk(String filename) {   
+    	String name = filename.toLowerCase();        
+        if (name.endsWith(".apk"))
+            return true;
+        return false;
+    }     
     /* file type extensions */
     //video from layer
     public static final String[] video_extensions = { ".3gp",
@@ -184,6 +194,10 @@ public class FileOp {
         	typeStr = "audio/*";
         else if (isPhoto(filename))
         	typeStr = "image/*";
+        else if (isApk(filename))
+        	typeStr = "application/vnd.android.package-archive";
+        else
+        	typeStr = "text/*";
         
         return typeStr;
        
@@ -896,9 +910,10 @@ public class FileOp {
         	}
         	IsBusy = false;
         	return FileOpReturn.SUCCESS;
-        } else
+        } else {
         	IsBusy = false;
-        	return FileOpReturn.ERR;    
+        	return FileOpReturn.ERR;   
+        } 
 			
     }
     
