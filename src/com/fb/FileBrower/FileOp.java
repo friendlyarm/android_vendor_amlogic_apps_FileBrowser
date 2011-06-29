@@ -197,7 +197,8 @@ public class FileOp {
         else if (isApk(filename))
         	typeStr = "application/vnd.android.package-archive";
         else
-        	typeStr = "text/*";
+        	//typeStr = "text/*";
+        	typeStr = "*/*";
         
         return typeStr;
        
