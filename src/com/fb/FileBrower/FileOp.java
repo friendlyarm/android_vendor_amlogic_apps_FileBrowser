@@ -185,7 +185,7 @@ public class FileOp {
     	".jfif"
     };	
     public static String CheckMediaType(File file){
-        String typeStr="*/*";
+        String typeStr="application/*";
         String filename = file.getName();
         
         if (isVideo(filename))
@@ -197,8 +197,7 @@ public class FileOp {
         else if (isApk(filename))
         	typeStr = "application/vnd.android.package-archive";
         else
-        	//typeStr = "text/*";
-        	typeStr = "*/*";
+        	typeStr = "application/*";
         
         return typeStr;
        
