@@ -399,6 +399,8 @@ public class FileBrower extends Activity {
                 	}
                 	break;
                 case 4:		//file paste ok
+					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
+	    				+ "/mnt")));                       
         			db.deleteAllFileMark();
         			lv.setAdapter(getFileListAdapter(cur_path)); 
         			ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path);
