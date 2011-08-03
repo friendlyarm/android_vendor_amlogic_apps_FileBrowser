@@ -131,6 +131,15 @@ public class ThumbnailView1 extends Activity{
 								map.put("file_size", 0);	//for sort
 								map.put("item_sel", R.drawable.item_img_unsel);
 								list.add(map);								
+							} else if (path.equals("/mnt/sata")) {
+								map = new HashMap<String, Object>();
+								map.put("item_name", getText(R.string.sata_device_str));
+								map.put("file_path", "/mnt/sata");
+								map.put("item_type", R.drawable.sata_default);
+								map.put("file_date", 0);
+								map.put("file_size", 1);	//for sort
+								map.put("item_sel", R.drawable.item_img_unsel);
+								list.add(map);								
 							} else if (path.equals("/mnt/sdcard")) {
 								map = new HashMap<String, Object>();
 								map.put("item_name", getText(R.string.sdcard_device_str));

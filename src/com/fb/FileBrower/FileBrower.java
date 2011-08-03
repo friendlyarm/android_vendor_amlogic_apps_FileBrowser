@@ -608,6 +608,16 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 					    		map.put("item_size", null);
 					    		map.put("item_rw", null);
 								list.add(map);								
+							} else if (path.equals("/mnt/sata")) {
+								map = new HashMap<String, Object>();
+								map.put("item_name", getText(R.string.sata_device_str));
+								map.put("file_path", "/mnt/sata");
+								map.put("item_type", R.drawable.sata_icon);
+								map.put("file_date", 0);
+								map.put("file_size", 1);	//for sort
+					    			map.put("item_size", null);
+						    		map.put("item_rw", null);
+								list.add(map);								
 							} else if (path.equals("/mnt/sdcard")) {
 								map = new HashMap<String, Object>();
 								map.put("item_name", getText(R.string.sdcard_device_str));

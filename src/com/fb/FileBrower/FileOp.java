@@ -209,6 +209,9 @@ public class FileOp {
 		else if(device_name.equals("/mnt/flash")){
 			return R.drawable.memory_icon;
 		}
+		else if(device_name.equals("/mnt/sata")){
+			return R.drawable.sata_icon;		
+		}
 		else if(device_name.equals("/mnt/sdcard")){
 			return R.drawable.sd_card_icon;		
 		}
@@ -221,6 +224,9 @@ public class FileOp {
     	//String usb = c.getString(R.string.usb_device_str);
     	if(device_name.equals("flash")){
 			return R.drawable.memory_default;
+		}
+		else if(device_name.equals("sata")){
+			return R.drawable.sata_default;
 		}
 		else if(device_name.equals("sdcard")){
 			return R.drawable.sdcard_default;

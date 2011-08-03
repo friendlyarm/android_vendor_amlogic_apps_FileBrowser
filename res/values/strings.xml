@@ -58,6 +58,7 @@ DROP TABLE IF EXISTS file_thumbnails_table
 	<string name="dialog_help_item_close_str">Close FileBrowser</string>
 	<string name="memory_device_str">Internal Memory </string>
 	<string name="sdcard_device_str">SD Card</string>
+	<string name="sata_device_str">SATA</string>
 	<string name="usb_device_str">USB</string>
 	<string name="Toast_copy_fail">Copy Failed</string>
 </resources>
