@@ -86,7 +86,8 @@ public class FileBrower extends Activity {
 	private ToggleButton btn_mode;
 	private List<String> devList = new ArrayList<String>();
 	private int request_code = 1550;
-
+	private String lv_sort_flag = "by_name"; 
+	
 	String open_mode[] = {"movie","music","photo","packageInstall"};
 	
 	
@@ -154,7 +155,7 @@ public class FileBrower extends Activity {
         	 DeviceScan();
         }
         else{
-        	lv.setAdapter(getFileListAdapter(cur_path));
+        	lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
         }		
     }
     
@@ -180,9 +181,17 @@ public class FileBrower extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);        
         setContentView(R.layout.main);
-        
+       
         //Log.i(TAG, "category =" + getIntent().getCategories());
-        
+        try{
+	        Bundle bundle = this.getIntent().getExtras();  
+	        if(!bundle.getString("sort_flag").equals("")){
+	        	lv_sort_flag=bundle.getString("sort_flag");
+	        }
+        }
+        catch(Exception e){
+     	   Log.e(TAG, "Do not set sort flag");
+        }
         PowerManager pm = (PowerManager)getSystemService(Context.POWER_SERVICE);
         mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, TAG);
                 
@@ -210,7 +219,7 @@ public class FileBrower extends Activity {
         	 DeviceScan();
         }
         else{
-        	lv.setAdapter(getFileListAdapter(cur_path));
+        	lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
         }
         
         /* lv OnItemClickListener */
@@ -230,7 +239,7 @@ public class FileBrower extends Activity {
 				if (file.isDirectory()) {	
 					prev_path = cur_path;
 					cur_path = file_path;
-					lv.setAdapter(getFileListAdapter(file_path));	
+					lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
 				}
 				else {	
 					ToggleButton btn_mode = (ToggleButton) findViewById(R.id.btn_mode); 
@@ -287,7 +296,7 @@ public class FileBrower extends Activity {
 						DeviceScan();
 					}
 					else{
-						lv.setAdapter(getFileListAdapter(parent_path));
+						lv.setAdapter(getFileListAdapterSorted(parent_path, lv_sort_flag));
 					
 					}
 				}
@@ -355,7 +364,10 @@ public class FileBrower extends Activity {
     		public void onClick(View v) {
     			FileOp.SetMode(true);
     			Intent intent = new Intent();
-    			intent.setClass(FileBrower.this, ThumbnailView1.class);
+    			intent.setClass(FileBrower.this, ThumbnailView1.class);	
+    			Bundle bundle = new Bundle();  
+                bundle.putString("sort_flag", lv_sort_flag);  
+                intent.putExtras(bundle);
     			local_mode = true;
     			FileBrower.this.finish();   
     			startActivity(intent);
@@ -402,7 +414,7 @@ public class FileBrower extends Activity {
 					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
 	    				+ "/mnt")));                       
         			db.deleteAllFileMark();
-        			lv.setAdapter(getFileListAdapter(cur_path)); 
+        			lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
         			ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path);
         			Toast.makeText(FileBrower.this,
         					getText(R.string.Toast_msg_paste_ok),
@@ -436,7 +448,7 @@ public class FileBrower extends Activity {
                 	break;
                 case 8:		//no free space
                 	db.deleteAllFileMark();
-        			lv.setAdapter(getFileListAdapter(cur_path)); 
+        			lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
         			ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path);
         			Toast.makeText(FileBrower.this,
         					getText(R.string.Toast_msg_paste_nospace),
@@ -456,7 +468,7 @@ public class FileBrower extends Activity {
     				FileOp.copy_cancel = false;
     				FileOp.copying_file = null;
     				db.deleteAllFileMark();
-    				lv.setAdapter(getFileListAdapter(cur_path));
+    				lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
     				FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
                     if (edit_dialog != null)
                     	edit_dialog.dismiss();   
@@ -735,12 +747,18 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
     					long id) {    				
     				
             		if (!cur_path.equals(ROOT_PATH)) {
-            			if (pos == 0)
-            				lv.setAdapter(getFileListAdapterSorted(cur_path, "by_name"));
-            			else if (pos == 1)
-            				lv.setAdapter(getFileListAdapterSorted(cur_path, "by_date"));
-            			else if (pos == 2)
-            				lv.setAdapter(getFileListAdapterSorted(cur_path, "by_size"));
+            			if (pos == 0){
+            				lv_sort_flag = "by_name";
+            				lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+            			}
+            			else if (pos == 1){
+            				lv_sort_flag = "by_date";
+            				lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+            			}
+            			else if (pos == 2){
+            				lv_sort_flag = "by_size";
+            				lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+            			}
             		}
             		sort_dialog.dismiss();
             		
@@ -845,8 +863,8 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
             				if (FileOpReturn.SUCCESS == FileOp.deleteSelectedFile("list")) {
             					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
 				    				+ "/mnt")));
-            					db.deleteAllFileMark();
-                				lv.setAdapter(getFileListAdapter(cur_path));  
+            					db.deleteAllFileMark(); 
+                				lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
                 				Toast.makeText(FileBrower.this,
                 						getText(R.string.Toast_msg_del_ok),
                 						Toast.LENGTH_SHORT).show();
