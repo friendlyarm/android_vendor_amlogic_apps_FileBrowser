@@ -88,6 +88,8 @@ public class FileBrower extends Activity {
 	private int request_code = 1550;
 	private String lv_sort_flag = "by_name"; 
 	
+	private int item_position_selected, item_position_first, item_position_last;
+	
 	String open_mode[] = {"movie","music","photo","packageInstall"};
 	
 	
@@ -157,6 +159,14 @@ public class FileBrower extends Activity {
         else{
         	lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
         }		
+        
+    	if(item_position_last == (lv.getCount() - 1)){
+    		lv.setSelection(item_position_selected);
+    	}
+    	else if(item_position_last != 0){
+        	int fromtop_piexl = lv.getHeight()/(item_position_last - item_position_first)*(item_position_selected - item_position_first);
+        	lv.setSelectionFromTop(item_position_selected, fromtop_piexl);
+        }
     }
     
     @Override
@@ -261,7 +271,9 @@ public class FileBrower extends Activity {
 						((BaseAdapter) lv.getAdapter()).notifyDataSetChanged();	
 					}
 				}
-								
+				item_position_selected = lv.getSelectedItemPosition();
+				item_position_first = lv.getFirstVisiblePosition();
+				item_position_last = lv.getLastVisiblePosition();
 			}        	
         });      
         
@@ -1141,7 +1153,6 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
     	if (!list.isEmpty()) {    	
         	if (sort_type.equals("by_name")) {
         		Collections.sort(list, new Comparator<Map<String, Object>>() {
-    				
     				public int compare(Map<String, Object> object1,
     						Map<String, Object> object2) {	
 						File file1 = new File((String) object1.get("file_path"));
