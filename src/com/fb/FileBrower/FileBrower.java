@@ -89,6 +89,7 @@ public class FileBrower extends Activity {
 	private String lv_sort_flag = "by_name"; 
 	
 	private int item_position_selected, item_position_first, item_position_last;
+	private int fromtop_piexl;
 	
 	String open_mode[] = {"movie","music","photo","packageInstall"};
 	
@@ -159,14 +160,7 @@ public class FileBrower extends Activity {
         else{
         	lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
         }		
-        
-    	if(item_position_last == (lv.getCount() - 1)){
-    		lv.setSelection(item_position_selected);
-    	}
-    	else if(item_position_last != 0){
-        	int fromtop_piexl = lv.getHeight()/(item_position_last - item_position_first)*(item_position_selected - item_position_first);
-        	lv.setSelectionFromTop(item_position_selected, fromtop_piexl);
-        }
+        lv.setSelectionFromTop(item_position_selected, fromtop_piexl);
     }
     
     @Override
@@ -274,6 +268,10 @@ public class FileBrower extends Activity {
 				item_position_selected = lv.getSelectedItemPosition();
 				item_position_first = lv.getFirstVisiblePosition();
 				item_position_last = lv.getLastVisiblePosition();
+				View cv = lv.getChildAt(item_position_selected - item_position_first);
+			    if (cv != null) {
+			        fromtop_piexl = cv.getTop();
+			    }
 			}        	
         });      
         
