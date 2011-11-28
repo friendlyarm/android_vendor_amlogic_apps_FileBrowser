@@ -323,14 +323,7 @@ public class FileBrower extends Activity {
 			}        	
         });       
         
-        /* btn_close_listener */
-        Button btn_close = (Button) findViewById(R.id.btn_close);  
-        btn_close.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
-				FileOp.SetMode(false);
-				finish();
-			}        	
-        });    
+  
         
         /* btn_edit_listener */
         Button btn_edit = (Button) findViewById(R.id.btn_edit);  
@@ -703,6 +696,7 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
         	
             sort_dialog =  new AlertDialog.Builder(FileBrower.this)   
         	.setView(layout_sort)
+        	.setTitle(R.string.btn_sort_str)  
             .create(); 
             return sort_dialog;
 
@@ -712,6 +706,7 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 	    	
 	    	edit_dialog = new AlertDialog.Builder(FileBrower.this)   
 	    	.setView(layout_edit)
+	    	.setTitle(R.string.btn_edit_str)  
 	        .create();             
 	    	return edit_dialog;
         	
@@ -727,9 +722,10 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 	    	View layout_help = inflater.inflate(R.layout.help_dialog_layout,
 		    		(ViewGroup) findViewById(R.id.layout_root_help));
 		    	
-		    	help_dialog = new AlertDialog.Builder(FileBrower.this)   
-		    	.setView(layout_help)
-		        .create();
+	    	help_dialog = new AlertDialog.Builder(FileBrower.this)   
+	    	.setView(layout_help)
+	    	.setTitle(R.string.btn_help_str)  
+	        .create();
 		    return help_dialog;	
         }
         
@@ -784,12 +780,7 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
     			}
             	
             });
-	    	Button sort_btn_close = (Button) sort_dialog.getWindow().findViewById(R.id.sort_btn_close);  
-	    	sort_btn_close.setOnClickListener(new OnClickListener() {
-	    		public void onClick(View v) {
-	    			sort_dialog.dismiss();
-	    		}        	
-	        });		
+		
             break;
     	case EDIT_DIALOG_ID:    		
             if (display.getHeight() > display.getWidth()) {            	
@@ -894,16 +885,7 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 				
     			}            	
             });            
-	    	Button edit_btn_close = (Button) edit_dialog.getWindow().findViewById(R.id.edit_btn_close);  
-	    	edit_btn_close.setOnClickListener(new OnClickListener() {
-	    		public void onClick(View v) {
-	    			if ((FileOp.file_op_todo == FileOpTodo.TODO_CPY) ||
-	    		    		(FileOp.file_op_todo == FileOpTodo.TODO_CUT)) {
-	    				FileOp.copy_cancel = true;	    				    				
-	    			}
-	    			edit_dialog.dismiss();
-	    		}        	
-	        }); 
+
     		break;
     	case CLICK_DIALOG_ID:
             if (display.getHeight() > display.getWidth()) {            	
@@ -916,12 +898,7 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
             click_lv = (ListView) click_dialog.getWindow().findViewById(R.id.click_listview);  
             click_lv.setAdapter(getDialogListAdapter(CLICK_DIALOG_ID));	
             
-	    	Button click_btn_close = (Button) click_dialog.getWindow().findViewById(R.id.click_btn_close);  
-	    	click_btn_close.setOnClickListener(new OnClickListener() {
-	    		public void onClick(View v) {
-	    			click_dialog.dismiss();
-	    		}        	
-	        }); 			
+			
     		break;
     	case HELP_DIALOG_ID:
             if (display.getHeight() > display.getWidth()) {            	
@@ -941,12 +918,7 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
     			}
             	
             });
-	    	Button help_btn_close = (Button) help_dialog.getWindow().findViewById(R.id.help_btn_close);  
-	    	help_btn_close.setOnClickListener(new OnClickListener() {
-	    		public void onClick(View v) {
-	    			help_dialog.dismiss();
-	    		}        	
-	        });	    		
+    		
     		break;
     	}
     }  
@@ -1295,7 +1267,8 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
         	map.put("item_type", R.drawable.dialog_help_item_list);  
         	map.put("item_name", getText(R.string.dialog_help_item_list_str));            	        	
         	map.put("item_sel", R.drawable.dialog_item_img_unsel);   
-        	list.add(map); */    
+        	list.add(map); */  
+        	/*  
     		map = new HashMap<String, Object>();    		
         	map.put("item_type", R.drawable.dialog_help_item_close);  
         	String ver_str = " ";
@@ -1307,11 +1280,25 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
      		}      
         	map.put("item_name", getText(R.string.dialog_help_item_close_str) + ver_str);           	        	
         	map.put("item_sel", R.drawable.dialog_item_img_unsel);   
-        	list.add(map);          	
+        	list.add(map);   
+        	*/       	
     		break;
     	}
     	return list;
     }    
-    
+  
+    //option menu    
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+   	 String ver_str = null;
+   	 try {
+			ver_str = getPackageManager().getPackageInfo("com.fb.FileBrower", 0).versionName;			
+		} catch (NameNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        menu.add(0, 0, 0, getText(R.string.app_name) + " v" + ver_str);
+        return true;
+    }   
      
 }

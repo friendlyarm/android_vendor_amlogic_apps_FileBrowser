@@ -312,19 +312,7 @@ public class ThumbnailView extends Activity{
     		}
     		   			       		
         }); 
-        /*close button*/
-        Button btn_thumbclose = (Button) findViewById(R.id.btn_thumbclose); 
-        btn_thumbclose.setOnClickListener(new OnClickListener() {
-   		public void onClick(View v) {
-   			if(decodePhotosTask !=null&&(decodePhotosTask.getStatus() == AsyncTask.Status.RUNNING)){
-				decodePhotosTask.cancel(true);
-				//return;
-			}
-   			FileOp.SetMode(false);
-   			finish();
-   		}
-   		
-       }); 
+
         
         
         /** edit process bar handler
@@ -754,12 +742,7 @@ public class ThumbnailView extends Activity{
     			}
             	
             });
-	    	Button sort_btn_close = (Button) sort_dialog.getWindow().findViewById(R.id.sort_btn_close);  
-	    	sort_btn_close.setOnClickListener(new OnClickListener() {
-	    		public void onClick(View v) {
-	    			sort_dialog.dismiss();
-	    		}        	
-	        });		
+	
             break;
     	case EDIT_DIALOG_ID:    		
     		if (display.getHeight() > display.getWidth()) {            	
@@ -857,12 +840,7 @@ public class ThumbnailView extends Activity{
 				
     			}            	
             });            
-	    	Button edit_btn_close = (Button) edit_dialog.getWindow().findViewById(R.id.edit_btn_close);  
-	    	edit_btn_close.setOnClickListener(new OnClickListener() {
-	    		public void onClick(View v) {
-	    			edit_dialog.dismiss();
-	    		}        	
-	        }); 
+
     		break;
     	case HELP_DIALOG_ID:
             if (display.getHeight() > display.getWidth()) {            	
@@ -882,12 +860,7 @@ public class ThumbnailView extends Activity{
     			}
             	
             });
-	    	Button help_btn_close = (Button) help_dialog.getWindow().findViewById(R.id.help_btn_close);  
-	    	help_btn_close.setOnClickListener(new OnClickListener() {
-	    		public void onClick(View v) {
-	    			help_dialog.dismiss();
-	    		}        	
-	        });	    		
+	    		
     		break;    		
     	}
     }

@@ -6,6 +6,7 @@
    
     <string name="btn_edit_str">Edit</string>
     <string name="btn_sort_str">Sort</string>
+    <string name="btn_help_str">Help</string>
     <string name="btn_close_str">Close</string>
     
     <string name="sort_dialog_title_str">Sort File</string>

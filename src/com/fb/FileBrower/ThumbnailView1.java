@@ -779,15 +779,7 @@ public class ThumbnailView1 extends Activity{
     		}
     		   			       		
         }); 
-        /*close button*/
-        Button btn_thumbclose = (Button) findViewById(R.id.btn_thumbclose); 
-        btn_thumbclose.setOnClickListener(new OnClickListener() {
-   		public void onClick(View v) {  			
-   			FileOp.SetMode(false);
-   			finish();
-   		}
-   		   			       		
-       }); 
+
         
         
         /** edit process bar handler
@@ -1178,6 +1170,7 @@ public class ThumbnailView1 extends Activity{
         	
             sort_dialog =  new AlertDialog.Builder(ThumbnailView1.this)   
         	.setView(layout_sort)
+        	.setTitle(R.string.btn_sort_str) 
             .create(); 
             return sort_dialog;
 
@@ -1187,6 +1180,7 @@ public class ThumbnailView1 extends Activity{
 	    	
 	    	edit_dialog = new AlertDialog.Builder(ThumbnailView1.this)   
 	    	.setView(layout_edit)
+	    	.setTitle(R.string.btn_edit_str) 
 	        .create();             
 	    	return edit_dialog;
         	
@@ -1194,9 +1188,10 @@ public class ThumbnailView1 extends Activity{
 	    	View layout_help = inflater.inflate(R.layout.help_dialog_layout,
 		    		(ViewGroup) findViewById(R.id.layout_root_help));
 		    	
-		    	help_dialog = new AlertDialog.Builder(ThumbnailView1.this)   
-		    	.setView(layout_help)
-		        .create();
+	    	help_dialog = new AlertDialog.Builder(ThumbnailView1.this)   
+	    	.setView(layout_help)
+	    	.setTitle(R.string.btn_help_str) 
+	        .create();
 		    return help_dialog;	       
         }
         
@@ -1256,12 +1251,7 @@ public class ThumbnailView1 extends Activity{
     			}
             	
             });
-	    	Button sort_btn_close = (Button) sort_dialog.getWindow().findViewById(R.id.sort_btn_close);  
-	    	sort_btn_close.setOnClickListener(new OnClickListener() {
-	    		public void onClick(View v) {
-	    			sort_dialog.dismiss();
-	    		}        	
-	        });		
+	
             break;
     	case EDIT_DIALOG_ID:    		
     		if (display.getHeight() > display.getWidth()) {            	
@@ -1369,16 +1359,7 @@ public class ThumbnailView1 extends Activity{
 				
     			}            	
             });            
-	    	Button edit_btn_close = (Button) edit_dialog.getWindow().findViewById(R.id.edit_btn_close);  
-	    	edit_btn_close.setOnClickListener(new OnClickListener() {
-	    		public void onClick(View v) {
-	    			if ((FileOp.file_op_todo == FileOpTodo.TODO_CPY) ||
-	    		    		(FileOp.file_op_todo == FileOpTodo.TODO_CUT)) {
-	    				FileOp.copy_cancel = true;	    				
-	    			}
-	    			edit_dialog.dismiss();
-	    		}        	
-	        }); 
+ 
     		break;
     	case HELP_DIALOG_ID:
             if (display.getHeight() > display.getWidth()) {            	
@@ -1398,12 +1379,7 @@ public class ThumbnailView1 extends Activity{
     			}
             	
             });
-	    	Button help_btn_close = (Button) help_dialog.getWindow().findViewById(R.id.help_btn_close);  
-	    	help_btn_close.setOnClickListener(new OnClickListener() {
-	    		public void onClick(View v) {
-	    			help_dialog.dismiss();
-	    		}        	
-	        });	    		
+    		
     		break;    		
     	}
     }
@@ -1506,6 +1482,7 @@ public class ThumbnailView1 extends Activity{
         	map.put("item_name", getText(R.string.dialog_help_item_list_str));            	        	
         	map.put("item_sel", R.drawable.dialog_item_img_unsel);   
         	list.add(map);   
+        	/*
     		map = new HashMap<String, Object>();    		
         	map.put("item_type", R.drawable.dialog_help_item_close);  
         	String ver_str = " ";
@@ -1517,11 +1494,26 @@ public class ThumbnailView1 extends Activity{
      		}      
         	map.put("item_name", getText(R.string.dialog_help_item_close_str) + ver_str);            	        	
         	map.put("item_sel", R.drawable.dialog_item_img_unsel);   
-        	list.add(map);          	
+        	list.add(map);  
+        	*/        	
     		break;    		
     	}
     	return list;
     }    
+    
+    //option menu    
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+   	 String ver_str = null;
+   	 try {
+			ver_str = getPackageManager().getPackageInfo("com.fb.FileBrower", 0).versionName;			
+		} catch (NameNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        menu.add(0, 0, 0, getText(R.string.app_name) + " v" + ver_str);
+        return true;
+    }      
     
 }
 

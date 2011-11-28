@@ -6,6 +6,7 @@
    
     <string name="btn_edit_str">編輯</string>
     <string name="btn_sort_str">排序</string>
+    <string name="btn_help_str">幫助</string>
     <string name="btn_close_str">關閉</string>
     
     <string name="sort_dialog_title_str">文件排序</string>
