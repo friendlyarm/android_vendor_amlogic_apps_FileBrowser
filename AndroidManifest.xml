@@ -18,7 +18,7 @@
             </intent-filter>
         </activity>
 		<activity android:name="ThumbnailView1"
-				  android:configChanges="orientation|screenSize"
+				  android:configChanges="orientation|screenSize|screenLayout"
 				  >
 		</activity>	
 		<service android:name=".ThumbnailScannerService"></service>	
