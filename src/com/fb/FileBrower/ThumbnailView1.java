@@ -45,6 +45,7 @@ import android.widget.ToggleButton;
 import android.os.PowerManager;
 import android.content.res.Configuration;
 import android.os.Environment;
+import android.os.storage.StorageVolume;
 
 import com.fb.FileBrower.FileBrowerDatabase.FileMarkCursor;
 import com.fb.FileBrower.FileOp.FileOpReturn;
@@ -492,29 +493,65 @@ public class ThumbnailView1 extends Activity{
         }
     };
 
-    private final StorageEventListener mListener = new StorageEventListener() {
-        public void onUsbMassStorageConnectionChanged(boolean connected)
-        {
-        	//this is the action when connect to pc
-        	return ;
-        }
-        public void onStorageStateChanged(String path, String oldState, String newState)
-        {
-        	if (newState == null || path == null) 
-        		return;
-        	
-        	if(newState.compareTo("mounted") == 0)
-        	{
-        		//Log.w(path, "mounted.........");
-        		//ThumbnailOpUtils.updateThumbnailsForDev(getBaseContext(), path);
-        		if (cur_path.equals(ROOT_PATH)) {
-                	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
-        		}
-        		
-        	}
-        	else if(newState.compareTo("unmounted") == 0)
-        	{
-        		//Log.w(path, "unmounted.........");
+//    private final StorageEventListener mListener = new StorageEventListener() {
+//        public void onUsbMassStorageConnectionChanged(boolean connected)
+//        {
+//        	//this is the action when connect to pc
+//        	return ;
+//        }
+//        public void onStorageStateChanged(String path, String oldState, String newState)
+//        {
+//        	if (newState == null || path == null) 
+//        		return;
+//        	
+//        	if(newState.compareTo("mounted") == 0)
+//        	{
+//        		//Log.w(path, "mounted.........");
+//        		//ThumbnailOpUtils.updateThumbnailsForDev(getBaseContext(), path);
+//        		if (cur_path.equals(ROOT_PATH)) {
+//                	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+//        		}
+//        		
+//        	}
+//        	else if(newState.compareTo("unmounted") == 0)
+//        	{
+//        		//Log.w(path, "unmounted.........");
+//        		if (cur_path.startsWith(path)) {
+//        			cur_path = ROOT_PATH;
+//                	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+//        		}
+//        		if (cur_path.equals(ROOT_PATH)) {
+//                	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+//        		}
+//        		FileOp.cleanFileMarks("thumbnail1");
+//        	}
+//        	else if(newState.compareTo("removed") == 0)
+//        	{
+//        		//Log.w(path, "removed.........");
+//        		if (cur_path.startsWith(path)) {
+//        			cur_path = ROOT_PATH;
+//                	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+//        		}
+//        		if (cur_path.equals(ROOT_PATH)) {
+//                	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+//        		}        		
+//        	}
+//        }
+//        
+//    };
+
+    private BroadcastReceiver mMountReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            StorageVolume storage = (StorageVolume)intent.getParcelableExtra(
+                   StorageVolume.EXTRA_STORAGE_VOLUME);
+            
+            if (action == null || storage == null)
+            	return;
+            
+            String path = storage.getPath();
+            if (action.equals(Intent.ACTION_MEDIA_EJECT)) {
         		if (cur_path.startsWith(path)) {
         			cur_path = ROOT_PATH;
                 	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
@@ -522,21 +559,16 @@ public class ThumbnailView1 extends Activity{
         		if (cur_path.equals(ROOT_PATH)) {
                 	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
         		}
-        		FileOp.cleanFileMarks("thumbnail1");
-        	}
-        	else if(newState.compareTo("removed") == 0)
-        	{
-        		//Log.w(path, "removed.........");
-        		if (cur_path.startsWith(path)) {
-        			cur_path = ROOT_PATH;
-                	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
-        		}
+        		FileOp.cleanFileMarks("thumbnail1");				
+            } else if (action.equals(Intent.ACTION_MEDIA_MOUNTED)) {          	
         		if (cur_path.equals(ROOT_PATH)) {
                 	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
-        		}        		
-        	}
+        		}
+            } else if (action.equals(Intent.ACTION_MEDIA_UNMOUNTED)) {
+                // SD card unavailable
+                // handled in ACTION_MEDIA_EJECT
+            } 
         }
-        
     };
 
     @Override
@@ -553,8 +585,16 @@ public class ThumbnailView1 extends Activity{
         //intentFilter.addAction(Intent.ACTION_MEDIA_SCANNER_FINISHED);
         //intentFilter.addDataScheme("file");
         registerReceiver(mReceiver, intentFilter);
-        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
-		m_storagemgr.registerListener(mListener);
+//        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
+//		m_storagemgr.registerListener(mListener);
+
+        // install an intent filter to receive SD card related events.
+        intentFilter =
+                new IntentFilter(Intent.ACTION_MEDIA_MOUNTED);
+        intentFilter.addAction(Intent.ACTION_MEDIA_EJECT);
+        intentFilter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
+        intentFilter.addDataScheme("file");
+        registerReceiver(mMountReceiver, intentFilter);
 
     	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
     }
@@ -563,8 +603,9 @@ public class ThumbnailView1 extends Activity{
     public void onPause() {
         super.onPause();
         unregisterReceiver(mReceiver);
-        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
-        m_storagemgr.unregisterListener(mListener);
+        unregisterReceiver(mMountReceiver);
+//        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
+//        m_storagemgr.unregisterListener(mListener);
         //update sharedPref
     	SharedPreferences settings = getSharedPreferences("settings", Activity.MODE_PRIVATE); 
     	SharedPreferences.Editor editor = settings.edit();
