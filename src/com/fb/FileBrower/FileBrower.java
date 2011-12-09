@@ -147,13 +147,12 @@ public class FileBrower extends Activity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            StorageVolume storage = (StorageVolume)intent.getParcelableExtra(
-                   StorageVolume.EXTRA_STORAGE_VOLUME);                        
+            Uri uri = intent.getData();
+            String path = uri.getPath();                        
             
-            if (action == null || storage == null)
+            if (action == null || path == null)
             	return;
             
-            String path = storage.getPath();
             if (action.equals(Intent.ACTION_MEDIA_EJECT)) {
         		if (cur_path.startsWith(path)) {
         			cur_path = ROOT_PATH;
@@ -167,8 +166,13 @@ public class FileBrower extends Activity {
         			DeviceScan();
         		}
             } else if (action.equals(Intent.ACTION_MEDIA_UNMOUNTED)) {
-                // SD card unavailable
-                // handled in ACTION_MEDIA_EJECT
+        		if (cur_path.startsWith(path)) {
+        			cur_path = ROOT_PATH;
+        			DeviceScan();
+        		}
+        		if (cur_path.equals(ROOT_PATH)) {
+        			DeviceScan();
+        		}
             } 
         }
     };

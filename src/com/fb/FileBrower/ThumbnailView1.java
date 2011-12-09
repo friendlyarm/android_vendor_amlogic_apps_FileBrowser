@@ -544,13 +544,12 @@ public class ThumbnailView1 extends Activity{
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            StorageVolume storage = (StorageVolume)intent.getParcelableExtra(
-                   StorageVolume.EXTRA_STORAGE_VOLUME);
+            Uri uri = intent.getData();
+            String path = uri.getPath();  
             
-            if (action == null || storage == null)
-            	return;
-            
-            String path = storage.getPath();
+            if (action == null || path == null)
+            	return;            
+
             if (action.equals(Intent.ACTION_MEDIA_EJECT)) {
         		if (cur_path.startsWith(path)) {
         			cur_path = ROOT_PATH;
@@ -565,8 +564,14 @@ public class ThumbnailView1 extends Activity{
                 	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
         		}
             } else if (action.equals(Intent.ACTION_MEDIA_UNMOUNTED)) {
-                // SD card unavailable
-                // handled in ACTION_MEDIA_EJECT
+        		if (cur_path.startsWith(path)) {
+        			cur_path = ROOT_PATH;
+                	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+        		}
+        		if (cur_path.equals(ROOT_PATH)) {
+                	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+        		}
+        		FileOp.cleanFileMarks("thumbnail1");
             } 
         }
     };
