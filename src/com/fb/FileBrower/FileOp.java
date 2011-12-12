@@ -528,6 +528,9 @@ public class FileOp {
         }
     }
     private static void nioBufferCopy(File source, File target, String cur_page, int buf_size) {
+    	if (!source.exists() || !target.exists())
+    		return;
+    		
         FileChannel in = null;
         FileChannel out = null;
 
@@ -544,7 +547,7 @@ public class FileOp {
             ByteBuffer buffer = ByteBuffer.allocate(1024 * buf_size);
             long bytecount = 0;	
             int byteread = 0;
-            while ((byteread = in.read(buffer)) != -1) {
+            while (!copy_cancel && ((byteread = in.read(buffer)) != -1)) {
             	if(copy_cancel){
             		break;            		
             	}
@@ -768,6 +771,9 @@ public class FileOp {
         								file.delete();
         							}
         						else{       							          		
+        			                	if (file_new.exists())		
+        			                		file_new.delete();
+        														          		
         			                	if(cur_page.equals("list")){
         			                		FileBrower.mProgressHandler.sendMessage(Message.obtain(
         			                				FileBrower.mProgressHandler, 9)); 

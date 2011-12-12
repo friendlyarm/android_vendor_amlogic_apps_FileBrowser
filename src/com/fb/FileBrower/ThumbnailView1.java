@@ -559,6 +559,11 @@ public class ThumbnailView1 extends Activity{
                 	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
         		}
         		FileOp.cleanFileMarks("thumbnail1");				
+        		
+        		ThumbnailOpUtils.stopThumbnailSanner(getBaseContext());
+        		if (FileOp.IsBusy) {
+        			FileOp.copy_cancel = true;
+        		}        					
             } else if (action.equals(Intent.ACTION_MEDIA_MOUNTED)) {          	
         		if (cur_path.equals(ROOT_PATH)) {
                 	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
