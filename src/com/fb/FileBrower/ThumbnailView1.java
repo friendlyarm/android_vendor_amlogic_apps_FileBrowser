@@ -870,8 +870,8 @@ public class ThumbnailView1 extends Activity{
                 	break;
                 case 4:		//file paste ok
                 	updateThumbnials();
-//					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
-//	    				+ "/mnt")));                	
+					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
+	    				+ "/mnt")));                	
         			db.deleteAllFileMark();
         			//GetCurrentFilelist(cur_path,cur_sort_type);   
                 	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));  
@@ -1385,8 +1385,8 @@ public class ThumbnailView1 extends Activity{
             				//Log.i(TAG, "DO delete...");   
             				updateThumbnials();
             				if (FileOpReturn.SUCCESS == FileOp.deleteSelectedFile("thumbnail1")) {
-//            					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
-//				    				+ "/mnt")));
+            					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
+				    				+ "/mnt")));
             					db.deleteAllFileMark();
             					//GetCurrentFilelist(cur_path,cur_sort_type);
                             	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));

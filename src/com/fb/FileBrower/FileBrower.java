@@ -464,8 +464,8 @@ public class FileBrower extends Activity {
                 	}
                 	break;
                 case 4:		//file paste ok
-//					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
-//	    				+ "/mnt")));                       
+					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
+	    				+ "/mnt")));                       
         			db.deleteAllFileMark();
         			lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
         			ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path);
@@ -912,8 +912,8 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
             				FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
             				//Log.i(TAG, "DO delete...");   
             				if (FileOpReturn.SUCCESS == FileOp.deleteSelectedFile("list")) {
-//            					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
-//				    				+ "/mnt")));
+            					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
+				    				+ "/mnt")));
             					db.deleteAllFileMark(); 
                 				lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
                 				Toast.makeText(FileBrower.this,
