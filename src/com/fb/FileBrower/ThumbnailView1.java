@@ -248,7 +248,7 @@ public class ThumbnailView1 extends Activity{
     		File file_path = new File(path); 
         	if (file_path != null && file_path.exists()) { 
         		if (file_path.listFiles() != null) {
-            		if (file_path.listFiles().length > 0) {
+            		if (file_path.listFiles().length > 0 && file_path.listFiles().length < 500) {
             			for (File file : file_path.listFiles()) {    					
             	        	Map<String, Object> map = new HashMap<String, Object>();    
             	        	String temp_name = FileOp.getShortName(file.getAbsolutePath());
@@ -320,7 +320,7 @@ public class ThumbnailView1 extends Activity{
     		File file_path = new File(path); 
         	if (file_path != null && file_path.exists()) { 
         		if (file_path.listFiles() != null) {
-            		if (file_path.listFiles().length > 0) {
+            		if (file_path.listFiles().length > 0 && file_path.listFiles().length < 500) {
             			for (File file : file_path.listFiles()) {    					
             	        	Map<String, Object> map = new HashMap<String, Object>();  
             	        	String temp_name = FileOp.getShortName(file.getAbsolutePath());
