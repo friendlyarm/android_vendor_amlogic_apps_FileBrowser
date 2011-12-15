@@ -54,6 +54,7 @@ import com.fb.FileBrower.FileOp.FileOpTodo;
 public class ThumbnailView1 extends Activity{
 	public static final String TAG = "ThumbnailView";
 	
+	private boolean mMediaScannerRunning;
 	private PowerManager.WakeLock mWakeLock;
 	private static final String ROOT_PATH = "/mnt";
 	public static String cur_path = ROOT_PATH;
@@ -581,6 +582,21 @@ public class ThumbnailView1 extends Activity{
         }
     };
 
+    private final BroadcastReceiver mMediaScannerReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+			String action = intent.getAction();
+			Log.d(TAG, "MediaScannerReceiver, " + action);
+            if (action.equals(Intent.ACTION_MEDIA_SCANNER_STARTED)) {
+            	mMediaScannerRunning = true;
+				ThumbnailOpUtils.stopThumbnailSanner(getBaseContext());
+				            	
+            } else if (action.equals(Intent.ACTION_MEDIA_SCANNER_FINISHED)) {
+            	mMediaScannerRunning = false;
+            }
+        }
+    };    
+
     @Override
     public void onConfigurationChanged(Configuration config) {
         super.onConfigurationChanged(config);
@@ -606,12 +622,24 @@ public class ThumbnailView1 extends Activity{
         intentFilter.addDataScheme("file");
         registerReceiver(mMountReceiver, intentFilter);
 
+        intentFilter = new IntentFilter(Intent.ACTION_MEDIA_SCANNER_STARTED);
+        intentFilter.addAction(Intent.ACTION_MEDIA_SCANNER_FINISHED);
+        intentFilter.addDataScheme("file");
+        Intent intent = registerReceiver(mMediaScannerReceiver, intentFilter);
+        mMediaScannerRunning = false;
+        if (intent != null) {
+        	if (intent.getAction().equals(Intent.ACTION_MEDIA_SCANNER_STARTED))
+        		mMediaScannerRunning = true;
+        }
+
     	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
     }
     
     @Override
     public void onPause() {
         super.onPause();
+        ThumbnailOpUtils.stopThumbnailSanner(getBaseContext());
+        unregisterReceiver(mMediaScannerReceiver);
         unregisterReceiver(mReceiver);
         unregisterReceiver(mMountReceiver);
 //        StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
@@ -875,7 +903,8 @@ public class ThumbnailView1 extends Activity{
         			db.deleteAllFileMark();
         			//GetCurrentFilelist(cur_path,cur_sort_type);   
                 	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));  
-					ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path);
+                	if (!mMediaScannerRunning)
+						ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path);
         			//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type)); 
         			Toast.makeText(ThumbnailView1.this,
         					getText(R.string.Toast_msg_paste_ok),
@@ -914,7 +943,8 @@ public class ThumbnailView1 extends Activity{
                 	break;
                 case 8:		//no free space
         			db.deleteAllFileMark();    
-                	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));    
+        			if (!mMediaScannerRunning)
+                		ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));    
 					ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path);
         			Toast.makeText(ThumbnailView1.this,
         					getText(R.string.Toast_msg_paste_nospace),
@@ -935,7 +965,8 @@ public class ThumbnailView1 extends Activity{
     				FileOp.copying_file = null;
     				db.deleteAllFileMark();
                 	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
-					ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path);
+                	if (!mMediaScannerRunning)
+						ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path);
     				FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
                     if (edit_dialog != null)
                     	edit_dialog.dismiss();   
@@ -1008,7 +1039,6 @@ public class ThumbnailView1 extends Activity{
     	if(!local_mode){
     		db.deleteAllFileMark();   		
     	}   
-    	ThumbnailOpUtils.stopThumbnailSanner(getBaseContext());
     	db.close();  	
     	
     }
@@ -1194,7 +1224,9 @@ public class ThumbnailView1 extends Activity{
 			tv.setText(getText(R.string.rootDevice));
 		else
 			tv.setText(path); 		
-		ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), path); 
+				
+		if (!mMediaScannerRunning)
+			ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), path); 
 	}
 
 	private void openFile(String file_path) {
