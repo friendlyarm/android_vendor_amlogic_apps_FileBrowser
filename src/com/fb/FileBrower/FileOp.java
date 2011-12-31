@@ -182,7 +182,10 @@ public class FileOp {
     	".jfi",
     	".jpe",
     	".jif",
-    	".jfif"
+    	".jfif",
+    	".mpo",
+    	".3dg",
+    	"3dp"
     };	
     public static String CheckMediaType(File file){
         String typeStr="application/*";
