@@ -1002,7 +1002,7 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
     		File file_path = new File(path); 
         	if (file_path != null && file_path.exists()) { 
         		if (file_path.listFiles() != null) {
-            		if (file_path.listFiles().length > 0 && file_path.listFiles().length < 500) {
+            		if (file_path.listFiles().length > 0) {
             			for (File file : file_path.listFiles()) {    					
             	        	Map<String, Object> map = new HashMap<String, Object>();    		        	
             	        	map.put("item_name", file.getName());   
@@ -1106,7 +1106,7 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
     		File file_path = new File(path); 
         	if (file_path != null && file_path.exists()) { 
         		if (file_path.listFiles() != null) {
-            		if (file_path.listFiles().length > 0 && file_path.listFiles().length < 500) {
+            		if (file_path.listFiles().length > 0) {
             			for (File file : file_path.listFiles()) {    					
             	        	Map<String, Object> map = new HashMap<String, Object>();    		        	
             	        	map.put("item_name", file.getName());    
