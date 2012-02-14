@@ -15,7 +15,9 @@ import java.util.Map;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -60,6 +62,12 @@ import com.fb.FileBrower.FileOp.FileOpTodo;
 
 public class FileBrower extends Activity {
 	public static final String TAG = "FileBrower";
+	
+	private List<Map<String, Object>> mList;
+	private boolean mListLoaded = false;
+	private static final int LOAD_DIALOG_ID = 4;
+	private ProgressDialog load_dialog;
+	private boolean mLoadCancel = false;
 	
 	private PowerManager.WakeLock mWakeLock;
 	private static final String ROOT_PATH = "/mnt";
@@ -218,6 +226,8 @@ public class FileBrower extends Activity {
         
         unregisterReceiver(mMountReceiver);
         
+        mLoadCancel = true;
+        
         //update sharedPref
     	SharedPreferences settings = getSharedPreferences("settings", Activity.MODE_PRIVATE); 
     	SharedPreferences.Editor editor = settings.edit();
@@ -268,6 +278,8 @@ public class FileBrower extends Activity {
     			cur_path = ROOT_PATH;
     	} else
     		cur_path = ROOT_PATH; 
+        
+        mList = new ArrayList<Map<String, Object>>();
         
         if(cur_path.equals(ROOT_PATH)){       	
         	 DeviceScan();
@@ -528,6 +540,13 @@ public class FileBrower extends Activity {
     				if (mWakeLock.isHeld())
     					mWakeLock.release();                        	
                 	break;
+                case 10:    //update list                                       
+                    //((BaseAdapter) lv.getAdapter()).notifyDataSetChanged();
+                    lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));                    
+                    mListLoaded = false;
+                    if (load_dialog != null)
+                        load_dialog.dismiss();
+                    break;    
                 }
                 
             }
@@ -777,6 +796,12 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 	    	.setTitle(R.string.btn_help_str)  
 	        .create();
 		    return help_dialog;	
+		case LOAD_DIALOG_ID:
+		    load_dialog = new ProgressDialog(this);
+		    load_dialog.setMessage(getText(R.string.load_dialog_msg_str));
+		    load_dialog.setIndeterminate(true);
+		    load_dialog.setCancelable(true);
+		    return load_dialog;
         }
         
 		return null;    	
@@ -970,6 +995,23 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
             });
     		
     		break;
+        case LOAD_DIALOG_ID:
+            if (display.getHeight() > display.getWidth()) {            	
+                lp.width = (int) (display.getWidth() * 1.0);       	
+            } else {        		
+                lp.width = (int) (display.getWidth() * 0.5);            	
+            }
+            dialog.getWindow().setAttributes(lp);   
+            
+            dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {					
+                public void onCancel(DialogInterface dialog) {
+                    mLoadCancel = true;
+                }
+            });
+
+            mLoadCancel = false;
+			           
+            break;
     	}
     }  
 	
@@ -1099,15 +1141,44 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
         	R.id.item_rw});  
     }
     
+    private List<Map<String, Object>> getFileListDataSorted(String path, String sort_type) {
+        updatePathShow(path);
+
+        if (!mListLoaded) {
+            mListLoaded = true; 
+            showDialog(LOAD_DIALOG_ID);
+            
+            final String ppath = path;
+            final String ssort_type = sort_type;
+            new Thread("getFileListDataSortedAsync") {
+                @Override
+                public void run() {                                       
+                    mList = getFileListDataSortedAsync(ppath, ssort_type);
+                    mProgressHandler.sendMessage(Message.obtain(mProgressHandler, 10));                    
+                }
+    
+            }.start();          
+            
+            return new ArrayList<Map<String, Object>>();
+        } else {
+            return mList;
+        }             
+        
+    }    
+    
     /** getFileListDataSorted */
-    private List<Map<String, Object>> getFileListDataSorted(String path, String sort_type) {    	
-    	List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();   	
+    private List<Map<String, Object>> getFileListDataSortedAsync(String path, String sort_type) {    	
+    	List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+    	 	
     	try {
     		File file_path = new File(path); 
         	if (file_path != null && file_path.exists()) { 
         		if (file_path.listFiles() != null) {
             		if (file_path.listFiles().length > 0) {
             			for (File file : file_path.listFiles()) {    					
+            	        	if (mLoadCancel)
+            	        	    return list;
+            			        					
             	        	Map<String, Object> map = new HashMap<String, Object>();    		        	
             	        	map.put("item_name", file.getName());    
             	        	String file_abs_path = file.getAbsolutePath();
@@ -1162,7 +1233,7 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
             			}
             		}            		
         		}
-        		updatePathShow(path);
+        		//updatePathShow(path);
         	}
     	} catch (Exception e) {
     		Log.e(TAG, "Exception when getFileListData(): ", e);

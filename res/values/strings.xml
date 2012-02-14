@@ -21,6 +21,7 @@
     <string name="edit_dialog_paste_str">Paste</string>
     <string name="edit_dialog_cut_str">Cut</string>
     
+    <string name="load_dialog_msg_str">Please wait while loading...</string>
     
     <string name="click_dialog_title_str">Open File</string>
     <string name="rootDevice">Device List</string>

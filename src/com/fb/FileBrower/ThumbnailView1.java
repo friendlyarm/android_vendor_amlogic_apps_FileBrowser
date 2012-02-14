@@ -12,8 +12,10 @@ import java.util.Map;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -53,6 +55,12 @@ import com.fb.FileBrower.FileOp.FileOpTodo;
     /** Called when the activity is first created. */
 public class ThumbnailView1 extends Activity{
 	public static final String TAG = "ThumbnailView";
+	
+	private List<Map<String, Object>> mList;
+	private boolean mListLoaded = false;
+	private static final int LOAD_DIALOG_ID = 4;
+	private ProgressDialog load_dialog;
+	private boolean mLoadCancel = false;	
 	
 	private boolean mMediaScannerRunning;
 	private PowerManager.WakeLock mWakeLock;
@@ -314,14 +322,41 @@ public class ThumbnailView1 extends Activity{
     	return list;
 		
 	}
+	
 	private List<Map<String, Object>> getFileListDataSorted(String path, String sort_type) {
+        updatePathShow(path);
+
+        if (!mListLoaded) {
+            mListLoaded = true; 
+            showDialog(LOAD_DIALOG_ID);
+            
+            final String ppath = path;
+            final String ssort_type = sort_type;
+            new Thread("getFileListDataSortedAsync") {
+                @Override
+                public void run() {                                       
+                    mList = getFileListDataSortedAsync(ppath, ssort_type);
+                    mProgressHandler.sendMessage(Message.obtain(mProgressHandler, 10));                    
+                }
+    
+            }.start();          
+            
+            return new ArrayList<Map<String, Object>>();
+        } else {
+            return mList;
+        } 	
+	}
+	
+	private List<Map<String, Object>> getFileListDataSortedAsync(String path, String sort_type) {
     	List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();   	
     	try {
     		File file_path = new File(path); 
         	if (file_path != null && file_path.exists()) { 
         		if (file_path.listFiles() != null) {
             		if (file_path.listFiles().length > 0) {
-            			for (File file : file_path.listFiles()) {    					
+            			for (File file : file_path.listFiles()) {
+            	        	if (mLoadCancel)
+            	        	    return list;            			        					
             	        	Map<String, Object> map = new HashMap<String, Object>();  
             	        	String temp_name = FileOp.getShortName(file.getAbsolutePath());
             	        	map.put("item_name", temp_name);   
@@ -375,7 +410,7 @@ public class ThumbnailView1 extends Activity{
             			}
             		}            		
         		}
-        		updatePathShow(path);
+        		//updatePathShow(path);
         	}
     	} catch (Exception e) {
     		Log.e(TAG, "Exception when getFileListData(): ", e);
@@ -638,6 +673,9 @@ public class ThumbnailView1 extends Activity{
     @Override
     public void onPause() {
         super.onPause();
+        
+        mLoadCancel = true;
+        
         ThumbnailOpUtils.stopThumbnailSanner(getBaseContext());
         unregisterReceiver(mMediaScannerReceiver);
         unregisterReceiver(mReceiver);
@@ -692,6 +730,8 @@ public class ThumbnailView1 extends Activity{
         	//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type)); 
         }
         */
+        
+        mList = new ArrayList<Map<String, Object>>();
         
         if (cur_path == null) cur_path = ROOT_PATH;
         if (cur_path.equals(ROOT_PATH)) {
@@ -973,6 +1013,14 @@ public class ThumbnailView1 extends Activity{
     				if (mWakeLock.isHeld())
     					mWakeLock.release();                         	
                 	break;
+                case 10:    //update list                                       
+                    //((BaseAdapter) ThumbnailView.getAdapter()).notifyDataSetChanged();
+                    ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));                    
+                    mListLoaded = false;
+                    if (load_dialog != null)
+                        load_dialog.dismiss();
+                    break; 	
+                	
                 }
                 
             }
@@ -1275,7 +1323,14 @@ public class ThumbnailView1 extends Activity{
 	    	.setView(layout_help)
 	    	.setTitle(R.string.btn_help_str) 
 	        .create();
-		    return help_dialog;	       
+		    return help_dialog;
+		    
+		case LOAD_DIALOG_ID:
+		    load_dialog = new ProgressDialog(this);
+		    load_dialog.setMessage(getText(R.string.load_dialog_msg_str));
+		    load_dialog.setIndeterminate(true);
+		    load_dialog.setCancelable(true);
+		    return load_dialog;		    	       
         }
         
 		return null;    	
@@ -1463,7 +1518,25 @@ public class ThumbnailView1 extends Activity{
             	
             });
     		
-    		break;    		
+    		break;
+    		
+        case LOAD_DIALOG_ID:
+            if (display.getHeight() > display.getWidth()) {            	
+                lp.width = (int) (display.getWidth() * 1.0);       	
+            } else {        		
+                lp.width = (int) (display.getWidth() * 0.5);            	
+            }
+            dialog.getWindow().setAttributes(lp);   
+            
+            dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {					
+                public void onCancel(DialogInterface dialog) {
+                    mLoadCancel = true;
+                }
+            });
+
+            mLoadCancel = false;
+			           
+            break;    		    		
     	}
     }
 

@@ -21,6 +21,7 @@
     <string name="edit_dialog_paste_str">粘贴</string>
     <string name="edit_dialog_cut_str">剪切</string>
     
+    <string name="load_dialog_msg_str">文件列表加载中，请稍等...</string>
     
     <string name="click_dialog_title_str">打开文件</string>
     <string name="rootDevice">设备列表</string>
