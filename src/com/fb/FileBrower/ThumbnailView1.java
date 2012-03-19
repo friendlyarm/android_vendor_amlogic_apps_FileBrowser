@@ -597,7 +597,7 @@ public class ThumbnailView1 extends Activity{
         		FileOp.cleanFileMarks("thumbnail1");				
         		
         		ThumbnailOpUtils.stopThumbnailSanner(getBaseContext());
-        		if (FileOp.IsSDBusy) {
+        		if (FileOp.IsBusy) {
         			FileOp.copy_cancel = true;
         		}        					
             } else if (action.equals(Intent.ACTION_MEDIA_MOUNTED)) {          	
