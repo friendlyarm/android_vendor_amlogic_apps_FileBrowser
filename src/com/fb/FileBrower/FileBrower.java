@@ -169,7 +169,7 @@ public class FileBrower extends Activity {
         		if (cur_path.equals(ROOT_PATH)) {
         			DeviceScan();
         		} 	
-        		if (FileOp.IsBusy) {
+        		if (FileOp.IsSDBusy) {
         			FileOp.copy_cancel = true;
         		}			
             } else if (action.equals(Intent.ACTION_MEDIA_MOUNTED)) {          	

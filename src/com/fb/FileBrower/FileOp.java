@@ -27,6 +27,8 @@ public class FileOp {
 	public static boolean copy_cancel = false;
 	public static boolean switch_mode = false;	
 	public static boolean IsBusy = false;
+	public static boolean IsSDBusy = false;
+	public static String SDCARD_PATH = null;
 	public static void SetMode(boolean value){
 		switch_mode = value;
 	}
@@ -530,10 +532,29 @@ public class FileOp {
             close(out);
         }
     }
+    private static String getSDCardPath() {
+        if (SDCARD_PATH != null)
+            return SDCARD_PATH;
+        else {
+            if (!Environment.isExternalStorageBeSdcard()) {
+                SDCARD_PATH = Environment.getExternalStorage2Directory().getAbsolutePath();
+            } else {
+                SDCARD_PATH = Environment.getExternalStorageDirectory().getAbsolutePath();
+            }
+            return SDCARD_PATH;
+        }
+    }
+    
     private static void nioBufferCopy(File source, File target, String cur_page, int buf_size) {
     	if (!source.exists() || !target.exists())
     		return;
-    		
+    	
+    	IsSDBusy = false;
+    	if (source.getAbsolutePath().startsWith(getSDCardPath())
+    	    || target.getAbsolutePath().startsWith(getSDCardPath())) {
+    	    IsSDBusy = true;
+    	}
+
         FileChannel in = null;
         FileChannel out = null;
 
@@ -577,6 +598,7 @@ public class FileOp {
             close(outStream);
             close(out);
         }
+        IsSDBusy = false;
     }
     private static void close(Closeable closable) {
         if (closable != null) {
