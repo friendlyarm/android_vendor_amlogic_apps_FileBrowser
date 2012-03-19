@@ -170,7 +170,10 @@ public class FileBrower extends Activity {
         			DeviceScan();
         		} 	
         		if (FileOp.IsBusy) {
-        			FileOp.copy_cancel = true;
+                    if (isOperateInDirectory(path, FileOp.source_path) ||
+                        isOperateInDirectory(path, FileOp.target_path)) {
+                        FileOp.copy_cancel = true;
+                    }
         		}			
             } else if (action.equals(Intent.ACTION_MEDIA_MOUNTED)) {          	
         		if (cur_path.equals(ROOT_PATH)) {
@@ -1421,5 +1424,11 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
         menu.add(0, 0, 0, getText(R.string.app_name) + " v" + ver_str);
         return true;
     }   
+
+    private boolean isOperateInDirectory(String umount_path, String path) 
+    {
+        String str = path.substring(0, umount_path.length());
+        return str.equals(umount_path);
+    }
      
 }

@@ -27,6 +27,8 @@ public class FileOp {
 	public static boolean copy_cancel = false;
 	public static boolean switch_mode = false;	
 	public static boolean IsBusy = false;
+	public static String source_path = null;
+	public static String target_path = null;
 	public static void SetMode(boolean value){
 		switch_mode = value;
 	}
@@ -541,6 +543,8 @@ public class FileOp {
         FileOutputStream outStream = null;
 
         try {
+            source_path = source.getPath();
+            target_path = target.getPath();
             inStream = new FileInputStream(source);
             outStream = new FileOutputStream(target);
 
@@ -569,6 +573,8 @@ public class FileOp {
 	        				ThumbnailView1.mProgressHandler, 1, (int)(bytecount * 100 / source.length()), 0));
 	        	}             
             }
+            source_path = null;
+            target_path = null;
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
