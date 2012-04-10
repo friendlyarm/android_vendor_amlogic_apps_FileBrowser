@@ -284,6 +284,118 @@ public class FileBrower extends Activity {
         
         mList = new ArrayList<Map<String, Object>>();
         
+        /** edit process bar handler
+         *  mProgressHandler.sendMessage(Message.obtain(mProgressHandler, msg.what, msg.arg1, msg.arg2));            
+         */
+        mProgressHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                
+                ProgressBar pb = null;
+                if (edit_dialog != null)
+                	pb = (ProgressBar) edit_dialog.findViewById(R.id.edit_progress_bar);
+              
+                switch(msg.what) {
+                case 0: 	//set invisible
+                    if ((edit_dialog != null) && (pb != null)) {                    	
+                	pb.setVisibility(View.INVISIBLE);
+                    }
+                	break;                
+                case 1:		//set progress_bar1 
+                	if ((edit_dialog != null) && (pb != null)) {  
+                		pb.setProgress(msg.arg1);
+                 	}
+                	break;
+                case 2:		//set progress_bar2
+                	if ((edit_dialog != null) && (pb != null)) {  
+                		pb.setSecondaryProgress(msg.arg1);  
+                	}
+                	break;
+                case 3:		//set visible
+                	if ((edit_dialog != null) && (pb != null)) {  
+	                	pb.setProgress(0);
+	                	pb.setSecondaryProgress(0);    
+	                	pb.setVisibility(View.VISIBLE);
+                	}
+                	break;
+                case 4:		//file paste ok
+					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
+	    				+ "/mnt")));                       
+        			db.deleteAllFileMark();
+        			lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+        			ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path);
+        			Toast.makeText(FileBrower.this,
+        					getText(R.string.Toast_msg_paste_ok),
+        					Toast.LENGTH_SHORT).show();       
+        			FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
+                    if (edit_dialog != null)
+                    	edit_dialog.dismiss();  
+    				if (mWakeLock.isHeld())
+    					mWakeLock.release();                         	                  	
+                	
+                	break;
+                case 5:		//file paste err
+        			Toast.makeText(FileBrower.this,
+        					getText(R.string.Toast_msg_paste_nofile),
+        					Toast.LENGTH_SHORT).show();   
+        			FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
+                    if (edit_dialog != null)
+                    	edit_dialog.dismiss();   
+    				if (mWakeLock.isHeld())
+    					mWakeLock.release();                         	
+                	break;
+                case 7:		//dir cannot write
+        			Toast.makeText(FileBrower.this,
+        					getText(R.string.Toast_msg_paste_writeable),
+        					Toast.LENGTH_SHORT).show();  
+        			//FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
+                    if (edit_dialog != null)
+                    	edit_dialog.dismiss();  
+    				if (mWakeLock.isHeld())
+    					mWakeLock.release();                         	
+                	break;
+                case 8:		//no free space
+                	db.deleteAllFileMark();
+        			lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+        			ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path);
+        			Toast.makeText(FileBrower.this,
+        					getText(R.string.Toast_msg_paste_nospace),
+        					Toast.LENGTH_SHORT).show();   
+        			FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
+                    if (edit_dialog != null)
+                    	edit_dialog.dismiss(); 
+    				if (mWakeLock.isHeld())
+    					mWakeLock.release();                         	
+                	break;
+                case 9:		//file copy cancel                	
+                	if((FileOp.copying_file!=null)&&(FileOp.copying_file.exists()))
+	    				FileOp.copying_file.delete();
+    				Toast.makeText(FileBrower.this,
+							getText(R.string.Toast_copy_fail),
+							Toast.LENGTH_SHORT).show();
+    				FileOp.copy_cancel = false;
+    				FileOp.copying_file = null;
+    				db.deleteAllFileMark();
+    				lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+    				FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
+                    if (edit_dialog != null)
+                    	edit_dialog.dismiss();   
+    				if (mWakeLock.isHeld())
+    					mWakeLock.release();                        	
+                	break;
+                case 10:    //update list                                       
+                    //((BaseAdapter) lv.getAdapter()).notifyDataSetChanged();
+                    lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));                    
+                    mListLoaded = false;
+                    if (load_dialog != null)
+                        load_dialog.dismiss();
+                    break;    
+                }
+                
+            }
+        };        
+        
         if(cur_path.equals(ROOT_PATH)){       	
         	 DeviceScan();
         }
@@ -443,117 +555,7 @@ public class FileBrower extends Activity {
     		   			       		
         }); 
         
-        /** edit process bar handler
-         *  mProgressHandler.sendMessage(Message.obtain(mProgressHandler, msg.what, msg.arg1, msg.arg2));            
-         */
-        mProgressHandler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                
-                ProgressBar pb = null;
-                if (edit_dialog != null)
-                	pb = (ProgressBar) edit_dialog.findViewById(R.id.edit_progress_bar);
-              
-                switch(msg.what) {
-                case 0: 	//set invisible
-                    if ((edit_dialog != null) && (pb != null)) {                    	
-                	pb.setVisibility(View.INVISIBLE);
-                    }
-                	break;                
-                case 1:		//set progress_bar1 
-                	if ((edit_dialog != null) && (pb != null)) {  
-                		pb.setProgress(msg.arg1);
-                 	}
-                	break;
-                case 2:		//set progress_bar2
-                	if ((edit_dialog != null) && (pb != null)) {  
-                		pb.setSecondaryProgress(msg.arg1);  
-                	}
-                	break;
-                case 3:		//set visible
-                	if ((edit_dialog != null) && (pb != null)) {  
-	                	pb.setProgress(0);
-	                	pb.setSecondaryProgress(0);    
-	                	pb.setVisibility(View.VISIBLE);
-                	}
-                	break;
-                case 4:		//file paste ok
-					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
-	    				+ "/mnt")));                       
-        			db.deleteAllFileMark();
-        			lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
-        			ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path);
-        			Toast.makeText(FileBrower.this,
-        					getText(R.string.Toast_msg_paste_ok),
-        					Toast.LENGTH_SHORT).show();       
-        			FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
-                    if (edit_dialog != null)
-                    	edit_dialog.dismiss();  
-    				if (mWakeLock.isHeld())
-    					mWakeLock.release();                         	                  	
-                	
-                	break;
-                case 5:		//file paste err
-        			Toast.makeText(FileBrower.this,
-        					getText(R.string.Toast_msg_paste_nofile),
-        					Toast.LENGTH_SHORT).show();   
-        			FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
-                    if (edit_dialog != null)
-                    	edit_dialog.dismiss();   
-    				if (mWakeLock.isHeld())
-    					mWakeLock.release();                         	
-                	break;
-                case 7:		//dir cannot write
-        			Toast.makeText(FileBrower.this,
-        					getText(R.string.Toast_msg_paste_writeable),
-        					Toast.LENGTH_SHORT).show();  
-        			//FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
-                    if (edit_dialog != null)
-                    	edit_dialog.dismiss();  
-    				if (mWakeLock.isHeld())
-    					mWakeLock.release();                         	
-                	break;
-                case 8:		//no free space
-                	db.deleteAllFileMark();
-        			lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
-        			ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path);
-        			Toast.makeText(FileBrower.this,
-        					getText(R.string.Toast_msg_paste_nospace),
-        					Toast.LENGTH_SHORT).show();   
-        			FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
-                    if (edit_dialog != null)
-                    	edit_dialog.dismiss(); 
-    				if (mWakeLock.isHeld())
-    					mWakeLock.release();                         	
-                	break;
-                case 9:		//file copy cancel                	
-                	if((FileOp.copying_file!=null)&&(FileOp.copying_file.exists()))
-	    				FileOp.copying_file.delete();
-    				Toast.makeText(FileBrower.this,
-							getText(R.string.Toast_copy_fail),
-							Toast.LENGTH_SHORT).show();
-    				FileOp.copy_cancel = false;
-    				FileOp.copying_file = null;
-    				db.deleteAllFileMark();
-    				lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
-    				FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
-                    if (edit_dialog != null)
-                    	edit_dialog.dismiss();   
-    				if (mWakeLock.isHeld())
-    					mWakeLock.release();                        	
-                	break;
-                case 10:    //update list                                       
-                    //((BaseAdapter) lv.getAdapter()).notifyDataSetChanged();
-                    lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));                    
-                    mListLoaded = false;
-                    if (load_dialog != null)
-                        load_dialog.dismiss();
-                    break;    
-                }
-                
-            }
-        };
+
 
     }
     /** onDestory() */

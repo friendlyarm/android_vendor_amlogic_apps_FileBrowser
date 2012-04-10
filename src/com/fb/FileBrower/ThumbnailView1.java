@@ -745,6 +745,131 @@ public class ThumbnailView1 extends Activity{
             //ThumbnailOpUtils.updateThumbnailsForAllDev(getBaseContext()); 
         }
 
+        /** edit process bar handler
+         *  mProgressHandler.sendMessage(Message.obtain(mProgressHandler, msg.what, msg.arg1, msg.arg2));            
+         */
+        mProgressHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                
+                ProgressBar pb = null;
+                if (edit_dialog != null)
+                	pb = (ProgressBar) edit_dialog.findViewById(R.id.edit_progress_bar);
+                
+                switch(msg.what) {
+                case 0: 	//set invisible
+                    if ((edit_dialog != null) && (pb != null)) {                    	
+                	pb.setVisibility(View.INVISIBLE);
+                    }
+                	break;                
+                case 1:		//set progress_bar1 
+                	if ((edit_dialog != null) && (pb != null)) {  
+                		pb.setProgress(msg.arg1);
+                 	}
+                	break;
+                case 2:		//set progress_bar2
+                	if ((edit_dialog != null) && (pb != null)) {  
+                		pb.setSecondaryProgress(msg.arg1);  
+                	}
+                	break;
+                case 3:		//set visible
+                	if ((edit_dialog != null) && (pb != null)) {  
+	                	pb.setProgress(0);
+	                	pb.setSecondaryProgress(0);    
+	                	pb.setVisibility(View.VISIBLE);
+                	}
+                	break;
+                case 4:		//file paste ok
+                	updateThumbnials();
+					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
+	    				+ "/mnt")));                	
+        			db.deleteAllFileMark();
+        			//GetCurrentFilelist(cur_path,cur_sort_type);   
+                	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));  
+                	if (!mMediaScannerRunning)
+						ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path);
+        			//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type)); 
+        			Toast.makeText(ThumbnailView1.this,
+        					getText(R.string.Toast_msg_paste_ok),
+        					Toast.LENGTH_SHORT).show();       
+        			FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
+                    if (edit_dialog != null)
+                    	edit_dialog.dismiss();    
+    				if (mWakeLock.isHeld())
+    					mWakeLock.release();                         	                	
+                	
+                	break;
+                case 5:		//file paste err
+                	updateThumbnials();
+        			Toast.makeText(ThumbnailView1.this,
+        					getText(R.string.Toast_msg_paste_nofile),
+        					Toast.LENGTH_SHORT).show();   
+        			FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
+                    if (edit_dialog != null)
+                    	edit_dialog.dismiss();   
+    				if (mWakeLock.isHeld())
+    					mWakeLock.release();                         	
+                	break;
+                case 6:
+                	if (!cur_path.equals(ROOT_PATH))
+                    	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+                	break;
+                case 7:		//dir cannot write
+        			Toast.makeText(ThumbnailView1.this,
+        					getText(R.string.Toast_msg_paste_writeable),
+        					Toast.LENGTH_SHORT).show();  
+        			//FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
+                    if (edit_dialog != null)
+                    	edit_dialog.dismiss(); 
+    				if (mWakeLock.isHeld())
+    					mWakeLock.release();                         	 
+                	break;
+                case 8:		//no free space
+        			db.deleteAllFileMark();    
+        			if (!mMediaScannerRunning)
+                		ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));    
+					ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path);
+        			Toast.makeText(ThumbnailView1.this,
+        					getText(R.string.Toast_msg_paste_nospace),
+        					Toast.LENGTH_SHORT).show();   
+        			FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
+                    if (edit_dialog != null)
+                    	edit_dialog.dismiss(); 
+    				if (mWakeLock.isHeld())
+    					mWakeLock.release();                         	
+                	break;                	
+                case 9:		//file copy cancel                	
+                	if((FileOp.copying_file!=null)&&(FileOp.copying_file.exists()))
+	    				FileOp.copying_file.delete();
+    				Toast.makeText(ThumbnailView1.this,
+							getText(R.string.Toast_copy_fail),
+							Toast.LENGTH_SHORT).show();
+    				FileOp.copy_cancel = false;
+    				FileOp.copying_file = null;
+    				db.deleteAllFileMark();
+                	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+                	if (!mMediaScannerRunning)
+						ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path);
+    				FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
+                    if (edit_dialog != null)
+                    	edit_dialog.dismiss();   
+    				if (mWakeLock.isHeld())
+    					mWakeLock.release();                         	
+                	break;
+                case 10:    //update list                                       
+                    //((BaseAdapter) ThumbnailView.getAdapter()).notifyDataSetChanged();
+                    ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));                    
+                    mListLoaded = false;
+                    if (load_dialog != null)
+                        load_dialog.dismiss();
+                    break; 	
+                	
+                }
+                
+            }
+        };
+
     	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
         /* btn_mode default checked */
         btn_mode = (ToggleButton) findViewById(R.id.btn_thumbmode); 
@@ -901,130 +1026,7 @@ public class ThumbnailView1 extends Activity{
 
         
         
-        /** edit process bar handler
-         *  mProgressHandler.sendMessage(Message.obtain(mProgressHandler, msg.what, msg.arg1, msg.arg2));            
-         */
-        mProgressHandler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                
-                ProgressBar pb = null;
-                if (edit_dialog != null)
-                	pb = (ProgressBar) edit_dialog.findViewById(R.id.edit_progress_bar);
-                
-                switch(msg.what) {
-                case 0: 	//set invisible
-                    if ((edit_dialog != null) && (pb != null)) {                    	
-                	pb.setVisibility(View.INVISIBLE);
-                    }
-                	break;                
-                case 1:		//set progress_bar1 
-                	if ((edit_dialog != null) && (pb != null)) {  
-                		pb.setProgress(msg.arg1);
-                 	}
-                	break;
-                case 2:		//set progress_bar2
-                	if ((edit_dialog != null) && (pb != null)) {  
-                		pb.setSecondaryProgress(msg.arg1);  
-                	}
-                	break;
-                case 3:		//set visible
-                	if ((edit_dialog != null) && (pb != null)) {  
-	                	pb.setProgress(0);
-	                	pb.setSecondaryProgress(0);    
-	                	pb.setVisibility(View.VISIBLE);
-                	}
-                	break;
-                case 4:		//file paste ok
-                	updateThumbnials();
-					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
-	    				+ "/mnt")));                	
-        			db.deleteAllFileMark();
-        			//GetCurrentFilelist(cur_path,cur_sort_type);   
-                	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));  
-                	if (!mMediaScannerRunning)
-						ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path);
-        			//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type)); 
-        			Toast.makeText(ThumbnailView1.this,
-        					getText(R.string.Toast_msg_paste_ok),
-        					Toast.LENGTH_SHORT).show();       
-        			FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
-                    if (edit_dialog != null)
-                    	edit_dialog.dismiss();    
-    				if (mWakeLock.isHeld())
-    					mWakeLock.release();                         	                	
-                	
-                	break;
-                case 5:		//file paste err
-                	updateThumbnials();
-        			Toast.makeText(ThumbnailView1.this,
-        					getText(R.string.Toast_msg_paste_nofile),
-        					Toast.LENGTH_SHORT).show();   
-        			FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
-                    if (edit_dialog != null)
-                    	edit_dialog.dismiss();   
-    				if (mWakeLock.isHeld())
-    					mWakeLock.release();                         	
-                	break;
-                case 6:
-                	if (!cur_path.equals(ROOT_PATH))
-                    	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
-                	break;
-                case 7:		//dir cannot write
-        			Toast.makeText(ThumbnailView1.this,
-        					getText(R.string.Toast_msg_paste_writeable),
-        					Toast.LENGTH_SHORT).show();  
-        			//FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
-                    if (edit_dialog != null)
-                    	edit_dialog.dismiss(); 
-    				if (mWakeLock.isHeld())
-    					mWakeLock.release();                         	 
-                	break;
-                case 8:		//no free space
-        			db.deleteAllFileMark();    
-        			if (!mMediaScannerRunning)
-                		ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));    
-					ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path);
-        			Toast.makeText(ThumbnailView1.this,
-        					getText(R.string.Toast_msg_paste_nospace),
-        					Toast.LENGTH_SHORT).show();   
-        			FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
-                    if (edit_dialog != null)
-                    	edit_dialog.dismiss(); 
-    				if (mWakeLock.isHeld())
-    					mWakeLock.release();                         	
-                	break;                	
-                case 9:		//file copy cancel                	
-                	if((FileOp.copying_file!=null)&&(FileOp.copying_file.exists()))
-	    				FileOp.copying_file.delete();
-    				Toast.makeText(ThumbnailView1.this,
-							getText(R.string.Toast_copy_fail),
-							Toast.LENGTH_SHORT).show();
-    				FileOp.copy_cancel = false;
-    				FileOp.copying_file = null;
-    				db.deleteAllFileMark();
-                	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
-                	if (!mMediaScannerRunning)
-						ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path);
-    				FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
-                    if (edit_dialog != null)
-                    	edit_dialog.dismiss();   
-    				if (mWakeLock.isHeld())
-    					mWakeLock.release();                         	
-                	break;
-                case 10:    //update list                                       
-                    //((BaseAdapter) ThumbnailView.getAdapter()).notifyDataSetChanged();
-                    ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));                    
-                    mListLoaded = false;
-                    if (load_dialog != null)
-                        load_dialog.dismiss();
-                    break; 	
-                	
-                }
-                
-            }
-        };
+
         
     }
     
