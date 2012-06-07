@@ -20,6 +20,9 @@
     <string name="edit_dialog_delete_str">Delete</string>
     <string name="edit_dialog_paste_str">Paste</string>
     <string name="edit_dialog_cut_str">Cut</string>
+    <string name="edit_dialog_rename_str">Rename</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">Ok</string>
     
     <string name="load_dialog_msg_str">Please wait while loading...</string>
     
@@ -49,6 +52,10 @@ DROP TABLE IF EXISTS file_thumbnails_table
 	<string name="Toast_msg_paste_wrongpath">Cannot paste here.</string>
 	<string name="Toast_msg_edit_noopen">Cannot edit here.</string>
 	<string name="Toast_msg_sort_noopen">Cannot sort here.</string>
+	<string name="Toast_msg_rename_morefile">Cannot rename more than one file:</string>
+	<string name="Toast_msg_rename_nofile">No file to rename.</string>
+	<string name="Toast_msg_rename_error">Rename failed.</string>
+	<string name="Toast_msg_rename_diffpath">Cannot rename in diffent path:</string>
 	
 	<string name="dialog_help_item_home_str">Show home page</string>
 	<string name="dialog_help_item_edit_str">Show edit dialog</string>

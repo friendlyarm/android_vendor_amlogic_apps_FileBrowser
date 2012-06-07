@@ -20,7 +20,10 @@
     <string name="edit_dialog_delete_str">删除</string>
     <string name="edit_dialog_paste_str">粘贴</string>
     <string name="edit_dialog_cut_str">剪切</string>
-    
+  	<string name="edit_dialog_rename_str">重命名</string>
+  	<string name="cancel">取消</string>
+    <string name="ok">确定</string>
+  	  
     <string name="load_dialog_msg_str">文件列表加载中，请稍等...</string>
     
     <string name="click_dialog_title_str">打开文件</string>
@@ -49,6 +52,10 @@ DROP TABLE IF EXISTS file_thumbnails_table
 	<string name="Toast_msg_paste_wrongpath">该目录无法进行粘贴.</string>
 	<string name="Toast_msg_edit_noopen">该目录无法进行编辑.</string>
 	<string name="Toast_msg_sort_noopen">该目录无法进行排序.</string>
+	<string name="Toast_msg_rename_morefile">不能同时重命名多个文件:</string>
+	<string name="Toast_msg_rename_nofile">没有文件被选中重命名.</string>
+	<string name="Toast_msg_rename_error">重命名失败.</string>
+	<string name="Toast_msg_rename_diffpath">不能在不同路径下重命名:</string>
 	
 	<string name="dialog_help_item_home_str">显示设备列表</string>
 	<string name="dialog_help_item_edit_str">显示编辑菜单</string>

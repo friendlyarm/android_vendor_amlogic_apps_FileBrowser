@@ -42,6 +42,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -956,6 +957,58 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
             				}         				          				
             				edit_dialog.dismiss();
             			}
+						else if(pos == 4)
+						{
+							FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
+							//Log.i(TAG, "DO rename...");
+							myCursor = db.getFileMark(); 
+        			        if (myCursor.getCount() > 0) 
+							{
+								if(myCursor.getCount() > 1)
+								{
+									String fullPath=FileOp.getMarkFilePath("list");
+		        					Toast.makeText(FileBrower.this,
+		        							getText(R.string.Toast_msg_rename_morefile)+"\n"+fullPath,
+		        							Toast.LENGTH_LONG).show(); 
+								}
+								else
+								{
+									String fullPath=FileOp.getSingleMarkFilePath("list");
+									if(null!=fullPath)
+									{
+										String dirPath=fullPath.substring(0, fullPath.lastIndexOf('/'));
+										if(cur_path.equals(dirPath))
+										{
+											if(true!=fileRename())
+											{
+												Toast.makeText(FileBrower.this,
+				        							getText(R.string.Toast_msg_rename_error),
+				        							Toast.LENGTH_SHORT).show();
+											}
+										}
+										else
+										{
+											Toast.makeText(FileBrower.this,
+			        							getText(R.string.Toast_msg_rename_diffpath)+"\n"+dirPath,
+			        							Toast.LENGTH_LONG).show();
+										}
+									}
+									else if(true!=fileRename())
+									{
+										Toast.makeText(FileBrower.this,
+		        							getText(R.string.Toast_msg_rename_error),
+		        							Toast.LENGTH_SHORT).show();
+									}
+								}
+        			        } 
+							else 
+							{
+            					Toast.makeText(FileBrower.this,
+            							getText(R.string.Toast_msg_rename_nofile),
+            							Toast.LENGTH_SHORT).show();     
+        			        }
+							edit_dialog.dismiss();
+						}
             		} else {
     					Toast.makeText(FileBrower.this,
     							getText(R.string.Toast_msg_paste_wrongpath),
@@ -1018,7 +1071,96 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 			           
             break;
     	}
-    }  
+    } 
+
+	private Dialog mRenameDialog;
+	private String name=null;
+	private String path=null;
+	private boolean fileRename()
+    {
+    	LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);  
+    	View v = inflater.inflate(R.layout.file_rename, null); 
+
+		path=FileOp.getSingleMarkFilePath("list");
+		if(null!=path)
+		{
+			int index=-1;
+			index=path.lastIndexOf("/");
+			if(index>=0)
+			{
+				name=path.substring(index+1);
+				if(null==name)
+				{
+					Log.e(TAG,"[fileRename] file name null!!");
+					return false;
+				}
+			}
+			else
+			{
+				Log.e(TAG,"[fileRename] index error!!");
+				return false;
+			}
+		}
+		else
+		{
+			Log.e(TAG,"[fileRename] file path null!!");
+			return false;
+		}
+    	
+    	final EditText mRenameEdit = (EditText) v.findViewById(R.id.editTextRename); 
+    	final File mRenameFile = new File(path);  
+    	mRenameEdit.setText(name); 
+    	
+    	Button buttonOK = (Button) v.findViewById(R.id.buttonOK);  
+    	Button buttonCancel = (Button) v.findViewById(R.id.buttonCancel);  
+    	
+    	buttonOK.setOnClickListener(new OnClickListener()
+		{
+    		public void onClick(View v) 
+    		{
+    			if( null != mRenameDialog )
+    			{
+    				mRenameDialog.dismiss();
+    				mRenameDialog = null;
+    			}
+    			
+    			String newFileName = String.valueOf(mRenameEdit.getText());
+    			if(!name.equals(newFileName))
+    			{
+	    			newFileName = path.substring(0, path.lastIndexOf('/') + 1) + newFileName;
+
+	    			if(mRenameFile.renameTo(new File(newFileName)))
+	    			{
+	    				db.deleteAllFileMark(); 
+	    				lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+	    			}
+	    			else
+	    			{
+	    				Toast.makeText(FileBrower.this,
+							getText(R.string.Toast_msg_rename_error),
+							Toast.LENGTH_SHORT).show();
+	    			}
+    			}
+    		}
+		});
+    	
+    	buttonCancel.setOnClickListener(new OnClickListener()
+		{
+    		public void onClick(View v) 
+    		{
+    			if( null != mRenameDialog )
+    			{
+    				mRenameDialog.dismiss();
+    				mRenameDialog = null;
+    			}
+    		}
+		});
+    	
+    	mRenameDialog = new AlertDialog.Builder(FileBrower.this)
+				        .setView(v)
+				        .show();
+		return true;
+    }
 	
     
     /** getFileListAdapter */

@@ -960,5 +960,96 @@ public class FileOp {
     	return false;
     	
     }
+
+	/*
+	* get mark file name for function rename
+	*/
+	public static String getMarkFilePath(String cur_page)
+	{
+		String path="\0";
+
+		if(cur_page.equals("list"))
+		{
+			FileBrower.myCursor = FileBrower.db.getFileMark();   
+	        if (FileBrower.myCursor.getCount() > 0)
+			{
+	            for(int i=0; i<FileBrower.myCursor.getCount(); i++){
+	            	FileBrower.myCursor.moveToPosition(i);
+	            	path+=FileBrower.myCursor.getColFilePath();
+					path+="\n";
+	            }      	
+	        }       
+		}
+		else if (cur_page.equals("thumbnail1"))
+		{
+    		ThumbnailView1.myCursor = ThumbnailView1.db.getFileMark();   
+	        if (ThumbnailView1.myCursor.getCount() > 0) {
+	            for(int i=0; i<ThumbnailView1.myCursor.getCount(); i++){
+	            	ThumbnailView1.myCursor.moveToPosition(i);
+	            	path+=ThumbnailView1.myCursor.getColFilePath();
+					path+="\n";
+	            }      	
+	        }
+    	}
+
+		return path;
+	}
+
+	/*
+	* get single mark file name for function rename
+	*/
+	public static String getSingleMarkFilePath(String cur_page)
+	{
+		String path=null;
+		
+		if(cur_page.equals("list"))
+		{
+    		FileBrower.myCursor = FileBrower.db.getFileMark();
+			if (FileBrower.myCursor.getCount() > 0) 
+			{
+		        if (FileBrower.myCursor.getCount()!=1) 
+		        {
+		        	Log.e(FileBrower.TAG,"current FileBrower Cursor outof range, count:"+FileBrower.myCursor.getCount());
+				}
+				else
+				{
+	            	FileBrower.myCursor.moveToFirst();
+	            	path=FileBrower.myCursor.getColFilePath();
+	            }    
+			}
+        }      
+		else if(cur_page.equals("thumbnail1"))
+		{
+    		ThumbnailView1.myCursor = ThumbnailView1.db.getFileMark();   
+	        if (ThumbnailView1.myCursor.getCount() > 0) 
+			{
+				if(ThumbnailView1.myCursor.getCount()!=1)
+				{
+					Log.e(FileBrower.TAG,"current ThumbnailView1 Cursor outof range, count:"+FileBrower.myCursor.getCount());
+				}
+				else
+				{
+	            	ThumbnailView1.myCursor.moveToFirst();
+	            	path=ThumbnailView1.myCursor.getColFilePath();
+	            }      	
+	        }      
+    	}
+
+		/*if(null!=path)
+		{
+			String name=null;
+			int index=-1;
+			index=path.lastIndexOf("/");
+			if(index>=0)
+			{
+				name=path.substring(index);
+			}
+		}
+		Log.i(FileBrower.TAG,"name :"+name);
+		return name;*/
+		
+		Log.i(FileBrower.TAG,"path :"+path);
+		return path;
+	}
 }
          
