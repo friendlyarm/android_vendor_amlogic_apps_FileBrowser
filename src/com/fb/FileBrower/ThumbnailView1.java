@@ -1745,7 +1745,12 @@ public class ThumbnailView1 extends Activity{
         	map.put("item_type", R.drawable.dialog_item_type_delete);  
         	map.put("item_name", getText(R.string.edit_dialog_delete_str));            	        	
         	map.put("item_sel", R.drawable.dialog_item_img_unsel);  
-        	list.add(map);     		
+        	list.add(map);    
+			map = new HashMap<String, Object>();         	
+        	map.put("item_type", R.drawable.dialog_item_type_rename);  
+        	map.put("item_name", getText(R.string.edit_dialog_rename_str));            	        	
+        	map.put("item_sel", R.drawable.dialog_item_img_unsel);  
+        	list.add(map); 
     		break;  
     	case HELP_DIALOG_ID:
     		map = new HashMap<String, Object>();    		
