@@ -128,6 +128,12 @@ public class FileOp {
             return true;
         return false;
     }     
+	 public  static boolean isHtm(String filename) {   
+    	String name = filename.toLowerCase();        
+        if (name.endsWith(".htm"))
+            return true;
+        return false;
+    }     
     /* file type extensions */
     //video from layer
     public static final String[] video_extensions = { ".3gp",
@@ -201,8 +207,11 @@ public class FileOp {
         	typeStr = "image/*";
         else if (isApk(filename))
         	typeStr = "application/vnd.android.package-archive";
-        else
-        	typeStr = "application/*";
+		else if (isHtm(filename))
+			typeStr = "application/xhtml+xml";
+        else {
+			typeStr = "application/*";
+        }
         
         return typeStr;
        
