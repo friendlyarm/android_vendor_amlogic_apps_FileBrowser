@@ -130,7 +130,7 @@ public class FileOp {
     }     
 	 public  static boolean isHtm(String filename) {   
     	String name = filename.toLowerCase();        
-        if (name.endsWith(".htm"))
+        if (name.endsWith(".htm") || name.endsWith(".shtml"))
             return true;
         return false;
     }     
@@ -208,7 +208,7 @@ public class FileOp {
         else if (isApk(filename))
         	typeStr = "application/vnd.android.package-archive";
 		else if (isHtm(filename))
-			typeStr = "application/xhtml+xml";
+			typeStr = "text/html";
         else {
 			typeStr = "application/*";
         }
