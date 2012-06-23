@@ -130,7 +130,7 @@ public class FileOp {
     }     
 	 public  static boolean isHtm(String filename) {   
     	String name = filename.toLowerCase();        
-        if (name.endsWith(".htm") || name.endsWith(".shtml"))
+        if (name.endsWith(".htm") || name.endsWith(".shtml") || name.endsWith(".bin"))
             return true;
         return false;
     }     
