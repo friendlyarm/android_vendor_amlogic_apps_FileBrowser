@@ -57,6 +57,7 @@ DROP TABLE IF EXISTS file_thumbnails_table
 	<string name="Toast_msg_rename_nofile">No file to rename.</string>
 	<string name="Toast_msg_rename_error">Rename failed.</string>
 	<string name="Toast_msg_rename_diffpath">Cannot rename in diffent path:</string>
+	<string name="Toast_msg_paste_sub_folder">Can\'t paste, destination directory is sub folder of source directory.</string>
 	
 	<string name="dialog_help_item_home_str">Show home page</string>
 	<string name="dialog_help_item_edit_str">Show edit dialog</string>

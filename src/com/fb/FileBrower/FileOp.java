@@ -743,7 +743,60 @@ public class FileOp {
                 			return FileOpReturn.ERR; 
         				}
         			}
-        			try {  
+
+					if(file.isDirectory())
+					{
+						try{
+							int idx=-1;
+							idx = (FileBrower.cur_path).indexOf(file.getPath());
+							if(idx!=-1)
+							{
+								if(cur_page.equals("list")){
+			                		FileBrower.mProgressHandler.sendMessage(Message.obtain(
+			                				FileBrower.mProgressHandler, 11)); 
+			                	} else if (cur_page.equals("thumbnail1")){
+			                		ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
+			                				ThumbnailView1.mProgressHandler, 11));                		              		
+			                	}    
+			                	IsBusy = false;
+			                	return FileOpReturn.ERR;
+							}
+							else
+							{
+								FileUtils.copyDirectoryToDirectory(file, new File(FileBrower.cur_path));
+							}
+
+							if(!copy_cancel)
+							{
+    							if (file_op_todo == FileOpTodo.TODO_CUT)
+    								FileUtils.deleteDirectory(file);
+	        				}
+	        				else
+							{       							          		
+			                	if (file.exists())		
+			                		FileUtils.deleteDirectory(file);
+														          		
+			                	if(cur_page.equals("list")){
+			                		FileBrower.mProgressHandler.sendMessage(Message.obtain(
+			                				FileBrower.mProgressHandler, 9)); 
+			                	} else if (cur_page.equals("thumbnail")){
+			                		ThumbnailView.mProgressHandler.sendMessage(Message.obtain(
+			                				ThumbnailView.mProgressHandler, 9)); 
+			                	} else if (cur_page.equals("thumbnail1")){
+			                		ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
+			                				ThumbnailView1.mProgressHandler, 9));                		              		
+			                	}    
+			                	IsBusy = false;
+			                	return FileOpReturn.ERR;
+    						}
+						}
+						catch (Exception e) {
+	        				Log.e("Exception when copyDirectoryToDirectory",e.toString());
+	        			}
+					}
+					else
+					{
+	        			try {  
         				File file_new = null;
     					//Log.i(FileBrower.TAG, "copy and paste file: " + name);
         				if(cur_page.equals("list")){
@@ -810,10 +863,12 @@ public class FileOp {
         					} 
     					}
 
-        			} catch (Exception e) {
-        				Log.e("Exception when delete file", e.toString());
-        			}
-        		}   
+	        			} catch (Exception e) {
+	        				Log.e("Exception when delete file", e.toString());
+	        			}
+	        		} 
+        		}
+				
         		if(cur_page.equals("list")){
         			FileBrower.mProgressHandler.sendMessage(Message.obtain(
                 			FileBrower.mProgressHandler, 2, (i+1) * 100 / fileList.size(), 0));
@@ -922,20 +977,34 @@ public class FileOp {
         		File file = new File(name);
         		if (file.exists()) {
         			//Log.i(FileBrower.TAG, "delete file: " + name);
-        			try {
-        				if(file.canWrite()){
-        					file.delete();
-        				}
-        				else{
-        					if(name.startsWith("/mnt/sdcard/")){
-        						if(!(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED_READ_ONLY))){
-        							file.delete();
-        	    				}        					
-        					}
-        				}
-        			} catch (Exception e) {
-        				Log.e("Exception when delete file", e.toString());
-        			}
+	    			try {
+	    				if(file.canWrite()){
+							if(file.isDirectory())
+							{
+								FileUtils.deleteDirectory(file);
+							}
+							else
+							{
+    							file.delete();
+							}
+	    				}
+	    				else{
+	    					if(name.startsWith("/mnt/sdcard/")){
+	    						if(!(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED_READ_ONLY))){
+	    							if(file.isDirectory())
+									{
+										FileUtils.deleteDirectory(file);
+									}
+									else
+									{
+		    							file.delete();
+									}
+	    	    				}        					
+	    					}
+	    				}
+	    			} catch (Exception e) {
+	    				Log.e("Exception when delete file", e.toString());
+	    			}
         		}
         	}
         	IsBusy = false;

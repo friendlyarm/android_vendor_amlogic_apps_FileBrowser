@@ -266,7 +266,12 @@ public class ThumbnailView1 extends Activity{
             	        	map.put("file_path", file_abs_path);
             	        	
             	        	if (file.isDirectory()) {
-            	        		map.put("item_sel", R.drawable.item_img_nosel);
+            	        		//map.put("item_sel", R.drawable.item_img_nosel);
+            	        		if (FileOp.isFileSelected(file_abs_path,"thumbnail1"))
+            	        			map.put("item_sel", R.drawable.item_img_sel); 
+            	        		else
+            	        			map.put("item_sel", R.drawable.item_img_unsel); 
+								
             	        		map.put("item_type", R.drawable.item_preview_dir);
             	        		
    
@@ -365,7 +370,11 @@ public class ThumbnailView1 extends Activity{
             	        	map.put("file_path", file_abs_path);
             	        	
             	        	if (file.isDirectory()) {
-            	        		map.put("item_sel", R.drawable.item_img_nosel);
+            	        		//map.put("item_sel", R.drawable.item_img_nosel);
+            	        		if (FileOp.isFileSelected(file_abs_path,"thumbnail1"))
+            	        			map.put("item_sel", R.drawable.item_img_sel); 
+            	        		else
+            	        			map.put("item_sel", R.drawable.item_img_unsel); 
             	        		map.put("item_type", R.drawable.item_preview_dir);
             	        		
    
@@ -887,7 +896,21 @@ public class ThumbnailView1 extends Activity{
                     mListLoaded = false;
                     if (load_dialog != null)
                         load_dialog.dismiss();
-                    break; 	
+                    break; 
+
+				case 11:	//destination dir is sub folder of src dir
+					Toast.makeText(ThumbnailView1.this,
+        					getText(R.string.Toast_msg_paste_sub_folder),
+        					Toast.LENGTH_SHORT).show();  
+        			//FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
+                    if (edit_dialog != null)
+                    	edit_dialog.dismiss();  
+    				if (mWakeLock.isHeld())
+    					mWakeLock.release();   
+
+					tvForPaste.setText("");
+					tvForPaste.setVisibility(View.GONE);
+					break;
                 	
                 }
                 
@@ -911,32 +934,33 @@ public class ThumbnailView1 extends Activity{
 					return;
 				}
 
-				if (file.isDirectory()) {						
-					cur_path = file_path;
-					//GetCurrentFilelist(cur_path,cur_sort_type);
-                	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
-					//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type)); 
-				}
-				else{
-					ToggleButton btn_mode = (ToggleButton) findViewById(R.id.btn_thumbmode); 
-					if (!btn_mode.isChecked()){
-						openFile(file_path);
-						
-					}
-					else {						
-						if (item.get("item_sel").equals(R.drawable.item_img_unsel)) {
-							FileOp.updateFileStatus(file_path, 1,"thumbnail1");
-							item.put("item_sel", R.drawable.item_img_sel);
-						}
-						else if (item.get("item_sel").equals(R.drawable.item_img_sel)) {
-							FileOp.updateFileStatus(file_path, 0,"thumbnail1");
-							item.put("item_sel", R.drawable.item_img_unsel);
-						}
-						
-						((BaseAdapter) ThumbnailView.getAdapter()).notifyDataSetChanged();	
-					}
-				}
 				
+				ToggleButton btn_mode = (ToggleButton) findViewById(R.id.btn_thumbmode); 
+				if (!btn_mode.isChecked()){
+					if (file.isDirectory()) {						
+						cur_path = file_path;
+						//GetCurrentFilelist(cur_path,cur_sort_type);
+	                	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+						//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type)); 
+					}
+					else
+					{
+						openFile(file_path);
+					}
+					
+				}
+				else {						
+					if (item.get("item_sel").equals(R.drawable.item_img_unsel)) {
+						FileOp.updateFileStatus(file_path, 1,"thumbnail1");
+						item.put("item_sel", R.drawable.item_img_sel);
+					}
+					else if (item.get("item_sel").equals(R.drawable.item_img_sel)) {
+						FileOp.updateFileStatus(file_path, 0,"thumbnail1");
+						item.put("item_sel", R.drawable.item_img_unsel);
+					}
+					
+					((BaseAdapter) ThumbnailView.getAdapter()).notifyDataSetChanged();	
+				}
 			}			
             	
         });

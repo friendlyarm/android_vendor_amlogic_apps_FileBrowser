@@ -415,7 +415,20 @@ public class FileBrower extends Activity {
                     if (load_dialog != null)
                         load_dialog.dismiss();
 					
-                    break;    
+                    break; 
+				case 11:	//destination dir is sub folder of src dir
+					Toast.makeText(FileBrower.this,
+        					getText(R.string.Toast_msg_paste_sub_folder),
+        					Toast.LENGTH_SHORT).show();  
+        			//FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
+                    if (edit_dialog != null)
+                    	edit_dialog.dismiss();  
+    				if (mWakeLock.isHeld())
+    					mWakeLock.release();   
+
+					tvForPaste.setText("");
+					tvForPaste.setVisibility(View.GONE);
+					break;
                 }
                 
             }
@@ -442,31 +455,33 @@ public class FileBrower extends Activity {
 					return;
 				}
 
-				if (file.isDirectory()) {	
-					prev_path = cur_path;
-					cur_path = file_path;
-					lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
-				}
-				else {	
-					ToggleButton btn_mode = (ToggleButton) findViewById(R.id.btn_mode); 
-					if (!btn_mode.isChecked()){
+				ToggleButton btn_mode = (ToggleButton) findViewById(R.id.btn_mode); 
+				if (!btn_mode.isChecked()){
+					if (file.isDirectory()) {	
+						prev_path = cur_path;
+						cur_path = file_path;
+						lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+					}
+					else
+					{
 						openFile(file);
 						//showDialog(CLICK_DIALOG_ID);
-						
 					}
-					else {
-						if (item.get("item_sel").equals(R.drawable.item_img_unsel)) {
-							FileOp.updateFileStatus(file_path, 1,"list");
-							item.put("item_sel", R.drawable.item_img_sel);
-						}
-						else if (item.get("item_sel").equals(R.drawable.item_img_sel)) {
-							FileOp.updateFileStatus(file_path, 0,"list");
-							item.put("item_sel", R.drawable.item_img_unsel);
-						}
-						
-						((BaseAdapter) lv.getAdapter()).notifyDataSetChanged();	
-					}
+					
 				}
+				else {
+					if (item.get("item_sel").equals(R.drawable.item_img_unsel)) {
+						FileOp.updateFileStatus(file_path, 1,"list");
+						item.put("item_sel", R.drawable.item_img_sel);
+					}
+					else if (item.get("item_sel").equals(R.drawable.item_img_sel)) {
+						FileOp.updateFileStatus(file_path, 0,"list");
+						item.put("item_sel", R.drawable.item_img_unsel);
+					}
+					
+					((BaseAdapter) lv.getAdapter()).notifyDataSetChanged();	
+				}
+				
 				item_position_selected = lv.getSelectedItemPosition();
 				item_position_first = lv.getFirstVisiblePosition();
 				item_position_last = lv.getLastVisiblePosition();
@@ -1223,7 +1238,13 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
             	        	map.put("file_path", file_abs_path);
             	        	
             	        	if (file.isDirectory()) {
-            	        		map.put("item_sel", R.drawable.item_img_nosel);
+            	        		//map.put("item_sel", R.drawable.item_img_nosel);
+            	        		if (FileOp.isFileSelected(file_abs_path,"list"))
+            	        			map.put("item_sel", R.drawable.item_img_sel); 
+            	        		else
+            	        			map.put("item_sel", R.drawable.item_img_unsel); 
+								
+								map.put("item_sel", R.drawable.item_img_nosel);
             	        		map.put("item_type", R.drawable.item_type_dir);
             	        		
             	        		String rw = "d";
@@ -1356,7 +1377,11 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
             	        	map.put("file_path", file_abs_path);
             	        	
             	        	if (file.isDirectory()) {
-            	        		map.put("item_sel", R.drawable.item_img_nosel);
+            	        		//map.put("item_sel", R.drawable.item_img_nosel);
+            	        		if (FileOp.isFileSelected(file_abs_path,"list"))
+            	        			map.put("item_sel", R.drawable.item_img_sel); 
+            	        		else
+            	        			map.put("item_sel", R.drawable.item_img_unsel); 
             	        		map.put("item_type", R.drawable.item_type_dir);
             	        		
             	        		String rw = "d";
