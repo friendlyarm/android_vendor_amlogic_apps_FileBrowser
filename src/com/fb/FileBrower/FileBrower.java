@@ -294,13 +294,18 @@ public class FileBrower extends Activity {
                 super.handleMessage(msg);
                 
                 ProgressBar pb = null;
+				TextView tvForPaste=null;
                 if (edit_dialog != null)
-                	pb = (ProgressBar) edit_dialog.findViewById(R.id.edit_progress_bar);
+                	{
+                		pb = (ProgressBar) edit_dialog.findViewById(R.id.edit_progress_bar);
+						tvForPaste=(TextView)edit_dialog.findViewById(R.id.text_view_paste);
+                	}
               
                 switch(msg.what) {
                 case 0: 	//set invisible
-                    if ((edit_dialog != null) && (pb != null)) {                    	
+                    if ((edit_dialog != null) && (pb != null)) { 
                 	pb.setVisibility(View.INVISIBLE);
+					tvForPaste.setVisibility(View.GONE);
                     }
                 	break;                
                 case 1:		//set progress_bar1 
@@ -318,6 +323,9 @@ public class FileBrower extends Activity {
 	                	pb.setProgress(0);
 	                	pb.setSecondaryProgress(0);    
 	                	pb.setVisibility(View.VISIBLE);
+						
+						tvForPaste.setVisibility(View.VISIBLE);
+						tvForPaste.setText(getText(R.string.edit_dialog_paste_file)+"\n"+FileOp.getMarkFileName("list"));
                 	}
                 	break;
                 case 4:		//file paste ok
@@ -333,7 +341,10 @@ public class FileBrower extends Activity {
                     if (edit_dialog != null)
                     	edit_dialog.dismiss();  
     				if (mWakeLock.isHeld())
-    					mWakeLock.release();                         	                  	
+    					mWakeLock.release(); 
+
+					tvForPaste.setText("");
+					tvForPaste.setVisibility(View.GONE);
                 	
                 	break;
                 case 5:		//file paste err
@@ -344,7 +355,10 @@ public class FileBrower extends Activity {
                     if (edit_dialog != null)
                     	edit_dialog.dismiss();   
     				if (mWakeLock.isHeld())
-    					mWakeLock.release();                         	
+    					mWakeLock.release(); 
+
+					tvForPaste.setText("");
+					tvForPaste.setVisibility(View.GONE);
                 	break;
                 case 7:		//dir cannot write
         			Toast.makeText(FileBrower.this,
@@ -354,7 +368,10 @@ public class FileBrower extends Activity {
                     if (edit_dialog != null)
                     	edit_dialog.dismiss();  
     				if (mWakeLock.isHeld())
-    					mWakeLock.release();                         	
+    					mWakeLock.release();   
+
+					tvForPaste.setText("");
+					tvForPaste.setVisibility(View.GONE);
                 	break;
                 case 8:		//no free space
                 	db.deleteAllFileMark();
@@ -367,7 +384,10 @@ public class FileBrower extends Activity {
                     if (edit_dialog != null)
                     	edit_dialog.dismiss(); 
     				if (mWakeLock.isHeld())
-    					mWakeLock.release();                         	
+    					mWakeLock.release();  
+
+					tvForPaste.setText("");
+					tvForPaste.setVisibility(View.GONE);
                 	break;
                 case 9:		//file copy cancel                	
                 	if((FileOp.copying_file!=null)&&(FileOp.copying_file.exists()))
@@ -383,7 +403,10 @@ public class FileBrower extends Activity {
                     if (edit_dialog != null)
                     	edit_dialog.dismiss();   
     				if (mWakeLock.isHeld())
-    					mWakeLock.release();                        	
+    					mWakeLock.release();  
+
+					tvForPaste.setText("");
+					tvForPaste.setVisibility(View.GONE);
                 	break;
                 case 10:    //update list                                       
                     //((BaseAdapter) lv.getAdapter()).notifyDataSetChanged();
@@ -391,6 +414,7 @@ public class FileBrower extends Activity {
                     mListLoaded = false;
                     if (load_dialog != null)
                         load_dialog.dismiss();
+					
                     break;    
                 }
                 

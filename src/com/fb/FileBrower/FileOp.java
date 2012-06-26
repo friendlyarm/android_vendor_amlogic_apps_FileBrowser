@@ -971,6 +971,52 @@ public class FileOp {
     }
 
 	/*
+	* get mark file name for function paste
+	*/
+	public static String getMarkFileName(String cur_page)
+	{
+		String path="\0";
+		String name="\0";
+		int index=-1;
+
+		if(cur_page.equals("list"))
+		{
+			FileBrower.myCursor = FileBrower.db.getFileMark();   
+	        if (FileBrower.myCursor.getCount() > 0)
+			{
+	            for(int i=0; i<FileBrower.myCursor.getCount(); i++){
+	            	FileBrower.myCursor.moveToPosition(i);
+	            	path=FileBrower.myCursor.getColFilePath();
+					index=path.lastIndexOf("/");
+					if(index>=0)
+					{
+						name+=path.substring(index+1);
+					}
+					name+="\n";
+	            }      	
+	        }       
+		}
+		else if (cur_page.equals("thumbnail1"))
+		{
+    		ThumbnailView1.myCursor = ThumbnailView1.db.getFileMark();   
+	        if (ThumbnailView1.myCursor.getCount() > 0) {
+	            for(int i=0; i<ThumbnailView1.myCursor.getCount(); i++){
+	            	ThumbnailView1.myCursor.moveToPosition(i);
+	            	path=ThumbnailView1.myCursor.getColFilePath();
+					index=path.lastIndexOf("/");
+					if(index>=0)
+					{
+						name+=path.substring(index+1);
+					}
+					name+="\n";
+	            }      	
+	        }
+    	}
+
+		return name;
+	}
+
+	/*
 	* get mark file name for function rename
 	*/
 	public static String getMarkFilePath(String cur_page)

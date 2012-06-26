@@ -755,13 +755,18 @@ public class ThumbnailView1 extends Activity{
                 super.handleMessage(msg);
                 
                 ProgressBar pb = null;
+                TextView tvForPaste=null;
                 if (edit_dialog != null)
+                {
                 	pb = (ProgressBar) edit_dialog.findViewById(R.id.edit_progress_bar);
+                	tvForPaste=(TextView)edit_dialog.findViewById(R.id.text_view_paste);
+                }
                 
                 switch(msg.what) {
                 case 0: 	//set invisible
                     if ((edit_dialog != null) && (pb != null)) {                    	
                 	pb.setVisibility(View.INVISIBLE);
+                	tvForPaste.setVisibility(View.GONE);
                     }
                 	break;                
                 case 1:		//set progress_bar1 
@@ -779,6 +784,9 @@ public class ThumbnailView1 extends Activity{
 	                	pb.setProgress(0);
 	                	pb.setSecondaryProgress(0);    
 	                	pb.setVisibility(View.VISIBLE);
+	                	
+	                	tvForPaste.setVisibility(View.VISIBLE);
+						tvForPaste.setText(getText(R.string.edit_dialog_paste_file)+"\n"+FileOp.getMarkFileName("thumbnail1"));
                 	}
                 	break;
                 case 4:		//file paste ok
@@ -798,7 +806,10 @@ public class ThumbnailView1 extends Activity{
                     if (edit_dialog != null)
                     	edit_dialog.dismiss();    
     				if (mWakeLock.isHeld())
-    					mWakeLock.release();                         	                	
+    					mWakeLock.release();   
+    					
+    				tvForPaste.setText("");
+					tvForPaste.setVisibility(View.GONE);                      	                	
                 	
                 	break;
                 case 5:		//file paste err
@@ -810,7 +821,10 @@ public class ThumbnailView1 extends Activity{
                     if (edit_dialog != null)
                     	edit_dialog.dismiss();   
     				if (mWakeLock.isHeld())
-    					mWakeLock.release();                         	
+    					mWakeLock.release();   
+    					
+    				tvForPaste.setText("");
+					tvForPaste.setVisibility(View.GONE);                      	
                 	break;
                 case 6:
                 	if (!cur_path.equals(ROOT_PATH))
@@ -824,7 +838,10 @@ public class ThumbnailView1 extends Activity{
                     if (edit_dialog != null)
                     	edit_dialog.dismiss(); 
     				if (mWakeLock.isHeld())
-    					mWakeLock.release();                         	 
+    					mWakeLock.release();   
+    					
+    				tvForPaste.setText("");
+					tvForPaste.setVisibility(View.GONE);                      	 
                 	break;
                 case 8:		//no free space
         			db.deleteAllFileMark();    
@@ -838,7 +855,10 @@ public class ThumbnailView1 extends Activity{
                     if (edit_dialog != null)
                     	edit_dialog.dismiss(); 
     				if (mWakeLock.isHeld())
-    					mWakeLock.release();                         	
+    					mWakeLock.release();   
+    					
+    				tvForPaste.setText("");
+					tvForPaste.setVisibility(View.GONE);                      	
                 	break;                	
                 case 9:		//file copy cancel                	
                 	if((FileOp.copying_file!=null)&&(FileOp.copying_file.exists()))
@@ -856,7 +876,10 @@ public class ThumbnailView1 extends Activity{
                     if (edit_dialog != null)
                     	edit_dialog.dismiss();   
     				if (mWakeLock.isHeld())
-    					mWakeLock.release();                         	
+    					mWakeLock.release(); 
+    					
+    				tvForPaste.setText("");
+					tvForPaste.setVisibility(View.GONE);                        	
                 	break;
                 case 10:    //update list                                       
                     //((BaseAdapter) ThumbnailView.getAdapter()).notifyDataSetChanged();

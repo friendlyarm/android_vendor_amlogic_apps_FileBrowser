@@ -16,6 +16,7 @@
     <string name="dialog_close_str">Cancel</string>
     
     <string name="edit_dialog_title_str">Edit File</string>
+    <string name="edit_dialog_paste_file">Paste File:</string>
     <string name="edit_dialog_copy_str">Copy</string>
     <string name="edit_dialog_delete_str">Delete</string>
     <string name="edit_dialog_paste_str">Paste</string>

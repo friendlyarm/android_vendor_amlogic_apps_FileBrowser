@@ -16,6 +16,7 @@
     <string name="dialog_close_str">取消</string>
     
     <string name="edit_dialog_title_str">文件編輯</string>
+  	<string name="edit_dialog_paste_file">粘貼文件：</string>
     <string name="edit_dialog_copy_str">複製</string>
     <string name="edit_dialog_delete_str">刪除</string>
     <string name="edit_dialog_paste_str">粘貼</string>
