@@ -241,7 +241,13 @@ public class FileBrower extends Activity {
     	
     	FileOp.copy_cancel = true;
     	if (mWakeLock.isHeld())
-    		mWakeLock.release();       	
+    		mWakeLock.release(); 
+
+		if(!local_mode){
+    		db.deleteAllFileMark();  
+    		
+    	}  	  	
+    	db.close();   
     }
 	
     /** Called when the activity is first created. */
@@ -303,7 +309,7 @@ public class FileBrower extends Activity {
               
                 switch(msg.what) {
                 case 0: 	//set invisible
-                    if ((edit_dialog != null) && (pb != null)) { 
+                    if ((edit_dialog != null) && (pb != null)&&(tvForPaste!=null)) { 
                 	pb.setVisibility(View.INVISIBLE);
 					tvForPaste.setVisibility(View.GONE);
                     }
@@ -319,7 +325,7 @@ public class FileBrower extends Activity {
                 	}
                 	break;
                 case 3:		//set visible
-                	if ((edit_dialog != null) && (pb != null)) {  
+                	if ((edit_dialog != null) && (pb != null)&&(tvForPaste!=null)) {  
 	                	pb.setProgress(0);
 	                	pb.setSecondaryProgress(0);    
 	                	pb.setVisibility(View.VISIBLE);
@@ -343,8 +349,11 @@ public class FileBrower extends Activity {
     				if (mWakeLock.isHeld())
     					mWakeLock.release(); 
 
-					tvForPaste.setText("");
-					tvForPaste.setVisibility(View.GONE);
+					if(tvForPaste!=null)
+					{
+						tvForPaste.setText("");
+						tvForPaste.setVisibility(View.GONE);
+					}
                 	
                 	break;
                 case 5:		//file paste err
@@ -357,8 +366,11 @@ public class FileBrower extends Activity {
     				if (mWakeLock.isHeld())
     					mWakeLock.release(); 
 
-					tvForPaste.setText("");
-					tvForPaste.setVisibility(View.GONE);
+					if(tvForPaste!=null)
+					{
+						tvForPaste.setText("");
+						tvForPaste.setVisibility(View.GONE);
+					}
                 	break;
                 case 7:		//dir cannot write
         			Toast.makeText(FileBrower.this,
@@ -370,8 +382,11 @@ public class FileBrower extends Activity {
     				if (mWakeLock.isHeld())
     					mWakeLock.release();   
 
-					tvForPaste.setText("");
-					tvForPaste.setVisibility(View.GONE);
+					if(tvForPaste!=null)
+					{
+						tvForPaste.setText("");
+						tvForPaste.setVisibility(View.GONE);
+					}
                 	break;
                 case 8:		//no free space
                 	db.deleteAllFileMark();
@@ -386,8 +401,11 @@ public class FileBrower extends Activity {
     				if (mWakeLock.isHeld())
     					mWakeLock.release();  
 
-					tvForPaste.setText("");
-					tvForPaste.setVisibility(View.GONE);
+					if(tvForPaste!=null)
+					{
+						tvForPaste.setText("");
+						tvForPaste.setVisibility(View.GONE);
+					}
                 	break;
                 case 9:		//file copy cancel                	
                 	if((FileOp.copying_file!=null)&&(FileOp.copying_file.exists()))
@@ -405,8 +423,11 @@ public class FileBrower extends Activity {
     				if (mWakeLock.isHeld())
     					mWakeLock.release();  
 
-					tvForPaste.setText("");
-					tvForPaste.setVisibility(View.GONE);
+					if(tvForPaste!=null)
+					{
+						tvForPaste.setText("");
+						tvForPaste.setVisibility(View.GONE);
+					}
                 	break;
                 case 10:    //update list                                       
                     //((BaseAdapter) lv.getAdapter()).notifyDataSetChanged();
@@ -426,8 +447,11 @@ public class FileBrower extends Activity {
     				if (mWakeLock.isHeld())
     					mWakeLock.release();   
 
-					tvForPaste.setText("");
-					tvForPaste.setVisibility(View.GONE);
+					if(tvForPaste!=null)
+					{
+						tvForPaste.setText("");
+						tvForPaste.setVisibility(View.GONE);
+					}
 					break;
                 }
                 
@@ -470,16 +494,25 @@ public class FileBrower extends Activity {
 					
 				}
 				else {
-					if (item.get("item_sel").equals(R.drawable.item_img_unsel)) {
+					if (!cur_path.equals(ROOT_PATH))
+					{
+						if (item.get("item_sel").equals(R.drawable.item_img_unsel)) {
 						FileOp.updateFileStatus(file_path, 1,"list");
 						item.put("item_sel", R.drawable.item_img_sel);
-					}
-					else if (item.get("item_sel").equals(R.drawable.item_img_sel)) {
-						FileOp.updateFileStatus(file_path, 0,"list");
-						item.put("item_sel", R.drawable.item_img_unsel);
-					}
+						}
+						else if (item.get("item_sel").equals(R.drawable.item_img_sel)) {
+							FileOp.updateFileStatus(file_path, 0,"list");
+							item.put("item_sel", R.drawable.item_img_unsel);
+						}
 					
-					((BaseAdapter) lv.getAdapter()).notifyDataSetChanged();	
+						((BaseAdapter) lv.getAdapter()).notifyDataSetChanged();	
+					}
+					else 
+					{
+	        			Toast.makeText(FileBrower.this,
+	        					getText(R.string.Toast_msg_edit_noopen),
+	        					Toast.LENGTH_SHORT).show();  	
+	        		}
 				}
 				
 				item_position_selected = lv.getSelectedItemPosition();
