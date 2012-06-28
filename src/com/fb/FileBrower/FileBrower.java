@@ -101,6 +101,7 @@ public class FileBrower extends Activity {
 	
 	private int item_position_selected, item_position_first, item_position_last;
 	private int fromtop_piexl;
+	private boolean isInFileBrowserView=false;
 	
 	String open_mode[] = {"movie","music","photo","packageInstall"};
 	
@@ -220,11 +221,15 @@ public class FileBrower extends Activity {
         	lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
         }		
         lv.setSelectionFromTop(item_position_selected, fromtop_piexl);
+
+		isInFileBrowserView=true;
     }
     
     @Override
     public void onPause() {
         super.onPause();
+
+		isInFileBrowserView=false;
         //StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
         //m_storagemgr.unregisterListener(mListener);
         
@@ -298,6 +303,9 @@ public class FileBrower extends Activity {
             @Override
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
+				
+				if(false==isInFileBrowserView)
+					return;
                 
                 ProgressBar pb = null;
 				TextView tvForPaste=null;
@@ -1344,7 +1352,7 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 		else
 			tv.setText(path);   	
     }
-   
+
     /** getFileListAdapterSorted */
     private SimpleAdapter getFileListAdapterSorted(String path, String sort_type) {
         return new SimpleAdapter(FileBrower.this,
@@ -1363,7 +1371,7 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
         	R.id.item_sel,
         	R.id.item_size,
         	R.id.item_date,
-        	R.id.item_rw});  
+        	R.id.item_rw});
     }
     
     private List<Map<String, Object>> getFileListDataSorted(String path, String sort_type) {

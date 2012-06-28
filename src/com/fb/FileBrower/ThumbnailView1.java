@@ -86,6 +86,7 @@ public class ThumbnailView1 extends Activity{
 	int request_code = 1550;
 	private ToggleButton btn_mode;
 	private String lv_sort_flag = "by_name"; 
+	private boolean isInFileBrowserView=false;
 	
 	private void updateThumbnials() {
        // sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://"
@@ -678,12 +679,14 @@ public class ThumbnailView1 extends Activity{
         }
 
     	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+
+		isInFileBrowserView=true;
     }
     
     @Override
     public void onPause() {
         super.onPause();
-        
+        isInFileBrowserView=false;
         mLoadCancel = true;
         
         ThumbnailOpUtils.stopThumbnailSanner(getBaseContext());
@@ -767,6 +770,9 @@ public class ThumbnailView1 extends Activity{
             @Override
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
+
+				if(false==isInFileBrowserView)
+					return;
                 
                 ProgressBar pb = null;
                 TextView tvForPaste=null;
