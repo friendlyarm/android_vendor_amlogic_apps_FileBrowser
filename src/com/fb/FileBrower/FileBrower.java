@@ -509,9 +509,9 @@ public class FileBrower extends Activity {
 					}
 					else 
 					{
-	        			Toast.makeText(FileBrower.this,
-	        					getText(R.string.Toast_msg_edit_noopen),
-	        					Toast.LENGTH_SHORT).show();  	
+	        			prev_path = cur_path;
+						cur_path = file_path;
+						lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));	
 	        		}
 				}
 				

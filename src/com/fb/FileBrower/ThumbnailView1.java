@@ -988,9 +988,8 @@ public class ThumbnailView1 extends Activity{
 					}
 					else
 					{
-		    			Toast.makeText(ThumbnailView1.this,
-		    					getText(R.string.Toast_msg_sort_noopen),
-		    					Toast.LENGTH_SHORT).show();  					
+		    			cur_path = file_path;
+	                	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));					
 					}
 				}
 			}			
