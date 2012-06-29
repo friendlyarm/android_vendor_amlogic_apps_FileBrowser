@@ -87,6 +87,8 @@ public class ThumbnailView1 extends Activity{
 	private ToggleButton btn_mode;
 	private String lv_sort_flag = "by_name"; 
 	private boolean isInFileBrowserView=false;
+	private boolean isRealSD=false;
+	private static final String EXT_SD="/mnt/sdcard/external_sdcard";
 	
 	private void updateThumbnials() {
        // sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://"
@@ -188,6 +190,22 @@ public class ThumbnailView1 extends Activity{
 				}
 			}
 		}
+
+		if(false==isRealSD)
+		{
+			dir = new File(EXT_SD);
+			if (dir.exists() && dir.isDirectory())
+			{
+				map = new HashMap<String, Object>();
+				map.put("item_name", getText(R.string.ext_sdcard_device_str));
+				map.put("file_path", EXT_SD);
+				map.put("item_type", R.drawable.sdcard_default);
+				map.put("file_date", 0);
+				map.put("file_size", 1);	//for sort
+				map.put("item_sel", R.drawable.item_img_unsel);
+				list.add(map);								
+			}
+		}
 		updatePathShow(ROOT_PATH);
     	if (!list.isEmpty()) { 
         		Collections.sort(list, new Comparator<Map<String, Object>>() {
@@ -262,8 +280,17 @@ public class ThumbnailView1 extends Activity{
             			for (File file : file_path.listFiles()) {    					
             	        	Map<String, Object> map = new HashMap<String, Object>();    
             	        	String temp_name = FileOp.getShortName(file.getAbsolutePath());
-            	        	map.put("item_name", temp_name);   
             	        	String file_abs_path = file.getAbsolutePath();
+
+							if(false==isRealSD)
+							{
+								if (file_abs_path.equals(EXT_SD)) 
+								{
+									continue;
+								}
+							}
+
+							map.put("item_name", temp_name);  
             	        	map.put("file_path", file_abs_path);
             	        	
             	        	if (file.isDirectory()) {
@@ -366,8 +393,17 @@ public class ThumbnailView1 extends Activity{
             	        	    return list;            			        					
             	        	Map<String, Object> map = new HashMap<String, Object>();  
             	        	String temp_name = FileOp.getShortName(file.getAbsolutePath());
-            	        	map.put("item_name", temp_name);   
             	        	String file_abs_path = file.getAbsolutePath();
+
+							if(false==isRealSD)
+							{
+								if (file_abs_path.equals(EXT_SD)) 
+								{
+									continue;
+								}
+							}
+							
+							map.put("item_name", temp_name); 
             	        	map.put("file_path", file_abs_path);
             	        	
             	        	if (file.isDirectory()) {
@@ -733,6 +769,10 @@ public class ThumbnailView1 extends Activity{
     			cur_path = ROOT_PATH;
     	} else
     		cur_path = ROOT_PATH; 
+
+		/* check whether use real sdcard*/
+		isRealSD=Environment.isExternalStorageBeSdcard();
+		
         /* setup database */
         FileOp.SetMode(false);
         db = new FileBrowerDatabase(this); 
@@ -1037,21 +1077,51 @@ public class ThumbnailView1 extends Activity{
         btn_thumbparent.setOnClickListener(new OnClickListener() {
     		public void onClick(View v) {  
     			if (!cur_path.equals(ROOT_PATH)) {
-					File file = new File(cur_path);
-					String parent_path = file.getParent();
-					
-					cur_path = parent_path;
-					if(parent_path.equals(ROOT_PATH)){
-						cur_path = parent_path;
-						//DeviceScan();
-	                	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+					if(false==isRealSD)
+					{
+						if (cur_path.equals(EXT_SD)) 
+						{
+							cur_path=ROOT_PATH;
+							ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+						}
+						else
+						{
+							File file = new File(cur_path);
+							String parent_path = file.getParent();
+							
+							cur_path = parent_path;
+							if(parent_path.equals(ROOT_PATH)){
+								cur_path = parent_path;
+								//DeviceScan();
+			                	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+							}
+							else{
+								 cur_path = parent_path;
+								// GetCurrentFilelist(cur_path,cur_sort_type);
+				                ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+								 //ThumbnailView.setAdapter(getThumbnailAdapter(parent_path,cur_sort_type)); 
+							
+							}
+						}
 					}
-					else{
-						 cur_path = parent_path;
-						// GetCurrentFilelist(cur_path,cur_sort_type);
-		                ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
-						 //ThumbnailView.setAdapter(getThumbnailAdapter(parent_path,cur_sort_type)); 
-					
+					else
+					{
+						File file = new File(cur_path);
+						String parent_path = file.getParent();
+						
+						cur_path = parent_path;
+						if(parent_path.equals(ROOT_PATH)){
+							cur_path = parent_path;
+							//DeviceScan();
+		                	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+						}
+						else{
+							 cur_path = parent_path;
+							// GetCurrentFilelist(cur_path,cur_sort_type);
+			                ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+							 //ThumbnailView.setAdapter(getThumbnailAdapter(parent_path,cur_sort_type)); 
+						
+						}
 					}
 				}
     		}

@@ -102,6 +102,8 @@ public class FileBrower extends Activity {
 	private int item_position_selected, item_position_first, item_position_last;
 	private int fromtop_piexl;
 	private boolean isInFileBrowserView=false;
+	private boolean isRealSD=false;
+	private static final String EXT_SD="/mnt/sdcard/external_sdcard";
 	
 	String open_mode[] = {"movie","music","photo","packageInstall"};
 	
@@ -273,6 +275,9 @@ public class FileBrower extends Activity {
         }
         PowerManager pm = (PowerManager)getSystemService(Context.POWER_SERVICE);
         mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, TAG);
+
+		/* check whether use real sdcard*/
+		isRealSD=Environment.isExternalStorageBeSdcard();
                 
         /* setup database */
         db = new FileBrowerDatabase(this); 
@@ -556,16 +561,41 @@ public class FileBrower extends Activity {
         btn_parent.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				if (!cur_path.equals(ROOT_PATH)) {
-					File file = new File(cur_path);
-					String parent_path = file.getParent();
-					prev_path = cur_path;
-					cur_path = parent_path;
-					if(parent_path.equals(ROOT_PATH)){
-						DeviceScan();
+					if(false==isRealSD)
+					{
+						if (cur_path.equals(EXT_SD)) 
+						{
+							cur_path=ROOT_PATH;
+							DeviceScan();
+						}
+						else
+						{
+							File file = new File(cur_path);
+							String parent_path = file.getParent();
+							prev_path = cur_path;
+							cur_path = parent_path;
+							if(parent_path.equals(ROOT_PATH)){
+								DeviceScan();
+							}
+							else{
+								lv.setAdapter(getFileListAdapterSorted(parent_path, lv_sort_flag));
+							
+							}
+						}
 					}
-					else{
-						lv.setAdapter(getFileListAdapterSorted(parent_path, lv_sort_flag));
-					
+					else
+					{
+						File file = new File(cur_path);
+						String parent_path = file.getParent();
+						prev_path = cur_path;
+						cur_path = parent_path;
+						if(parent_path.equals(ROOT_PATH)){
+							DeviceScan();
+						}
+						else{
+							lv.setAdapter(getFileListAdapterSorted(parent_path, lv_sort_flag));
+						
+						}
 					}
 				}
 			}        	
@@ -681,8 +711,20 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
     	String internal = getString(R.string.memory_device_str);
     	String sdcard = getString(R.string.sdcard_device_str);
     	String usb = getString(R.string.usb_device_str);
-    	String DeviceArray[]={internal,sdcard,usb};   	
-    	for(int i=0;i<DeviceArray.length;i++){
+		String sdcardExt = getString(R.string.ext_sdcard_device_str);
+    	String DeviceArray[]={internal,sdcard,usb,sdcardExt};
+
+		int length=0;
+		if(true==isRealSD)
+		{
+			length=DeviceArray.length-1;
+		}
+		else
+		{
+			length=DeviceArray.length;
+		}
+		
+    	for(int i=0;i<length;i++){
     		if(FileOp.deviceExist(DeviceArray[i])){
     			devList.add(DeviceArray[i]);
     		}
@@ -797,8 +839,8 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 								map.put("file_size", 1);	//for sort
 					    		map.put("item_size", null);
 					    		map.put("item_rw", null);
-								list.add(map);								
-							} else if (path.equals("/mnt/usb")) {
+								list.add(map);
+							}else if (path.equals("/mnt/usb")) {
 								map = new HashMap<String, Object>();
 								map.put("item_name", getText(R.string.usb_device_str) + 
 										" " + file.getName());
@@ -826,6 +868,24 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 				}
 			}
 		}
+
+		if(false==isRealSD)
+		{
+			dir = new File(EXT_SD);
+			if (dir.exists() && dir.isDirectory())
+			{ 
+				map = new HashMap<String, Object>();
+				map.put("item_name", getText(R.string.ext_sdcard_device_str));
+				map.put("file_path", EXT_SD);
+				map.put("item_type", R.drawable.sd_card_icon);
+				map.put("file_date", 0);
+				map.put("file_size", 1);	//for sort
+				map.put("item_size", null);
+				map.put("item_rw", null);
+				list.add(map);
+			}
+		}
+		
 		updatePathShow(ROOT_PATH);
     	if (!list.isEmpty()) { 
     		Collections.sort(list, new Comparator<Map<String, Object>>() {
@@ -1273,9 +1333,18 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
         		if (file_path.listFiles() != null) {
             		if (file_path.listFiles().length > 0) {
             			for (File file : file_path.listFiles()) {    					
-            	        	Map<String, Object> map = new HashMap<String, Object>();    		        	
-            	        	map.put("item_name", file.getName());   
+            	        	Map<String, Object> map = new HashMap<String, Object>();    
             	        	String file_abs_path = file.getAbsolutePath();
+							
+							if(false==isRealSD)
+							{
+								if (file_abs_path.equals(EXT_SD)) 
+								{
+									continue;
+								}
+							}
+
+							map.put("item_name", file.getName()); 
             	        	map.put("file_path", file_abs_path);
             	        	
             	        	if (file.isDirectory()) {
@@ -1412,9 +1481,18 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
             	        	if (mLoadCancel)
             	        	    return list;
             			        					
-            	        	Map<String, Object> map = new HashMap<String, Object>();    		        	
-            	        	map.put("item_name", file.getName());    
+            	        	Map<String, Object> map = new HashMap<String, Object>();   
             	        	String file_abs_path = file.getAbsolutePath();
+							
+							if(false==isRealSD)
+							{
+								if (file_abs_path.equals(EXT_SD)) 
+								{
+									continue;
+								}
+							}
+							
+							map.put("item_name", file.getName()); 
             	        	map.put("file_path", file_abs_path);
             	        	
             	        	if (file.isDirectory()) {
