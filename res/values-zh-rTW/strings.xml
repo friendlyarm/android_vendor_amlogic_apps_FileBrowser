@@ -68,8 +68,8 @@ DROP TABLE IF EXISTS file_thumbnails_table
 	<string name="dialog_help_item_list_str">列表顯示文件</string>
 	<string name="dialog_help_item_close_str">關閉文件管理器</string>
 	<string name="memory_device_str">內部存儲器 </string>
-	<string name="sdcard_device_str">SD卡</string>
-	<string name="ext_sdcard_device_str">外部SD卡</string>
+	<string name="sdcard_device_str">本機磁盤</string>
+	<string name="ext_sdcard_device_str">外接TF卡</string>
 	<string name="sata_device_str">SATA</string>
 	<string name="usb_device_str">USB設備</string>
 	<string name="Toast_copy_fail">拷貝失敗！</string>
