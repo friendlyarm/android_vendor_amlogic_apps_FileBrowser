@@ -18,6 +18,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -192,6 +193,17 @@ public class FileBrower extends Activity {
         			DeviceScan();
         		}
             } 
+			else if(action.equals(Intent.ACTION_SCREEN_OFF))
+			{
+				if(sort_dialog != null)
+					sort_dialog.dismiss();
+				if(edit_dialog != null)
+					edit_dialog.dismiss();
+				if(click_dialog != null)
+					click_dialog.dismiss();
+				if(help_dialog != null)
+					help_dialog.dismiss();
+			}
         }
     };
 
@@ -213,6 +225,7 @@ public class FileBrower extends Activity {
                 new IntentFilter(Intent.ACTION_MEDIA_MOUNTED);
         intentFilter.addAction(Intent.ACTION_MEDIA_EJECT);
         intentFilter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
+		intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
         intentFilter.addDataScheme("file");
         registerReceiver(mMountReceiver, intentFilter);
         		
@@ -247,6 +260,8 @@ public class FileBrower extends Activity {
     	editor.commit();          
     	
     	FileOp.copy_cancel = true;
+		if (edit_dialog != null)
+            edit_dialog.dismiss(); 
     	if (mWakeLock.isHeld())
     		mWakeLock.release(); 
 
@@ -833,7 +848,12 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 								list.add(map);								
 							} else if (path.equals("/mnt/sdcard")) {
 								map = new HashMap<String, Object>();
-								map.put("item_name", getText(R.string.sdcard_device_str));
+								
+								if(true==isRealSD)
+									map.put("item_name", getText(R.string.ext_sdcard_device_str));
+								else
+									map.put("item_name", getText(R.string.sdcard_device_str));
+								
 								map.put("file_path", "/mnt/sdcard");
 								map.put("item_type", R.drawable.sd_card_icon);
 								map.put("file_date", 0);
@@ -1019,7 +1039,13 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 
             mProgressHandler.sendMessage(Message.obtain(mProgressHandler, 0));
             edit_lv = (ListView) edit_dialog.getWindow().findViewById(R.id.edit_listview);  
-            edit_lv.setAdapter(getDialogListAdapter(EDIT_DIALOG_ID));	
+            edit_lv.setAdapter(getDialogListAdapter(EDIT_DIALOG_ID));
+			//edit_dialog.setCanceledOnTouchOutside(false);
+			edit_dialog.setOnDismissListener(new OnDismissListener(){
+				public void onDismiss(DialogInterface dialog) {
+					FileOp.copy_cancel = true;
+				}
+			});
             
             edit_lv.setOnItemClickListener(new OnItemClickListener() {
             	public void onItemClick(AdapterView<?> parent, View view, int pos,
@@ -1073,17 +1099,79 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
             				//Log.i(TAG, "DO paste...");     
 					    	if (!mWakeLock.isHeld())
 						    	mWakeLock.acquire(); 
-						    				            				
-            				new Thread () {
-            					public void run () {
-            						try {   
-            							FileOp.pasteSelectedFile("list");
-            						} catch(Exception e) {
-            							Log.e("Exception when paste file", e.toString());
-            						}
-            					}
-            				}.start();
-            				            				
+
+							if(false==isRealSD)
+							{
+								if(cur_path.startsWith(EXT_SD))
+								{
+									if(Environment.getExternalStorage2State().equals(Environment.MEDIA_MOUNTED))
+									{
+										new Thread () {
+				        					public void run () {
+				        						try {   
+				        							FileOp.pasteSelectedFile("list");
+				        						} catch(Exception e) {
+				        							Log.e("Exception when paste file", e.toString());
+				        						}
+				        					}
+				        				}.start();
+									}
+									else
+									{
+										Toast.makeText(FileBrower.this,
+		        							getText(R.string.Toast_no_sdcard),
+		        							Toast.LENGTH_SHORT).show();
+									}
+								}
+								else
+								{
+									new Thread () {
+			        					public void run () {
+			        						try {   
+			        							FileOp.pasteSelectedFile("list");
+			        						} catch(Exception e) {
+			        							Log.e("Exception when paste file", e.toString());
+			        						}
+			        					}
+			        				}.start();
+								}
+							} 
+							else
+							{
+								if(cur_path.startsWith("/mnt/sdcard"))
+								{
+									if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
+									{
+										new Thread () {
+				        					public void run () {
+				        						try {   
+				        							FileOp.pasteSelectedFile("list");
+				        						} catch(Exception e) {
+				        							Log.e("Exception when paste file", e.toString());
+				        						}
+				        					}
+				        				}.start();
+									}
+									else
+									{
+										Toast.makeText(FileBrower.this,
+		        							getText(R.string.Toast_no_sdcard),
+		        							Toast.LENGTH_SHORT).show();
+									}
+								}
+								else
+								{
+									new Thread () {
+			        					public void run () {
+			        						try {   
+			        							FileOp.pasteSelectedFile("list");
+			        						} catch(Exception e) {
+			        							Log.e("Exception when paste file", e.toString());
+			        						}
+			        					}
+			        				}.start();
+								}
+							}
             			}
             			else if (pos == 3) {
             				FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
@@ -1430,23 +1518,44 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 
     /** getFileListAdapterSorted */
     private SimpleAdapter getFileListAdapterSorted(String path, String sort_type) {
-        return new SimpleAdapter(FileBrower.this,
-        		getFileListDataSorted(path, sort_type),
-        		R.layout.filelist_item,        		
+    	if(path.equals(ROOT_PATH)) 
+    	{
+			return new SimpleAdapter(FileBrower.this,
+        		getDeviceListData(),
+        		R.layout.device_item,        		
                 new String[]{
         	"item_type",
-        	"item_name",
-        	"item_sel",
-        	"item_size",
-        	"item_date",
-        	"item_rw"},        		
+        	"item_name",        	        	
+        	"item_rw",
+        	"item_size"
+        	},        		
                 new int[]{
-        	R.id.item_type,
-        	R.id.item_name,
-        	R.id.item_sel,
-        	R.id.item_size,
-        	R.id.item_date,
-        	R.id.item_rw});
+        	R.id.device_type,
+        	R.id.device_name,        	
+        	R.id.device_rw,       	
+        	R.id.device_size
+        	});  
+		}
+		else
+		{
+		    return new SimpleAdapter(FileBrower.this,
+		    		getFileListDataSorted(path, sort_type),
+		    		R.layout.filelist_item,        		
+		            new String[]{
+		    	"item_type",
+		    	"item_name",
+		    	"item_sel",
+		    	"item_size",
+		    	"item_date",
+		    	"item_rw"},        		
+		            new int[]{
+		    	R.id.item_type,
+		    	R.id.item_name,
+		    	R.id.item_sel,
+		    	R.id.item_size,
+		    	R.id.item_date,
+		    	R.id.item_rw});
+		}
     }
     
     private List<Map<String, Object>> getFileListDataSorted(String path, String sort_type) {

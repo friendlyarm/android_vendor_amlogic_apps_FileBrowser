@@ -16,6 +16,7 @@ import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -157,7 +158,12 @@ public class ThumbnailView1 extends Activity{
 								list.add(map);								
 							} else if (path.equals("/mnt/sdcard")) {
 								map = new HashMap<String, Object>();
-								map.put("item_name", getText(R.string.sdcard_device_str));
+								
+								if(true==isRealSD)
+									map.put("item_name", getText(R.string.ext_sdcard_device_str));
+								else
+									map.put("item_name", getText(R.string.sdcard_device_str));
+								
 								map.put("file_path", "/mnt/sdcard");
 								map.put("item_type", R.drawable.sdcard_default);
 								map.put("file_date", 0);
@@ -661,6 +667,15 @@ public class ThumbnailView1 extends Activity{
         		}
         		FileOp.cleanFileMarks("thumbnail1");
             } 
+			else if(action.equals(Intent.ACTION_SCREEN_OFF))
+			{
+				if(sort_dialog != null)
+					sort_dialog.dismiss();
+				if(edit_dialog != null)
+					edit_dialog.dismiss();
+				if(help_dialog != null)
+					help_dialog.dismiss();
+			}
         }
     };
 
@@ -701,6 +716,7 @@ public class ThumbnailView1 extends Activity{
                 new IntentFilter(Intent.ACTION_MEDIA_MOUNTED);
         intentFilter.addAction(Intent.ACTION_MEDIA_EJECT);
         intentFilter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
+		intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
         intentFilter.addDataScheme("file");
         registerReceiver(mMountReceiver, intentFilter);
 
@@ -738,7 +754,9 @@ public class ThumbnailView1 extends Activity{
     	editor.putBoolean("isChecked", btn_mode.isChecked());
     	editor.commit();     
     	
-		FileOp.copy_cancel = true;    	
+		FileOp.copy_cancel = true;  
+		if (edit_dialog != null)
+            edit_dialog.dismiss(); 
     	if (mWakeLock.isHeld())
     		mWakeLock.release();   
 
@@ -1558,7 +1576,13 @@ public class ThumbnailView1 extends Activity{
 
             mProgressHandler.sendMessage(Message.obtain(mProgressHandler, 0));
             edit_lv = (ListView) edit_dialog.getWindow().findViewById(R.id.edit_listview);  
-            edit_lv.setAdapter(getDialogListAdapter(EDIT_DIALOG_ID));	
+            edit_lv.setAdapter(getDialogListAdapter(EDIT_DIALOG_ID));
+			//edit_dialog.setCanceledOnTouchOutside(false);
+			edit_dialog.setOnDismissListener(new OnDismissListener(){
+				public void onDismiss(DialogInterface dialog) {
+					FileOp.copy_cancel = true;
+				}
+			});
             
             edit_lv.setOnItemClickListener(new OnItemClickListener() {
             	public void onItemClick(AdapterView<?> parent, View view, int pos,
@@ -1612,16 +1636,79 @@ public class ThumbnailView1 extends Activity{
             				//Log.i(TAG, "DO paste...");     
 					    	if (!mWakeLock.isHeld())
 						    	mWakeLock.acquire(); 
-						    	            				
-            				new Thread () {
-            					public void run () {
-            						try {
-            							FileOp.pasteSelectedFile("thumbnail1");
-            						} catch(Exception e) {
-            							Log.e("Exception when paste file", e.toString());
-            						}
-            					}
-            				}.start();
+         				
+            				if(false==isRealSD)
+							{
+								if(cur_path.startsWith(EXT_SD))
+								{
+									if(Environment.getExternalStorage2State().equals(Environment.MEDIA_MOUNTED))
+									{
+										new Thread () {
+				        					public void run () {
+				        						try {   
+				        							FileOp.pasteSelectedFile("thumbnail1");
+				        						} catch(Exception e) {
+				        							Log.e("Exception when paste file", e.toString());
+				        						}
+				        					}
+				        				}.start();
+									}
+									else
+									{
+										Toast.makeText(ThumbnailView1.this,
+		        							getText(R.string.Toast_no_sdcard),
+		        							Toast.LENGTH_SHORT).show();
+									}
+								}
+								else
+								{
+									new Thread () {
+			        					public void run () {
+			        						try {   
+			        							FileOp.pasteSelectedFile("thumbnail1");
+			        						} catch(Exception e) {
+			        							Log.e("Exception when paste file", e.toString());
+			        						}
+			        					}
+			        				}.start();
+								}
+							} 
+							else
+							{
+								if(cur_path.startsWith("/mnt/sdcard"))
+								{
+									if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
+									{
+										new Thread () {
+				        					public void run () {
+				        						try {   
+				        							FileOp.pasteSelectedFile("thumbnail1");
+				        						} catch(Exception e) {
+				        							Log.e("Exception when paste file", e.toString());
+				        						}
+				        					}
+				        				}.start();
+									}
+									else
+									{
+										Toast.makeText(ThumbnailView1.this,
+		        							getText(R.string.Toast_no_sdcard),
+		        							Toast.LENGTH_SHORT).show();
+									}
+								}
+								else
+								{
+									new Thread () {
+			        					public void run () {
+			        						try {   
+			        							FileOp.pasteSelectedFile("thumbnail1");
+			        						} catch(Exception e) {
+			        							Log.e("Exception when paste file", e.toString());
+			        						}
+			        					}
+			        				}.start();
+								}
+							}
             				            				
             			}
             			else if (pos == 3) {

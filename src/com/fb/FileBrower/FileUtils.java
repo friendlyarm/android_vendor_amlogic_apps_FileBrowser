@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import android.os.Message;
 
 public class FileUtils 
 {
@@ -625,6 +626,15 @@ public class FileUtils
         }
     }
 
+	private static String cur_page=null;
+	/**
+	* Set current page to check for showing copy progress
+	*/
+	public static void setCurPage(String page)
+	{
+		cur_page=page;
+	}
+
     //-----------------------------------------------------------------------
     /**
      * Copies a directory to within another directory preserving the file dates.
@@ -865,6 +875,14 @@ public class FileUtils
                     doCopyDirectory(files[i], copiedFile, filter, preserveFileDate, exclusionList);
                 } else {
                     doCopyFile(files[i], copiedFile, preserveFileDate);
+
+					if(cur_page.equals("list")){
+        				FileBrower.mProgressHandler.sendMessage(Message.obtain(
+                				FileBrower.mProgressHandler, 2, (i+1) * 100 / files.length, 0));
+		        	}else if (cur_page.equals("thumbnail1")){
+		        		ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
+		        				ThumbnailView1.mProgressHandler, 2, (i+1) * 100 / files.length, 0));
+		        	}
                 }
             }
         }
