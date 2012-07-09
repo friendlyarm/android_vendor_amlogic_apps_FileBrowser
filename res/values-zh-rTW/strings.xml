@@ -73,4 +73,5 @@ DROP TABLE IF EXISTS file_thumbnails_table
 	<string name="sata_device_str">SATA</string>
 	<string name="usb_device_str">USB設備</string>
 	<string name="Toast_copy_fail">拷貝失敗！</string>
+	<string name="Toast_no_sdcard">TF卡不存在！</string>
 </resources>
