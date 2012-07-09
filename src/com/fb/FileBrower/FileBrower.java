@@ -803,6 +803,7 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 		map.put("item_sel", R.drawable.item_img_unsel);
 		list.add(map);		
 		*/
+		int dev_count=0;
         File dir = new File("/mnt");
 		if (dir.exists() && dir.isDirectory()) {
 			if (dir.listFiles() != null) {
@@ -853,8 +854,13 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 								list.add(map);									
 							} else if (path.startsWith("/mnt/sd")) {
 								map = new HashMap<String, Object>();
-								map.put("item_name", getText(R.string.usb_device_str) + 
-										" " + file.getName());
+								if (!path.equals("/mnt/sdcard")){
+									dev_count++;
+								}
+								String devname = null;
+								char data = (char) ('A' +dev_count-1);
+								devname =  getText(R.string.usb_device_str) +"(" +data + ":)" ;
+								map.put("item_name", devname);
 								map.put("file_path", path);
 								map.put("item_type", R.drawable.usb_card_icon);
 								map.put("file_date", 0);
