@@ -134,6 +134,15 @@ public class FileOp {
             return true;
         return false;
     }     
+    
+    public  static boolean isPdf(String filename) {   
+    	String name = filename.toLowerCase();        
+        if (name.endsWith(".pdf"))
+            return true;
+        return false;
+    } 
+    
+    
     /* file type extensions */
     //video from layer
     public static final String[] video_extensions = { ".3gp",
@@ -207,10 +216,12 @@ public class FileOp {
         	typeStr = "image/*";
         else if (isApk(filename))
         	typeStr = "application/vnd.android.package-archive";
-		else if (isHtm(filename))
-			typeStr = "text/html";
+				else if (isHtm(filename))
+					typeStr = "text/html";
+				else if (isPdf(filename))
+					typeStr = "application/pdf";
         else {
-			typeStr = "application/*";
+					typeStr = "application/*";
         }
         
         return typeStr;
