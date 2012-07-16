@@ -720,7 +720,22 @@ public class FileOp {
         				ThumbnailView1.mProgressHandler, 3)); 
         	}
 
-			File file_new_bac = null;
+			String curPathBefCopy=null;
+			String curPathAftCopy=null;
+			if(cur_page.equals("list"))
+			{
+				curPathBefCopy=FileBrower.cur_path;
+			}
+			else if (cur_page.equals("thumbnail1"))
+			{
+				curPathBefCopy=ThumbnailView1.cur_path;
+			}
+			else
+			{
+				Log.e("pasteSelectedFile","curPathBefCopy=null error.");
+				IsBusy = false;
+            	return FileOpReturn.ERR;
+			}
         	 
         	for (int i = 0; i < fileList.size(); i++) {
         		String name = fileList.get(i);
@@ -777,33 +792,62 @@ public class FileOp {
 							}
 							else
 							{
-								FileUtils.setCurPage(cur_page);
-								FileUtils.copyDirectoryToDirectory(file, new File(FileBrower.cur_path));
-							}
+								//copying_file=new File(FileBrower.cur_path+file);
+								File file_new = null;
+		    					//Log.i(FileBrower.TAG, "copy and paste file: " + name);
+		        				if(cur_page.equals("list")){
+		        					 file_new = new File(FileBrower.cur_path + File.separator + file.getName());  
+		        	        	}
+		        	        	else if (cur_page.equals("thumbnail")){
+		        	        		 file_new = new File(ThumbnailView.cur_path + File.separator + file.getName()); 
+		        	        	} else if (cur_page.equals("thumbnail1")){
+		        	        		 file_new = new File(ThumbnailView1.cur_path + File.separator + file.getName()); 
+		        	        	}
+		    					
+		    					if (file_new.exists()) {
+		        	        		String date = new SimpleDateFormat("yyyyMMddHHmmss_")
+		    	        			.format(Calendar.getInstance().getTime()); 
+		        	        		if(cur_page.equals("list")){
+		        	        			file_new = new File(FileBrower.cur_path + File.separator + date + file.getName()); 
+		        	        		}
+		        	        		else if (cur_page.equals("thumbnail")){
+		        	        			file_new = new File(ThumbnailView.cur_path + File.separator + date + file.getName()); 
+		        	        		} else if (cur_page.equals("thumbnail1")){
+		        	        			file_new = new File(ThumbnailView1.cur_path + File.separator + date + file.getName()); 
+		        	        		}
+		    					}
 
-							if(!copy_cancel)
-							{
-    							if (file_op_todo == FileOpTodo.TODO_CUT)
-    								FileUtils.deleteDirectory(file);
-	        				}
-	        				else
-							{       							          		
-			                	if (file.exists())		
-			                		FileUtils.deleteDirectory(file);
-														          		
-			                	if(cur_page.equals("list")){
-			                		FileBrower.mProgressHandler.sendMessage(Message.obtain(
-			                				FileBrower.mProgressHandler, 9)); 
-			                	} else if (cur_page.equals("thumbnail")){
-			                		ThumbnailView.mProgressHandler.sendMessage(Message.obtain(
-			                				ThumbnailView.mProgressHandler, 9)); 
-			                	} else if (cur_page.equals("thumbnail1")){
-			                		ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
-			                				ThumbnailView1.mProgressHandler, 9));                		              		
-			                	}    
-			                	IsBusy = false;
-			                	return FileOpReturn.ERR;
-    						}
+								if(!file_new.exists())
+								{
+									copying_file = file_new;
+									FileUtils.setCurPage(cur_page);
+									FileUtils.copyDirectoryToDirectory(file, new File(FileBrower.cur_path));
+
+									if(!copy_cancel)
+									{
+		    							if (file_op_todo == FileOpTodo.TODO_CUT)
+		    								FileUtils.deleteDirectory(file);
+			        				}
+			        				else
+									{       							          		
+					                	if (file_new.exists())		
+					                		FileUtils.deleteDirectory(file_new);
+																          		
+					                	if(cur_page.equals("list")){
+					                		FileBrower.mProgressHandler.sendMessage(Message.obtain(
+					                				FileBrower.mProgressHandler, 9)); 
+					                	} else if (cur_page.equals("thumbnail")){
+					                		ThumbnailView.mProgressHandler.sendMessage(Message.obtain(
+					                				ThumbnailView.mProgressHandler, 9)); 
+					                	} else if (cur_page.equals("thumbnail1")){
+					                		ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
+					                				ThumbnailView1.mProgressHandler, 9));                		              		
+					                	}    
+					                	IsBusy = false;
+					                	return FileOpReturn.ERR;
+		    						}
+								}
+							}
 						}
 						catch (Exception e) {
 	        				Log.e("Exception when copyDirectoryToDirectory",e.toString());
@@ -836,8 +880,6 @@ public class FileOp {
 	        	        			file_new = new File(ThumbnailView1.cur_path + File.separator + date + file.getName()); 
 	        	        		}
 	    					}
-
-							file_new_bac=file_new;
 
 	    					if (!file_new.exists()) {	
 	        					//Log.i(FileBrower.TAG, "copy to file: " + file_new.getPath());
@@ -882,40 +924,78 @@ public class FileOp {
 	        			} catch (Exception e) {
 	        				Log.e("Exception when delete file", e.toString());
 	        			}
+						
+						if(cur_page.equals("list")){
+		        			FileBrower.mProgressHandler.sendMessage(Message.obtain(
+		                			FileBrower.mProgressHandler, 2, (i+1) * 100 / fileList.size(), 0));
+			        	}
+			        	else if (cur_page.equals("thumbnail")){
+			        		ThumbnailView.mProgressHandler.sendMessage(Message.obtain(
+			        				ThumbnailView.mProgressHandler, 2, (i+1) * 100 / fileList.size(), 0));
+			        	} else if (cur_page.equals("thumbnail1")){
+			        		ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
+			        				ThumbnailView1.mProgressHandler, 2, (i+1) * 100 / fileList.size(), 0));
+			        	}
 	        		} 
         		}
-				
-        		if(cur_page.equals("list")){
-        			FileBrower.mProgressHandler.sendMessage(Message.obtain(
-                			FileBrower.mProgressHandler, 2, (i+1) * 100 / fileList.size(), 0));
-	        	}
-	        	else if (cur_page.equals("thumbnail")){
-	        		ThumbnailView.mProgressHandler.sendMessage(Message.obtain(
-	        				ThumbnailView.mProgressHandler, 2, (i+1) * 100 / fileList.size(), 0));
-	        	} else if (cur_page.equals("thumbnail1")){
-	        		ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
-	        				ThumbnailView1.mProgressHandler, 2, (i+1) * 100 / fileList.size(), 0));
-	        	}
         	}
+
+			//make sure current path is the destination path, otherwise indicate copy fail
+			if(cur_page.equals("list"))
+			{
+				curPathAftCopy=FileBrower.cur_path;
+			}
+			else if (cur_page.equals("thumbnail1"))
+			{
+				curPathAftCopy=ThumbnailView1.cur_path;
+			}
+			else
+			{
+				Log.e("pasteSelectedFile","curPathAftCopy=null error.");
+				IsBusy = false;
+            	return FileOpReturn.ERR;
+			}
+
+			//Log.i("wxl","curPathBefCopy:"+curPathBefCopy);
+			//Log.i("wxl","curPathAftCopy:"+curPathAftCopy);
+
+			if((copy_cancel)||!(curPathBefCopy.equals(curPathAftCopy)))
+			{
+				if (copying_file.exists())
+				{
+					try{
+						if(copying_file.isDirectory())
+						{
+					        FileUtils.deleteDirectory(copying_file);
+						}
+						else
+						{		
+			        		copying_file.delete();
+						}
+					}
+					catch (Exception e) {
+        				Log.e("Exception when delete",e.toString());
+        			}
+				}
+
+				if(cur_page.equals("list"))
+				{
+					FileBrower.mProgressHandler.sendMessage(Message.obtain(FileBrower.mProgressHandler, 9));
+				}
+				else if (cur_page.equals("thumbnail1"))
+				{
+					ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(ThumbnailView1.mProgressHandler, 9)); 
+				}
+				
+				IsBusy = false;
+		        return FileOpReturn.ERR;
+			}
 			
         	if(cur_page.equals("list")){
-				if((copy_cancel)||!((FileBrower.cur_path).equals((file_new_bac.getPath()).substring(0, (file_new_bac.getPath()).lastIndexOf('/')))))
-				{
-					if (file_new_bac.exists())		
-	        			file_new_bac.delete();
-
-					FileBrower.mProgressHandler.sendMessage(Message.obtain(
-	        			    FileBrower.mProgressHandler, 9));
-					IsBusy = false;
-	        		return FileOpReturn.ERR;
-				}
-				else
-				{
-		    		FileBrower.mProgressHandler.sendMessage(Message.obtain(
-		        			FileBrower.mProgressHandler, 4));
-		    		IsBusy = false;
-		        	return FileOpReturn.SUCCESS;
-				}
+				FileBrower.mProgressHandler.sendMessage(Message.obtain(
+	        			FileBrower.mProgressHandler, 4));
+	    		IsBusy = false;
+	        	return FileOpReturn.SUCCESS;
         	}
         	else if (cur_page.equals("thumbnail")){
         		ThumbnailView.mProgressHandler.sendMessage(Message.obtain(
@@ -923,23 +1003,10 @@ public class FileOp {
         		IsBusy = false;
             	return FileOpReturn.SUCCESS;
         	} else if (cur_page.equals("thumbnail1")){
-        		if((copy_cancel)||!((ThumbnailView1.cur_path).equals((file_new_bac.getPath()).substring(0, (file_new_bac.getPath()).lastIndexOf('/')))))
-        		{
-					if (file_new_bac.exists())		
-	        			file_new_bac.delete();
-
-					ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
-	        			    ThumbnailView1.mProgressHandler, 9)); 
-					IsBusy = false;
-	        		return FileOpReturn.ERR;
-				}
-				else
-				{
-		    		ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
-		    				ThumbnailView1.mProgressHandler, 4));
-		    		IsBusy = false;
-		        	return FileOpReturn.SUCCESS;
-				}
+        		ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
+	    				ThumbnailView1.mProgressHandler, 4));
+	    		IsBusy = false;
+	        	return FileOpReturn.SUCCESS;
         	}
         	
         } else {

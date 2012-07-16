@@ -878,10 +878,10 @@ public class FileUtils
 
 					if(cur_page.equals("list")){
         				FileBrower.mProgressHandler.sendMessage(Message.obtain(
-                				FileBrower.mProgressHandler, 2, (i+1) * 100 / files.length, 0));
+                				FileBrower.mProgressHandler, 1, (i+1) * 100 / files.length, 0));
 		        	}else if (cur_page.equals("thumbnail1")){
 		        		ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
-		        				ThumbnailView1.mProgressHandler, 2, (i+1) * 100 / files.length, 0));
+		        				ThumbnailView1.mProgressHandler, 1, (i+1) * 100 / files.length, 0));
 		        	}
                 }
             }

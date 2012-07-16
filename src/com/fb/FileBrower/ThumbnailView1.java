@@ -952,7 +952,18 @@ public class ThumbnailView1 extends Activity{
                 	break;                	
                 case 9:		//file copy cancel                	
                 	if((FileOp.copying_file!=null)&&(FileOp.copying_file.exists()))
-	    				FileOp.copying_file.delete();
+	    			{
+	    				try
+    					{
+							if(FileOp.copying_file.isDirectory())
+						        FileUtils.deleteDirectory(FileOp.copying_file);
+							else
+				        		FileOp.copying_file.delete();
+    					}
+						catch (Exception e) {
+	        				Log.e("Exception when delete",e.toString());
+	        			}
+            		}
     				Toast.makeText(ThumbnailView1.this,
 							getText(R.string.Toast_copy_fail),
 							Toast.LENGTH_SHORT).show();
