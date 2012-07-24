@@ -789,7 +789,7 @@ public class ThumbnailView1 extends Activity{
     		cur_path = ROOT_PATH; 
 
 		/* check whether use real sdcard*/
-		isRealSD=false; //Environment.isExternalStorageBeSdcard();
+		isRealSD=Environment.isExternalStorageBeSdcard();
 		
         /* setup database */
         FileOp.SetMode(false);
@@ -1652,7 +1652,7 @@ public class ThumbnailView1 extends Activity{
 							{
 								if(cur_path.startsWith(EXT_SD))
 								{
-									if(true/*Environment.getExternalStorage2State().equals(Environment.MEDIA_MOUNTED)*/)
+									if(Environment.getExternalStorage2State().equals(Environment.MEDIA_MOUNTED))
 									{
 										new Thread () {
 				        					public void run () {

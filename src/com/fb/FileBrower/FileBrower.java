@@ -292,7 +292,7 @@ public class FileBrower extends Activity {
         mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, TAG);
 
 		/* check whether use real sdcard*/
-		isRealSD=false; //Environment.isExternalStorageBeSdcard();
+		isRealSD=Environment.isExternalStorageBeSdcard();
                 
         /* setup database */
         db = new FileBrowerDatabase(this); 
@@ -1116,7 +1116,7 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 							{
 								if(cur_path.startsWith(EXT_SD))
 								{
-									if(true/*Environment.getExternalStorage2State().equals(Environment.MEDIA_MOUNTED)*/)
+									if(Environment.getExternalStorage2State().equals(Environment.MEDIA_MOUNTED))
 									{
 										new Thread () {
 				        					public void run () {
