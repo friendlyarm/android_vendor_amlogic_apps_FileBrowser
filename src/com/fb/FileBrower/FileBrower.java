@@ -1000,10 +1000,13 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 	        .create();
 		    return help_dialog;	
 		case LOAD_DIALOG_ID:
-		    load_dialog = new ProgressDialog(this);
-		    load_dialog.setMessage(getText(R.string.load_dialog_msg_str));
-		    load_dialog.setIndeterminate(true);
-		    load_dialog.setCancelable(true);
+			if(load_dialog==null)
+			{
+			    load_dialog = new ProgressDialog(this);
+			    load_dialog.setMessage(getText(R.string.load_dialog_msg_str));
+			    load_dialog.setIndeterminate(true);
+			    load_dialog.setCancelable(true);
+	    	}
 		    return load_dialog;
         }
         
