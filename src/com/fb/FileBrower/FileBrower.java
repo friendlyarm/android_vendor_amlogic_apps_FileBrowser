@@ -166,6 +166,8 @@ public class FileBrower extends Activity {
             if (action == null || path == null)
             	return;
             
+            path = path.replaceFirst("/storage/sdcard0", "/mnt/sdcard");
+            
             if (action.equals(Intent.ACTION_MEDIA_EJECT)) {
         		if (cur_path.startsWith(path)) {
         			cur_path = ROOT_PATH;
