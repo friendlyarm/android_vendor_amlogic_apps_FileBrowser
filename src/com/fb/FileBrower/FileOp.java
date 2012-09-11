@@ -21,6 +21,7 @@ import android.os.Message;
 import android.os.StatFs;
 import android.util.Log;
 import com.fb.FileBrower.FileBrowerDatabase.FileMarkCursor;
+import android.net.Uri;
 
 public class FileOp {
 	public static File copying_file = null;
@@ -1191,6 +1192,43 @@ public class FileOp {
     	}
 
 		return name;
+	}
+
+	public static ArrayList<Uri> getMarkFilePathUri(String cur_page) {
+		ArrayList<Uri> uris = new ArrayList<Uri>();
+		String path = "\0";
+
+		if(cur_page.equals("list"))
+		{
+			FileBrower.myCursor = FileBrower.db.getFileMark();   
+	        if (FileBrower.myCursor.getCount() > 0)
+			{
+	            for(int i=0; i<FileBrower.myCursor.getCount(); i++){
+	            	FileBrower.myCursor.moveToPosition(i);
+	            	path = FileBrower.myCursor.getColFilePath();
+					File f = new File(path);
+					if(!f.isDirectory()) {
+						uris.add(Uri.fromFile(f));
+					}
+	            }      	
+	        }       
+		}
+		else if (cur_page.equals("thumbnail1"))
+		{
+    		ThumbnailView1.myCursor = ThumbnailView1.db.getFileMark();   
+	        if (ThumbnailView1.myCursor.getCount() > 0) {
+	            for(int i=0; i<ThumbnailView1.myCursor.getCount(); i++){
+	            	ThumbnailView1.myCursor.moveToPosition(i);
+	            	path = ThumbnailView1.myCursor.getColFilePath();
+					File f = new File(path);
+					if(!f.isDirectory()) {
+						uris.add(Uri.fromFile(f));
+					}
+	            }      	
+	        }
+    	}
+
+		return uris;
 	}
 
 	/*

@@ -22,6 +22,7 @@
     <string name="edit_dialog_paste_str">Paste</string>
     <string name="edit_dialog_cut_str">Cut</string>
     <string name="edit_dialog_rename_str">Rename</string>
+    <string name="edit_dialog_share_str">Share</string>
     <string name="cancel">Cancel</string>
     <string name="ok">Ok</string>
     
@@ -55,6 +56,8 @@ DROP TABLE IF EXISTS file_thumbnails_table
 	<string name="Toast_msg_sort_noopen">Cannot sort here.</string>
 	<string name="Toast_msg_rename_morefile">Cannot rename more than one file:</string>
 	<string name="Toast_msg_rename_nofile">No file to rename.</string>
+	<string name="Toast_msg_share_nofile">Folder can\'t be shared, No file selected.</string>
+	<string name="Toast_msg_share_nodev">No shared devices.</string>
 	<string name="Toast_msg_rename_error">Rename failed.</string>
 	<string name="Toast_msg_rename_diffpath">Cannot rename in diffent path:</string>
 	<string name="Toast_msg_paste_sub_folder">Can\'t paste, destination directory is sub folder of source directory.</string>

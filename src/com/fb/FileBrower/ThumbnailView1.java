@@ -54,6 +54,9 @@ import android.os.storage.StorageVolume;
 import com.fb.FileBrower.FileBrowerDatabase.FileMarkCursor;
 import com.fb.FileBrower.FileOp.FileOpReturn;
 import com.fb.FileBrower.FileOp.FileOpTodo;
+
+import android.bluetooth.BluetoothAdapter;
+
     /** Called when the activity is first created. */
 public class ThumbnailView1 extends Activity{
 	public static final String TAG = "ThumbnailView";
@@ -1798,6 +1801,25 @@ public class ThumbnailView1 extends Activity{
         			        }
 							edit_dialog.dismiss();
 						}
+						else if (pos == 5) {
+							FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
+							//Log.i(TAG, "DO share...");
+							myCursor = db.getFileMark(); 
+        			        if (myCursor.getCount() > 0) {
+								int ret = shareFile();
+								if(ret <= 0) {
+									Toast.makeText(ThumbnailView1.this,
+	        							getText(R.string.Toast_msg_share_nofile),
+	        							Toast.LENGTH_SHORT).show(); 
+								}
+							}
+							else {
+								Toast.makeText(ThumbnailView1.this,
+        							getText(R.string.Toast_msg_share_nofile),
+        							Toast.LENGTH_SHORT).show(); 
+							}
+							edit_dialog.dismiss();
+						}
             		} else {
     					Toast.makeText(ThumbnailView1.this,
     							getText(R.string.Toast_msg_paste_wrongpath),
@@ -1939,6 +1961,38 @@ public class ThumbnailView1 extends Activity{
 		return true;
     }
 
+	private int shareFile() {
+		ArrayList<Uri> uris = new ArrayList<Uri>();
+		Intent intent = new Intent();
+		String type = "*/*";
+
+		BluetoothAdapter ba = BluetoothAdapter.getDefaultAdapter();
+		if(ba == null) {
+			Toast.makeText(ThumbnailView1.this,
+						getText(R.string.Toast_msg_share_nodev),
+						Toast.LENGTH_SHORT).show(); 
+			return 0xff;
+		}
+
+		uris = FileOp.getMarkFilePathUri("thumbnail1");
+		final int size = uris.size();
+
+		if(size > 0) {
+			if (size > 1) {
+                intent.setAction(Intent.ACTION_SEND_MULTIPLE).setType(type);
+                intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
+            } else {
+                intent.setAction(Intent.ACTION_SEND).setType(type);
+                intent.putExtra(Intent.EXTRA_STREAM, uris.get(0));
+            }
+            intent.setType(type);
+			startActivity(intent); 
+		} 
+
+		return size;
+	}
+	
+
 	 /** getDialogListAdapter */
     private SimpleAdapter getDialogListAdapter(int id) {
         return new SimpleAdapter(ThumbnailView1.this,
@@ -2003,6 +2057,11 @@ public class ThumbnailView1 extends Activity{
 			map = new HashMap<String, Object>();         	
         	map.put("item_type", R.drawable.dialog_item_type_rename);  
         	map.put("item_name", getText(R.string.edit_dialog_rename_str));            	        	
+        	map.put("item_sel", R.drawable.dialog_item_img_unsel);  
+        	list.add(map); 
+			map = new HashMap<String, Object>();         	
+        	map.put("item_type", R.drawable.dialog_item_type_size);  
+        	map.put("item_name", getText(R.string.edit_dialog_share_str));            	        	
         	map.put("item_sel", R.drawable.dialog_item_img_unsel);  
         	list.add(map); 
     		break;  

@@ -22,6 +22,7 @@
     <string name="edit_dialog_paste_str">粘貼</string>
     <string name="edit_dialog_cut_str">剪切</string>
   	<string name="edit_dialog_rename_str">重命名</string>  
+  	<string name="edit_dialog_share_str">分享</string>
   	<string name="cancel">取消</string>
     <string name="ok">確定</string>
     
@@ -55,6 +56,8 @@ DROP TABLE IF EXISTS file_thumbnails_table
 	<string name="Toast_msg_sort_noopen">該目錄無法進行排序.</string>
 	<string name="Toast_msg_rename_morefile">不能同時重命名多個文件:</string>
 	<string name="Toast_msg_rename_nofile">沒有文件被選中重命名.</string>
+	<string name="Toast_msg_share_nofile">文件夾不能共享，沒有文件被選中.</string>
+	<string name="Toast_msg_share_nodev">沒有共享設備.</string>
 	<string name="Toast_msg_rename_error">重命名失敗.</string>
 	<string name="Toast_msg_rename_diffpath">不能茬不同路徑下重命名:</string>
 	<string name="Toast_msg_paste_sub_folder">無法粘貼，目標文件夾是源文件夾的子文件夾！</string>
