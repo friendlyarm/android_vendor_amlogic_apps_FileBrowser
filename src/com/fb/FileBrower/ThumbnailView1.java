@@ -632,6 +632,21 @@ public class ThumbnailView1 extends Activity{
 //        
 //    };
 
+	private String pathTransferForJB(String path) {
+		String pathout = path;
+
+		if (path.startsWith("/storage/sd")) {
+			if(path.contains("/storage/sdcard0")) {
+				pathout = path.replaceFirst("/storage/sdcard0", "/mnt/sdcard");
+			}
+			else {
+				pathout = path.replaceFirst("/storage/sd", "/mnt/sd");
+			}
+		}
+
+		return pathout;
+	}
+
     private BroadcastReceiver mMountReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -642,7 +657,7 @@ public class ThumbnailView1 extends Activity{
             if (action == null || path == null)
             	return;            
             
-            path = path.replaceFirst("/storage/sdcard0", "/mnt/sdcard");    
+            path = pathTransferForJB(path);    
 
             if (action.equals(Intent.ACTION_MEDIA_EJECT)) {
         		if (cur_path.startsWith(path)) {
