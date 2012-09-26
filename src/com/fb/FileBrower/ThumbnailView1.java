@@ -778,7 +778,13 @@ public class ThumbnailView1 extends Activity{
 		if (edit_dialog != null)
             edit_dialog.dismiss(); 
     	if (mWakeLock.isHeld())
-    		mWakeLock.release();   
+    		mWakeLock.release(); 
+
+		if (load_dialog != null)
+			load_dialog.dismiss();
+
+		if(mListLoaded==true)
+			mListLoaded = false;
 
 		if(!local_mode){
     		db.deleteAllFileMark();   		

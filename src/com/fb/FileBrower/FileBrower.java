@@ -284,6 +284,12 @@ public class FileBrower extends Activity {
     	if (mWakeLock.isHeld())
     		mWakeLock.release(); 
 
+		if (load_dialog != null)
+			load_dialog.dismiss();
+
+		if(mListLoaded==true)
+			mListLoaded = false;
+
 		if(!local_mode){
     		db.deleteAllFileMark();  
     		
