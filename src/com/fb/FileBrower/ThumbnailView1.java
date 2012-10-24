@@ -815,7 +815,19 @@ public class ThumbnailView1 extends Activity{
     		cur_path = ROOT_PATH; 
 
 		/* check whether use real sdcard*/
-		isRealSD=Environment.isExternalStorageBeSdcard();
+		//isRealSD=Environment.isExternalStorageBeSdcard();
+		String path = System.getenv("INTERNAL_STORAGE");
+		if(path!=null) {
+			if(path.equals("/storage/sdcard0")) {
+				isRealSD = false;
+			}
+			else {
+				isRealSD = true;
+			}
+		}
+		else {
+			isRealSD = false;
+		}
 		
         /* setup database */
         FileOp.SetMode(false);

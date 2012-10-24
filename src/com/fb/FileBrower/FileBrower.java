@@ -63,6 +63,7 @@ import com.fb.FileBrower.FileOp.FileOpReturn;
 import com.fb.FileBrower.FileOp.FileOpTodo;
 
 import android.bluetooth.BluetoothAdapter;
+import java.lang.System;
 
 public class FileBrower extends Activity {
 	public static final String TAG = "FileBrower";
@@ -317,7 +318,21 @@ public class FileBrower extends Activity {
         mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, TAG);
 
 		/* check whether use real sdcard*/
-		isRealSD=Environment.isExternalStorageBeSdcard();
+		//isRealSD=Environment.isExternalStorageBeSdcard();
+		//isRealSD=false;
+		String path = System.getenv("INTERNAL_STORAGE");
+		if(path!=null) {
+			if(path.equals("/storage/sdcard0")) {
+				isRealSD = false;
+			}
+			else {
+				isRealSD = true;
+			}
+		}
+		else {
+			isRealSD = false;
+		}
+
                 
         /* setup database */
         db = new FileBrowerDatabase(this); 
