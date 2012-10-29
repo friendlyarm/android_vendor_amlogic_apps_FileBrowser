@@ -691,8 +691,6 @@ public class ThumbnailView1 extends Activity{
 			{
 				if(sort_dialog != null)
 					sort_dialog.dismiss();
-				if(edit_dialog != null)
-					edit_dialog.dismiss();
 				if(help_dialog != null)
 					help_dialog.dismiss();
 			}
@@ -758,7 +756,6 @@ public class ThumbnailView1 extends Activity{
     @Override
     public void onPause() {
         super.onPause();
-        isInFileBrowserView=false;
         mLoadCancel = true;
         
         ThumbnailOpUtils.stopThumbnailSanner(getBaseContext());
@@ -773,12 +770,6 @@ public class ThumbnailView1 extends Activity{
     	editor.putString("cur_path", cur_path);
     	editor.putBoolean("isChecked", btn_mode.isChecked());
     	editor.commit();     
-    	
-		FileOp.copy_cancel = true;  
-		if (edit_dialog != null)
-            edit_dialog.dismiss(); 
-    	if (mWakeLock.isHeld())
-    		mWakeLock.release(); 
 
 		if (load_dialog != null)
 			load_dialog.dismiss();
@@ -1307,7 +1298,8 @@ public class ThumbnailView1 extends Activity{
 */
 
     public void onDestroy() {
-    	super.onDestroy(); 
+    	super.onDestroy();
+		isInFileBrowserView=false;
     	if(!local_mode){
     		db.deleteAllFileMark();   		
     	}   
