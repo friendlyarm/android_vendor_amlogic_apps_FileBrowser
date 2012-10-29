@@ -792,7 +792,7 @@ public class ThumbnailView1 extends Activity{
         	lv_sort_flag=bundle.getString("sort_flag");
         }
         PowerManager pm = (PowerManager)getSystemService(Context.POWER_SERVICE);
-        mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, TAG);        
+        mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);        
         
         ThumbnailView = (GridView)findViewById(R.id.mygridview);   
         /*get cur path form listview*/
