@@ -1424,7 +1424,9 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 
 	    			if(mRenameFile.renameTo(new File(newFileName)))
 	    			{
-	    				db.deleteAllFileMark(); 
+	    				sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
+				    				+ "/mnt")));
+						db.deleteAllFileMark(); 
 	    				lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
 	    			}
 	    			else
