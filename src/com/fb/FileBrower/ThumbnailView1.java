@@ -691,8 +691,6 @@ public class ThumbnailView1 extends Activity{
 			{
 				if(sort_dialog != null)
 					sort_dialog.dismiss();
-				if(edit_dialog != null)
-					edit_dialog.dismiss();
 				if(help_dialog != null)
 					help_dialog.dismiss();
 			}
@@ -758,7 +756,6 @@ public class ThumbnailView1 extends Activity{
     @Override
     public void onPause() {
         super.onPause();
-        isInFileBrowserView=false;
         mLoadCancel = true;
         
         ThumbnailOpUtils.stopThumbnailSanner(getBaseContext());
@@ -773,12 +770,6 @@ public class ThumbnailView1 extends Activity{
     	editor.putString("cur_path", cur_path);
     	editor.putBoolean("isChecked", btn_mode.isChecked());
     	editor.commit();     
-    	
-		FileOp.copy_cancel = true;  
-		if (edit_dialog != null)
-            edit_dialog.dismiss(); 
-    	if (mWakeLock.isHeld())
-    		mWakeLock.release(); 
 
 		if (load_dialog != null)
 			load_dialog.dismiss();
@@ -801,7 +792,7 @@ public class ThumbnailView1 extends Activity{
         	lv_sort_flag=bundle.getString("sort_flag");
         }
         PowerManager pm = (PowerManager)getSystemService(Context.POWER_SERVICE);
-        mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, TAG);        
+        mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);        
         
         ThumbnailView = (GridView)findViewById(R.id.mygridview);   
         /*get cur path form listview*/
@@ -815,7 +806,19 @@ public class ThumbnailView1 extends Activity{
     		cur_path = ROOT_PATH; 
 
 		/* check whether use real sdcard*/
-		isRealSD=Environment.isExternalStorageBeSdcard();
+		//isRealSD=Environment.isExternalStorageBeSdcard();
+		String path = System.getenv("INTERNAL_STORAGE");
+		if(path!=null) {
+			if(path.equals("/storage/sdcard0")) {
+				isRealSD = false;
+			}
+			else {
+				isRealSD = true;
+			}
+		}
+		else {
+			isRealSD = false;
+		}
 		
         /* setup database */
         FileOp.SetMode(false);
@@ -1295,7 +1298,8 @@ public class ThumbnailView1 extends Activity{
 */
 
     public void onDestroy() {
-    	super.onDestroy(); 
+    	super.onDestroy();
+		isInFileBrowserView=false;
     	if(!local_mode){
     		db.deleteAllFileMark();   		
     	}   

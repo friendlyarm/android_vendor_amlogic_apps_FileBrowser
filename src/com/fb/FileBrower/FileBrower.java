@@ -63,6 +63,7 @@ import com.fb.FileBrower.FileOp.FileOpReturn;
 import com.fb.FileBrower.FileOp.FileOpTodo;
 
 import android.bluetooth.BluetoothAdapter;
+import java.lang.System;
 
 public class FileBrower extends Activity {
 	public static final String TAG = "FileBrower";
@@ -216,8 +217,6 @@ public class FileBrower extends Activity {
 			{
 				if(sort_dialog != null)
 					sort_dialog.dismiss();
-				if(edit_dialog != null)
-					edit_dialog.dismiss();
 				if(click_dialog != null)
 					click_dialog.dismiss();
 				if(help_dialog != null)
@@ -263,7 +262,6 @@ public class FileBrower extends Activity {
     public void onPause() {
         super.onPause();
 
-		isInFileBrowserView=false;
         //StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
         //m_storagemgr.unregisterListener(mListener);
         
@@ -277,12 +275,6 @@ public class FileBrower extends Activity {
     	editor.putString("cur_path", cur_path);
     	editor.putBoolean("isChecked", btn_mode.isChecked());
     	editor.commit();          
-    	
-    	FileOp.copy_cancel = true;
-		if (edit_dialog != null)
-            edit_dialog.dismiss(); 
-    	if (mWakeLock.isHeld())
-    		mWakeLock.release(); 
 
 		if (load_dialog != null)
 			load_dialog.dismiss();
@@ -314,10 +306,25 @@ public class FileBrower extends Activity {
      	   Log.e(TAG, "Do not set sort flag");
         }
         PowerManager pm = (PowerManager)getSystemService(Context.POWER_SERVICE);
-        mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, TAG);
+        //mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, TAG);
+		mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
 
 		/* check whether use real sdcard*/
-		isRealSD=Environment.isExternalStorageBeSdcard();
+		//isRealSD=Environment.isExternalStorageBeSdcard();
+		//isRealSD=false;
+		String path = System.getenv("INTERNAL_STORAGE");
+		if(path!=null) {
+			if(path.equals("/storage/sdcard0")) {
+				isRealSD = false;
+			}
+			else {
+				isRealSD = true;
+			}
+		}
+		else {
+			isRealSD = false;
+		}
+
                 
         /* setup database */
         db = new FileBrowerDatabase(this); 
@@ -348,7 +355,6 @@ public class FileBrower extends Activity {
             @Override
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
-				
 				if(false==isInFileBrowserView)
 					return;
                 
@@ -359,7 +365,7 @@ public class FileBrower extends Activity {
                 		pb = (ProgressBar) edit_dialog.findViewById(R.id.edit_progress_bar);
 						tvForPaste=(TextView)edit_dialog.findViewById(R.id.text_view_paste);
                 	}
-              
+              	
                 switch(msg.what) {
                 case 0: 	//set invisible
                     if ((edit_dialog != null) && (pb != null)&&(tvForPaste!=null)) { 
@@ -500,7 +506,6 @@ public class FileBrower extends Activity {
                     mListLoaded = false;
                     if (load_dialog != null)
                         load_dialog.dismiss();
-					
                     break; 
 				case 11:	//destination dir is sub folder of src dir
 					Toast.makeText(FileBrower.this,
@@ -725,6 +730,7 @@ public class FileBrower extends Activity {
     @Override
     public void onDestroy() {
     	super.onDestroy();
+		isInFileBrowserView=false;
     	if(!local_mode){
     		db.deleteAllFileMark();  
     		
