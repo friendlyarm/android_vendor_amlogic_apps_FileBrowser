@@ -48,7 +48,7 @@ import android.widget.ToggleButton;
     /** Called when the activity is first created. */
 public class ThumbnailView extends Activity{
 	public static final String TAG = "ThumbnailView";
-	private static final String ROOT_PATH = "/mnt";
+	private static final String ROOT_PATH = "/stroage";
 	public static String cur_path = ROOT_PATH;
 	protected static final int SORT_DIALOG_ID = 0;
 	protected static final int EDIT_DIALOG_ID = 1;

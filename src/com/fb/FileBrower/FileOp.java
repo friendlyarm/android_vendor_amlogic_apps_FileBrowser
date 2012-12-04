@@ -30,6 +30,11 @@ public class FileOp {
 	public static boolean IsBusy = false;
 	public static String source_path = null;
 	public static String target_path = null;
+	private static final String ROOT_PATH = "/storage";
+	private static final String NAND_PATH = "/storage/sdcard0";
+	private static final String SD_PATH = "/storage/sdcard0/external_sdcard";
+	private static final String USB_PATH ="/storage/sdcard0/usbdrive";
+	private static final String SATA_PATH ="/storage/sdcard0/sata";
 	public static void SetMode(boolean value){
 		switch_mode = value;
 	}
@@ -230,7 +235,7 @@ public class FileOp {
         return typeStr;
        
     }
-    public static int getDeviceIcon(String device_name){
+    /*public static int getDeviceIcon(String device_name){
 		if(device_name.equals("/mnt/usb")){
 			return R.drawable.usb_card_icon;
 		}
@@ -245,7 +250,7 @@ public class FileOp {
 		}
 		return 0;
 		
-	}
+	}*/
     public static int getThumbDeviceIcon(Context c,String device_name){
     	//String internal = c.getString(R.string.memory_device_str);
     	//String sdcard = c.getString(R.string.sdcard_device_str);
@@ -266,13 +271,13 @@ public class FileOp {
     } 
     public static String getDeviceName(Context c,String filename){
     	String ret_str = null;
-    	if(filename.equals("/mnt/flash")){
+    	/*if(filename.equals("/mnt/flash")){
     		ret_str = c.getString(R.string.memory_device_str);
     	}
-    	else if(filename.equals("/mnt/sdcard")){
+    	else */if(filename.equals(SD_PATH)){
     		ret_str = c.getString(R.string.sdcard_device_str);
     	}
-    	else if(filename.equals("/mnt/usb")){
+    	else if(filename.equals(USB_PATH)){
     		ret_str = c.getString(R.string.usb_device_str);
     	}
 		return ret_str;
@@ -284,14 +289,14 @@ public class FileOp {
     		String internal = c.getString(R.string.memory_device_str);
         	String sdcard = c.getString(R.string.sdcard_device_str);
         	String usb = c.getString(R.string.usb_device_str);
-    		if(name.equals(internal))
+    		/*if(name.equals(internal))
     			temp_name="/mnt/flash";
-    		else if(name.equals(sdcard))
-    			temp_name="/mnt/sdcard";
+    		else */if(name.equals(sdcard))
+    			temp_name=SD_PATH;
     		else if(name.equals(usb))
-    			temp_name="/mnt/usb";
+    			temp_name=USB_PATH;
     		return temp_name;
-	}	
+	}
     public static boolean deviceExist(String string) {
 		// TODO Auto-generated method stub
 		if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
@@ -639,7 +644,7 @@ public class FileOp {
     	}    			
     		
     	if(cur_page.equals("list")){
-    		if(FileBrower.cur_path.startsWith("/mnt/sdcard/")){
+    		if(FileBrower.cur_path.startsWith(ROOT_PATH)){
     			if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED_READ_ONLY)){
     				FileBrower.mProgressHandler.sendMessage(Message.obtain(
         					FileBrower.mProgressHandler, 7));
@@ -654,7 +659,7 @@ public class FileOp {
     			return FileOpReturn.ERR; 
     		}
     	} else if (cur_page.equals("thumbnail1")) {
-    		if(ThumbnailView1.cur_path.startsWith("/mnt/sdcard/")){
+    		if(ThumbnailView1.cur_path.startsWith(ROOT_PATH)){
     			if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED_READ_ONLY)){
     				ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
     						ThumbnailView1.mProgressHandler, 7));
@@ -1100,7 +1105,7 @@ public class FileOp {
 							}
 	    				}
 	    				else{
-	    					if(name.startsWith("/mnt/sdcard/")){
+	    					if(name.startsWith(ROOT_PATH)){
 	    						if(!(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED_READ_ONLY))){
 	    							if(file.isDirectory())
 									{

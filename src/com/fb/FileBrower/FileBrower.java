@@ -75,9 +75,14 @@ public class FileBrower extends Activity {
 	private boolean mLoadCancel = false;
 	
 	private PowerManager.WakeLock mWakeLock;
-	private static final String ROOT_PATH = "/mnt";
+	private static final String ROOT_PATH = "/storage";
+	private static final String SHEILD_EXT_STOR = "/storage/sdcard0/external_storage";
+	private static final String NAND_PATH = "/storage/sdcard0";
+	private static final String SD_PATH = "/storage/external_storage/sdcard1";
+	private static final String USB_PATH ="/storage/external_storage";
+	private static final String SATA_PATH ="/storage/external_storage/sata";
+	
 	public static String cur_path = ROOT_PATH;
-	private static String prev_path = ROOT_PATH;
 	private static final int SORT_DIALOG_ID = 0;
 	private static final int EDIT_DIALOG_ID = 1;
 	private static final int CLICK_DIALOG_ID = 2;
@@ -106,73 +111,8 @@ public class FileBrower extends Activity {
 	private int item_position_selected, item_position_first, item_position_last;
 	private int fromtop_piexl;
 	private boolean isInFileBrowserView=false;
-	private boolean isRealSD=false;
-	private static final String EXT_SD="/mnt/sdcard/external_sdcard";
 	
 	String open_mode[] = {"movie","music","photo","packageInstall"};
-	
-	
-//    private final StorageEventListener mListener = new StorageEventListener() {
-//        public void onUsbMassStorageConnectionChanged(boolean connected)
-//        {
-//        	//this is the action when connect to pc
-//        	return ;
-//        }
-//        public void onStorageStateChanged(String path, String oldState, String newState)
-//        {
-//        	if (newState == null || path == null) 
-//        		return;
-//        	
-//        	if(newState.compareTo("mounted") == 0)
-//        	{
-//        		//Log.w(path, "mounted.........");
-//        		//ThumbnailOpUtils.updateThumbnailsForDev(getBaseContext(), path);
-//        		if (cur_path.equals(ROOT_PATH)) {
-//        			DeviceScan();
-//        		}
-//        		
-//        	}
-//        	else if(newState.compareTo("unmounted") == 0)
-//        	{
-//        		//Log.w(path, "unmounted.........");
-//        		if (cur_path.startsWith(path)) {
-//        			cur_path = ROOT_PATH;
-//        			DeviceScan();
-//        		}
-//        		if (cur_path.equals(ROOT_PATH)) {
-//        			DeviceScan();
-//        		}
-//        		FileOp.cleanFileMarks("list");
-//        	}
-//        	else if(newState.compareTo("removed") == 0)
-//        	{
-//        		//Log.w(path, "removed.........");
-//        		if (cur_path.startsWith(path)) {
-//        			cur_path = ROOT_PATH;
-//        			DeviceScan();
-//        		}
-//        		if (cur_path.equals(ROOT_PATH)) {
-//        			DeviceScan();
-//        		}        		
-//        	}
-//        }
-//        
-//    };
-
-	private String pathTransferForJB(String path) {
-		String pathout = path;
-
-		if (path.startsWith("/storage/sd")) {
-			if(path.contains("/storage/sdcard0")) {
-				pathout = path.replaceFirst("/storage/sdcard0", "/mnt/sdcard");
-			}
-			else {
-				pathout = path.replaceFirst("/storage/sd", "/mnt/sd");
-			}
-		}
-
-		return pathout;
-	}
 
     private BroadcastReceiver mMountReceiver = new BroadcastReceiver() {
         @Override
@@ -183,9 +123,7 @@ public class FileBrower extends Activity {
             
             if (action == null || path == null)
             	return;
-            
-            path = pathTransferForJB(path);
-            
+          
             if (action.equals(Intent.ACTION_MEDIA_EJECT)) {
         		if (cur_path.startsWith(path)) {
         			cur_path = ROOT_PATH;
@@ -308,23 +246,6 @@ public class FileBrower extends Activity {
         PowerManager pm = (PowerManager)getSystemService(Context.POWER_SERVICE);
         //mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, TAG);
 		mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
-
-		/* check whether use real sdcard*/
-		//isRealSD=Environment.isExternalStorageBeSdcard();
-		//isRealSD=false;
-		String path = System.getenv("INTERNAL_STORAGE");
-		if(path!=null) {
-			if(path.equals("/storage/sdcard0")) {
-				isRealSD = false;
-			}
-			else {
-				isRealSD = true;
-			}
-		}
-		else {
-			isRealSD = false;
-		}
-
                 
         /* setup database */
         db = new FileBrowerDatabase(this); 
@@ -395,7 +316,7 @@ public class FileBrower extends Activity {
                 	break;
                 case 4:		//file paste ok
 					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
-	    				+ "/mnt")));                       
+	    				+ ROOT_PATH)));                       
         			db.deleteAllFileMark();
         			lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
         			ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path);
@@ -552,7 +473,6 @@ public class FileBrower extends Activity {
 				ToggleButton btn_mode = (ToggleButton) findViewById(R.id.btn_mode); 
 				if (!btn_mode.isChecked()){
 					if (file.isDirectory()) {	
-						prev_path = cur_path;
 						cur_path = file_path;
 						lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
 					}
@@ -579,7 +499,6 @@ public class FileBrower extends Activity {
 					}
 					else 
 					{
-	        			prev_path = cur_path;
 						cur_path = file_path;
 						lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));	
 	        		}
@@ -595,64 +514,20 @@ public class FileBrower extends Activity {
 			}        	
         });      
         
-        /* lv OnItemLongClickListener */
-        /* TODO
-        lv.setOnItemLongClickListener(new OnItemLongClickListener() {
-			
-			public boolean onItemLongClick(AdapterView<?> parent, View view, int pos,
-					long id) {
-				Map<String, Object> item = (Map<String, Object>)parent.getItemAtPosition(pos);
-				
-				String file_path = (String) item.get("file_path");
-				File file = new File(file_path);
-				
-				if (file.isFile()) {	
-					showDialog(EDIT_DIALOG_ID);					
-				}
-				return false;
-			}
-		});
-        */
         /* btn_parent listener */
         Button btn_parent = (Button) findViewById(R.id.btn_parent);  
         btn_parent.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				if (!cur_path.equals(ROOT_PATH)) {
-					if(false==isRealSD)
-					{
-						if (cur_path.equals(EXT_SD)) 
-						{
-							cur_path=ROOT_PATH;
-							DeviceScan();
-						}
-						else
-						{
-							File file = new File(cur_path);
-							String parent_path = file.getParent();
-							prev_path = cur_path;
-							cur_path = parent_path;
-							if(parent_path.equals(ROOT_PATH)){
-								DeviceScan();
-							}
-							else{
-								lv.setAdapter(getFileListAdapterSorted(parent_path, lv_sort_flag));
-							
-							}
-						}
+					File file = new File(cur_path);
+					String parent_path = file.getParent();
+					if(cur_path.equals(NAND_PATH)||cur_path.equals(SD_PATH)||parent_path.equals(USB_PATH)) {
+						cur_path = ROOT_PATH;
+						DeviceScan();
 					}
-					else
-					{
-						File file = new File(cur_path);
-						String parent_path = file.getParent();
-						prev_path = cur_path;
+					else {
 						cur_path = parent_path;
-						if(parent_path.equals(ROOT_PATH)){
-							DeviceScan();
-						}
-						else{
-							lv.setAdapter(getFileListAdapterSorted(parent_path, lv_sort_flag));
-						
-						}
+						lv.setAdapter(getFileListAdapterSorted(parent_path, lv_sort_flag));
 					}
 				}
 			}        	
@@ -662,7 +537,6 @@ public class FileBrower extends Activity {
         Button btn_home = (Button) findViewById(R.id.btn_home);  
         btn_home.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {	
-				prev_path = cur_path;
 				cur_path = ROOT_PATH;
 				DeviceScan();
 			}        	
@@ -773,14 +647,7 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
     	String DeviceArray[]={internal,sdcard,usb,sdcardExt};
 
 		int length=0;
-		if(true==isRealSD)
-		{
-			length=DeviceArray.length-1;
-		}
-		else
-		{
-			length=DeviceArray.length;
-		}
+		length=DeviceArray.length;
 		
     	for(int i=0;i<length;i++){
     		if(FileOp.deviceExist(DeviceArray[i])){
@@ -809,61 +676,12 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
         	R.id.device_size
         	});  		
 	}
-/*
-	private List<? extends Map<String, ?>> getDeviceListData() {
-		// TODO Auto-generated method stub
-		String file_path = null;
-		String device = null;
-		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();              
-    	for(int i = 0; i < this.devList.size(); i++) {   
-    		Map<String, Object> map = new HashMap<String, Object>();    		
-    		map.put("item_name", this.devList.get(i)); 
-    		file_path = FileOp.convertDeviceName(this,this.devList.get(i));
-    		map.put("file_path", file_path);         
-    		map.put("item_size", null);
-    		map.put("item_rw", null);
-    		map.put("item_type", FileOp.getDeviceIcon(file_path));    		
-    		list.add(map); 
-    	}
-    	device = getString(R.string.rootDevice);
-    	updatePathShow(device);
-    	return list; 
-	}
-	*/
 	private List<Map<String, Object>> getDeviceListData() {
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>(); 
 		Map<String, Object> map;
-		/*
-		map = new HashMap<String, Object>();
-		map.put("item_name", getText(R.string.memory_device_str));
-		map.put("file_path", "/mnt/flash");
-		map.put("item_type", R.drawable.memory_default);
-		map.put("file_date", 0);
-		map.put("file_size", 0);
-		map.put("item_sel", R.drawable.item_img_unsel);
-		list.add(map);
-		
-		map = new HashMap<String, Object>();
-		map.put("item_name", getText(R.string.sdcard_device_str));
-		map.put("file_path", "/mnt/sdcard");
-		map.put("item_type", R.drawable.sdcard_default);
-		map.put("file_date", 0);
-		map.put("file_size", 0);
-		map.put("item_sel", R.drawable.item_img_unsel);
-		list.add(map);
-		
-		map = new HashMap<String, Object>();
-		map.put("item_name", getText(R.string.usb_device_str));
-		map.put("file_path", "/mnt/usb");
-		map.put("item_type", R.drawable.usb_default);
-		map.put("file_date", 0);
-		map.put("file_size", 0);
-		map.put("item_sel", R.drawable.item_img_unsel);
-		list.add(map);		
-		*/
-		int dev_count=0;
-        File dir = new File("/mnt");
-		if (dir.exists() && dir.isDirectory()) {
+		//int dev_count=0;
+        //File dir = new File(ROOT_PATH);
+		/*if (dir.exists() && dir.isDirectory()) {
 			if (dir.listFiles() != null) {
 				if (dir.listFiles().length > 0) {
 					for (File file : dir.listFiles()) {
@@ -936,23 +754,71 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 					}
 				}
 			}
+		}*/
+		File dir = new File(NAND_PATH);
+		if (dir.exists() && dir.isDirectory()) {
+			map = new HashMap<String, Object>();
+			map.put("item_name", getText(R.string.sdcard_device_str));
+			map.put("file_path", NAND_PATH);
+			map.put("item_type", R.drawable.sd_card_icon);
+			map.put("file_date", 0);
+			map.put("file_size", 1);	//for sort
+			map.put("item_size", null);
+			map.put("item_rw", null);
+			list.add(map);
 		}
 
-		if(false==isRealSD)
-		{
-			dir = new File(EXT_SD);
-			if (dir.exists() && dir.isDirectory())
-			{ 
-				map = new HashMap<String, Object>();
-				map.put("item_name", getText(R.string.ext_sdcard_device_str));
-				map.put("file_path", EXT_SD);
-				map.put("item_type", R.drawable.sd_card_icon);
-				map.put("file_date", 0);
-				map.put("file_size", 1);	//for sort
-				map.put("item_size", null);
-				map.put("item_rw", null);
-				list.add(map);
+		dir = new File(SD_PATH);
+		if (dir.exists() && dir.isDirectory()) { 
+			map = new HashMap<String, Object>();
+			map.put("item_name", getText(R.string.ext_sdcard_device_str));
+			map.put("file_path", SD_PATH);
+			map.put("item_type", R.drawable.sd_card_icon);
+			map.put("file_date", 0);
+			map.put("file_size", 1);	//for sort
+			map.put("item_size", null);
+			map.put("item_rw", null);
+			list.add(map);
+		}
+
+		dir = new File(USB_PATH);
+		if (dir.exists() && dir.isDirectory()) { 
+			if (dir.listFiles() != null) {
+				int dev_count=0;
+				for (File file : dir.listFiles()) {
+					if (file.isDirectory()) {
+						String devname = null;
+						String path = file.getAbsolutePath();
+						if (path.startsWith(USB_PATH+"/sd")&&!path.equals(SD_PATH)) {
+							map = new HashMap<String, Object>();
+							dev_count++;
+							char data = (char) ('A' +dev_count-1);
+							devname =  getText(R.string.usb_device_str) +"(" +data + ":)" ;
+							map.put("item_name", devname);
+							map.put("file_path", path);
+							map.put("item_type", R.drawable.usb_card_icon);
+							map.put("file_date", 0);
+							map.put("file_size", 3);	//for sort
+				    		map.put("item_size", null);
+				    		map.put("item_rw", null);
+							list.add(map);	
+						}
+					}
+				}
 			}
+		}
+
+		dir = new File(SATA_PATH);
+		if (dir.exists() && dir.isDirectory()) { 
+			map = new HashMap<String, Object>();
+			map.put("item_name", getText(R.string.sata_device_str));
+			map.put("file_path", SATA_PATH);
+			map.put("item_type", R.drawable.sata_icon);
+			map.put("file_date", 0);
+			map.put("file_size", 1);	//for sort
+			map.put("item_size", null);
+			map.put("item_rw", null);
+			list.add(map);	
 		}
 		
 		updatePathShow(ROOT_PATH);
@@ -1146,30 +1012,9 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 					    	if (!mWakeLock.isHeld())
 						    	mWakeLock.acquire(); 
 
-							if(false==isRealSD)
+							if(cur_path.startsWith(SD_PATH))
 							{
-								if(cur_path.startsWith(EXT_SD))
-								{
-									if(Environment.getExternalStorage2State().equals(Environment.MEDIA_MOUNTED))
-									{
-										new Thread () {
-				        					public void run () {
-				        						try {   
-				        							FileOp.pasteSelectedFile("list");
-				        						} catch(Exception e) {
-				        							Log.e("Exception when paste file", e.toString());
-				        						}
-				        					}
-				        				}.start();
-									}
-									else
-									{
-										Toast.makeText(FileBrower.this,
-		        							getText(R.string.Toast_no_sdcard),
-		        							Toast.LENGTH_SHORT).show();
-									}
-								}
-								else
+								if(Environment.getExternalStorage2State().equals(Environment.MEDIA_MOUNTED))
 								{
 									new Thread () {
 			        					public void run () {
@@ -1181,42 +1026,24 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 			        					}
 			        				}.start();
 								}
-							} 
+								else
+								{
+									Toast.makeText(FileBrower.this,
+	        							getText(R.string.Toast_no_sdcard),
+	        							Toast.LENGTH_SHORT).show();
+								}
+							}
 							else
 							{
-								if(cur_path.startsWith("/mnt/sdcard"))
-								{
-									if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
-									{
-										new Thread () {
-				        					public void run () {
-				        						try {   
-				        							FileOp.pasteSelectedFile("list");
-				        						} catch(Exception e) {
-				        							Log.e("Exception when paste file", e.toString());
-				        						}
-				        					}
-				        				}.start();
-									}
-									else
-									{
-										Toast.makeText(FileBrower.this,
-		        							getText(R.string.Toast_no_sdcard),
-		        							Toast.LENGTH_SHORT).show();
-									}
-								}
-								else
-								{
-									new Thread () {
-			        					public void run () {
-			        						try {   
-			        							FileOp.pasteSelectedFile("list");
-			        						} catch(Exception e) {
-			        							Log.e("Exception when paste file", e.toString());
-			        						}
-			        					}
-			        				}.start();
-								}
+								new Thread () {
+		        					public void run () {
+		        						try {   
+		        							FileOp.pasteSelectedFile("list");
+		        						} catch(Exception e) {
+		        							Log.e("Exception when paste file", e.toString());
+		        						}
+		        					}
+		        				}.start();
 							}
             			}
             			else if (pos == 3) {
@@ -1224,7 +1051,7 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
             				//Log.i(TAG, "DO delete...");   
             				if (FileOpReturn.SUCCESS == FileOp.deleteSelectedFile("list")) {
             					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
-				    				+ "/mnt")));
+				    				+ ROOT_PATH)));
             					db.deleteAllFileMark(); 
                 				lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
                 				Toast.makeText(FileBrower.this,
@@ -1431,7 +1258,7 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 	    			if(mRenameFile.renameTo(new File(newFileName)))
 	    			{
 	    				sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
-				    				+ "/mnt")));
+				    				+ ROOT_PATH)));
 						db.deleteAllFileMark(); 
 	    				lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
 	    			}
@@ -1528,13 +1355,9 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
             	        	Map<String, Object> map = new HashMap<String, Object>();    
             	        	String file_abs_path = file.getAbsolutePath();
 							
-							if(false==isRealSD)
-							{
-								if (file_abs_path.equals(EXT_SD)) 
-								{
-									continue;
-								}
-							}
+							//shield external_sdcard and usbdrive under /storage/sdcard0/
+							if ((file_abs_path.equals(SD_PATH)) ||(file_abs_path.equals(USB_PATH)) || (file_abs_path.equals(SHEILD_EXT_STOR)))
+								continue;
 
 							map.put("item_name", file.getName()); 
             	        	map.put("file_path", file_abs_path);
@@ -1696,14 +1519,10 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
             			        					
             	        	Map<String, Object> map = new HashMap<String, Object>();   
             	        	String file_abs_path = file.getAbsolutePath();
-							
-							if(false==isRealSD)
-							{
-								if (file_abs_path.equals(EXT_SD)) 
-								{
-									continue;
-								}
-							}
+
+							//shield external_sdcard and usbdrive under /storage/sdcard0/
+							if ((file_abs_path.equals(SD_PATH)) || (file_abs_path.equals(USB_PATH)) || (file_abs_path.equals(SHEILD_EXT_STOR)))
+								continue;
 							
 							map.put("item_name", file.getName()); 
             	        	map.put("file_path", file_abs_path);

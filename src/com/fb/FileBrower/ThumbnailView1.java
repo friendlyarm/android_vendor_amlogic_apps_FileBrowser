@@ -69,7 +69,13 @@ public class ThumbnailView1 extends Activity{
 	
 	private boolean mMediaScannerRunning;
 	private PowerManager.WakeLock mWakeLock;
-	private static final String ROOT_PATH = "/mnt";
+	private static final String ROOT_PATH = "/storage";
+	private static final String SHEILD_EXT_STOR = "/storage/sdcard0/external_storage";
+	private static final String NAND_PATH = "/storage/sdcard0";
+	private static final String SD_PATH = "/storage/external_storage/sdcard1";
+	private static final String USB_PATH ="/storage/external_storage";
+	private static final String SATA_PATH ="/storage/external_storage/sata";
+	
 	public static String cur_path = ROOT_PATH;
 	protected static final int SORT_DIALOG_ID = 0;
 	protected static final int EDIT_DIALOG_ID = 1;
@@ -91,8 +97,6 @@ public class ThumbnailView1 extends Activity{
 	private ToggleButton btn_mode;
 	private String lv_sort_flag = "by_name"; 
 	private boolean isInFileBrowserView=false;
-	private boolean isRealSD=false;
-	private static final String EXT_SD="/mnt/sdcard/external_sdcard";
 	
 	private void updateThumbnials() {
        // sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://"
@@ -106,35 +110,7 @@ public class ThumbnailView1 extends Activity{
 	private List<Map<String, Object>> getDeviceListData() {
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>(); 
 		Map<String, Object> map;
-		/*
-		map = new HashMap<String, Object>();
-		map.put("item_name", getText(R.string.memory_device_str));
-		map.put("file_path", "/mnt/flash");
-		map.put("item_type", R.drawable.memory_default);
-		map.put("file_date", 0);
-		map.put("file_size", 0);
-		map.put("item_sel", R.drawable.item_img_unsel);
-		list.add(map);
-		
-		map = new HashMap<String, Object>();
-		map.put("item_name", getText(R.string.sdcard_device_str));
-		map.put("file_path", "/mnt/sdcard");
-		map.put("item_type", R.drawable.sdcard_default);
-		map.put("file_date", 0);
-		map.put("file_size", 0);
-		map.put("item_sel", R.drawable.item_img_unsel);
-		list.add(map);
-		
-		map = new HashMap<String, Object>();
-		map.put("item_name", getText(R.string.usb_device_str));
-		map.put("file_path", "/mnt/usb");
-		map.put("item_type", R.drawable.usb_default);
-		map.put("file_date", 0);
-		map.put("file_size", 0);
-		map.put("item_sel", R.drawable.item_img_unsel);
-		list.add(map);		
-		*/
-        File dir = new File("/mnt");
+        /*File dir = new File(ROOT_PATH);
 		if (dir.exists() && dir.isDirectory()) {
 			if (dir.listFiles() != null) {
 				if (dir.listFiles().length > 0) {
@@ -198,23 +174,67 @@ public class ThumbnailView1 extends Activity{
 					}
 				}
 			}
+		}*/
+
+		File dir = new File(NAND_PATH);
+		if (dir.exists() && dir.isDirectory()) {
+			map = new HashMap<String, Object>();
+			map.put("item_name", getText(R.string.sdcard_device_str));
+			map.put("file_path", NAND_PATH);
+			map.put("item_type", R.drawable.sdcard_default);
+			map.put("file_date", 0);
+			map.put("file_size", 1);	//for sort
+			map.put("item_sel", R.drawable.item_img_unsel);
+			list.add(map);	
 		}
 
-		if(false==isRealSD)
-		{
-			dir = new File(EXT_SD);
-			if (dir.exists() && dir.isDirectory())
-			{
-				map = new HashMap<String, Object>();
-				map.put("item_name", getText(R.string.ext_sdcard_device_str));
-				map.put("file_path", EXT_SD);
-				map.put("item_type", R.drawable.sdcard_default);
-				map.put("file_date", 0);
-				map.put("file_size", 1);	//for sort
-				map.put("item_sel", R.drawable.item_img_unsel);
-				list.add(map);								
+		dir = new File(SD_PATH);
+		if (dir.exists() && dir.isDirectory()) { 
+			map = new HashMap<String, Object>();
+			map.put("item_name", getText(R.string.ext_sdcard_device_str));
+			map.put("file_path", SD_PATH);
+			map.put("item_type", R.drawable.sdcard_default);
+			map.put("file_date", 0);
+			map.put("file_size", 1);	//for sort
+			map.put("item_sel", R.drawable.item_img_unsel);
+			list.add(map);
+		}
+		
+		dir = new File(USB_PATH);
+		if (dir.exists() && dir.isDirectory()) { 
+			if (dir.listFiles() != null) {
+				for (File file : dir.listFiles()) {
+					if (file.isDirectory()) {
+						String devname = null;
+						String path = file.getAbsolutePath();
+						if (path.startsWith(USB_PATH+"/sd")&&!path.equals(SD_PATH)) {
+							map = new HashMap<String, Object>();
+							map.put("item_name", getText(R.string.usb_device_str) + 
+									" " + file.getName());
+							map.put("file_path", path);
+							map.put("item_type", R.drawable.usb_default);
+							map.put("file_date", 0);
+							map.put("file_size", 3);	//for sort
+							map.put("item_sel", R.drawable.item_img_unsel);
+							list.add(map);	
+						}
+					}
+				}
 			}
 		}
+
+		dir = new File(SATA_PATH);
+		if (dir.exists() && dir.isDirectory()) { 
+			map = new HashMap<String, Object>();
+			map.put("item_name", getText(R.string.sata_device_str));
+			map.put("file_path", SATA_PATH);
+			map.put("item_type", R.drawable.sata_default);
+			map.put("file_date", 0);
+			map.put("file_size", 1);	//for sort
+			map.put("item_sel", R.drawable.item_img_unsel);
+			list.add(map);
+		}
+		
 		updatePathShow(ROOT_PATH);
     	if (!list.isEmpty()) { 
         		Collections.sort(list, new Comparator<Map<String, Object>>() {
@@ -291,13 +311,8 @@ public class ThumbnailView1 extends Activity{
             	        	String temp_name = FileOp.getShortName(file.getAbsolutePath());
             	        	String file_abs_path = file.getAbsolutePath();
 
-							if(false==isRealSD)
-							{
-								if (file_abs_path.equals(EXT_SD)) 
-								{
-									continue;
-								}
-							}
+							if ((file_abs_path.equals(SD_PATH)) ||(file_abs_path.equals(USB_PATH)) || (file_abs_path.equals(SHEILD_EXT_STOR)))
+								continue;
 
 							map.put("item_name", temp_name);  
             	        	map.put("file_path", file_abs_path);
@@ -342,9 +357,6 @@ public class ThumbnailView1 extends Activity{
             	        		
             	        		long file_size = file.length();
             	        		map.put("file_size", file_size);	//use for sorting
-
-            	        		
-            	        		
             	        	}
             	        	
             	        	//list.add(map);    
@@ -404,13 +416,8 @@ public class ThumbnailView1 extends Activity{
             	        	String temp_name = FileOp.getShortName(file.getAbsolutePath());
             	        	String file_abs_path = file.getAbsolutePath();
 
-							if(false==isRealSD)
-							{
-								if (file_abs_path.equals(EXT_SD)) 
-								{
-									continue;
-								}
-							}
+							if ((file_abs_path.equals(SD_PATH)) ||(file_abs_path.equals(USB_PATH)) || (file_abs_path.equals(SHEILD_EXT_STOR)))
+								continue;
 							
 							map.put("item_name", temp_name); 
             	        	map.put("file_path", file_abs_path);
@@ -454,9 +461,6 @@ public class ThumbnailView1 extends Activity{
             	        		
             	        		long file_size = file.length();
             	        		map.put("file_size", file_size);	//use for sorting
-
-            	        		
-            	        		
             	        	}
             	        	
             	        	//list.add(map); 
@@ -632,21 +636,6 @@ public class ThumbnailView1 extends Activity{
 //        
 //    };
 
-	private String pathTransferForJB(String path) {
-		String pathout = path;
-
-		if (path.startsWith("/storage/sd")) {
-			if(path.contains("/storage/sdcard0")) {
-				pathout = path.replaceFirst("/storage/sdcard0", "/mnt/sdcard");
-			}
-			else {
-				pathout = path.replaceFirst("/storage/sd", "/mnt/sd");
-			}
-		}
-
-		return pathout;
-	}
-
     private BroadcastReceiver mMountReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -655,9 +644,7 @@ public class ThumbnailView1 extends Activity{
             String path = uri.getPath();  
             
             if (action == null || path == null)
-            	return;            
-            
-            path = pathTransferForJB(path);    
+            	return;               
 
             if (action.equals(Intent.ACTION_MEDIA_EJECT)) {
         		if (cur_path.startsWith(path)) {
@@ -804,21 +791,6 @@ public class ThumbnailView1 extends Activity{
     			cur_path = ROOT_PATH;
     	} else
     		cur_path = ROOT_PATH; 
-
-		/* check whether use real sdcard*/
-		//isRealSD=Environment.isExternalStorageBeSdcard();
-		String path = System.getenv("INTERNAL_STORAGE");
-		if(path!=null) {
-			if(path.equals("/storage/sdcard0")) {
-				isRealSD = false;
-			}
-			else {
-				isRealSD = true;
-			}
-		}
-		else {
-			isRealSD = false;
-		}
 		
         /* setup database */
         FileOp.SetMode(false);
@@ -899,7 +871,7 @@ public class ThumbnailView1 extends Activity{
                 case 4:		//file paste ok
                 	updateThumbnials();
 					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
-	    				+ "/mnt")));                	
+	    				+ ROOT_PATH)));                	
         			db.deleteAllFileMark();
         			//GetCurrentFilelist(cur_path,cur_sort_type);   
                 	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));  
@@ -1135,52 +1107,13 @@ public class ThumbnailView1 extends Activity{
         btn_thumbparent.setOnClickListener(new OnClickListener() {
     		public void onClick(View v) {  
     			if (!cur_path.equals(ROOT_PATH)) {
-					if(false==isRealSD)
-					{
-						if (cur_path.equals(EXT_SD)) 
-						{
-							cur_path=ROOT_PATH;
-							ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
-						}
-						else
-						{
-							File file = new File(cur_path);
-							String parent_path = file.getParent();
-							
-							cur_path = parent_path;
-							if(parent_path.equals(ROOT_PATH)){
-								cur_path = parent_path;
-								//DeviceScan();
-			                	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
-							}
-							else{
-								 cur_path = parent_path;
-								// GetCurrentFilelist(cur_path,cur_sort_type);
-				                ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
-								 //ThumbnailView.setAdapter(getThumbnailAdapter(parent_path,cur_sort_type)); 
-							
-							}
-						}
-					}
-					else
-					{
-						File file = new File(cur_path);
-						String parent_path = file.getParent();
-						
+					File file = new File(cur_path);
+					String parent_path = file.getParent();
+					if(cur_path.equals(NAND_PATH)||cur_path.equals(SD_PATH)||parent_path.equals(USB_PATH)) 
+						cur_path = ROOT_PATH;
+					else 
 						cur_path = parent_path;
-						if(parent_path.equals(ROOT_PATH)){
-							cur_path = parent_path;
-							//DeviceScan();
-		                	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
-						}
-						else{
-							 cur_path = parent_path;
-							// GetCurrentFilelist(cur_path,cur_sort_type);
-			                ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
-							 //ThumbnailView.setAdapter(getThumbnailAdapter(parent_path,cur_sort_type)); 
-						
-						}
-					}
+					ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
 				}
     		}
     		   			       		
@@ -1680,31 +1613,10 @@ public class ThumbnailView1 extends Activity{
             				//Log.i(TAG, "DO paste...");     
 					    	if (!mWakeLock.isHeld())
 						    	mWakeLock.acquire(); 
-         				
-            				if(false==isRealSD)
+         			
+							if(cur_path.startsWith(SD_PATH))
 							{
-								if(cur_path.startsWith(EXT_SD))
-								{
-									if(Environment.getExternalStorage2State().equals(Environment.MEDIA_MOUNTED))
-									{
-										new Thread () {
-				        					public void run () {
-				        						try {   
-				        							FileOp.pasteSelectedFile("thumbnail1");
-				        						} catch(Exception e) {
-				        							Log.e("Exception when paste file", e.toString());
-				        						}
-				        					}
-				        				}.start();
-									}
-									else
-									{
-										Toast.makeText(ThumbnailView1.this,
-		        							getText(R.string.Toast_no_sdcard),
-		        							Toast.LENGTH_SHORT).show();
-									}
-								}
-								else
+								if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
 								{
 									new Thread () {
 			        					public void run () {
@@ -1716,44 +1628,25 @@ public class ThumbnailView1 extends Activity{
 			        					}
 			        				}.start();
 								}
-							} 
-							else
-							{
-								if(cur_path.startsWith("/mnt/sdcard"))
-								{
-									if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
-									{
-										new Thread () {
-				        					public void run () {
-				        						try {   
-				        							FileOp.pasteSelectedFile("thumbnail1");
-				        						} catch(Exception e) {
-				        							Log.e("Exception when paste file", e.toString());
-				        						}
-				        					}
-				        				}.start();
-									}
-									else
-									{
-										Toast.makeText(ThumbnailView1.this,
-		        							getText(R.string.Toast_no_sdcard),
-		        							Toast.LENGTH_SHORT).show();
-									}
-								}
 								else
 								{
-									new Thread () {
-			        					public void run () {
-			        						try {   
-			        							FileOp.pasteSelectedFile("thumbnail1");
-			        						} catch(Exception e) {
-			        							Log.e("Exception when paste file", e.toString());
-			        						}
-			        					}
-			        				}.start();
+									Toast.makeText(ThumbnailView1.this,
+	        							getText(R.string.Toast_no_sdcard),
+	        							Toast.LENGTH_SHORT).show();
 								}
 							}
-            				            				
+							else
+							{
+								new Thread () {
+		        					public void run () {
+		        						try {   
+		        							FileOp.pasteSelectedFile("thumbnail1");
+		        						} catch(Exception e) {
+		        							Log.e("Exception when paste file", e.toString());
+		        						}
+		        					}
+		        				}.start();
+							}
             			}
             			else if (pos == 3) {
             				FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
@@ -1761,7 +1654,7 @@ public class ThumbnailView1 extends Activity{
             				updateThumbnials();
             				if (FileOpReturn.SUCCESS == FileOp.deleteSelectedFile("thumbnail1")) {
             					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
-				    				+ "/mnt")));
+				    				+ ROOT_PATH)));
             					db.deleteAllFileMark();
             					//GetCurrentFilelist(cur_path,cur_sort_type);
                             	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
