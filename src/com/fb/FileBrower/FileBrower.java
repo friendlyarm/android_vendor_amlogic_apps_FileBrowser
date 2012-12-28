@@ -286,6 +286,8 @@ public class FileBrower extends Activity {
                 		pb = (ProgressBar) edit_dialog.findViewById(R.id.edit_progress_bar);
 						tvForPaste=(TextView)edit_dialog.findViewById(R.id.text_view_paste);
                 	}
+
+				Log.i("wxl","msg.what:"+msg.what);
               	
                 switch(msg.what) {
                 case 0: 	//set invisible
@@ -413,7 +415,10 @@ public class FileBrower extends Activity {
                     if (edit_dialog != null)
                     	edit_dialog.dismiss();   
     				if (mWakeLock.isHeld())
-    					mWakeLock.release();  
+    					mWakeLock.release(); 
+
+					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
+	    				+ ROOT_PATH))); 
 
 					if(tvForPaste!=null)
 					{

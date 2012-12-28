@@ -979,6 +979,9 @@ public class ThumbnailView1 extends Activity{
                     	edit_dialog.dismiss();   
     				if (mWakeLock.isHeld())
     					mWakeLock.release(); 
+
+					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
+	    				+ ROOT_PATH))); 
     					
     				if(tvForPaste!=null)
 					{
