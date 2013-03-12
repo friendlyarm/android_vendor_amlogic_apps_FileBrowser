@@ -152,6 +152,7 @@ public class FileOp {
     /* file type extensions */
     //video from layer
     public static final String[] video_extensions = { ".3gp",
+    	".3g2",
         ".divx",
         ".h264",
         ".avi",
@@ -174,6 +175,7 @@ public class FileOp {
         ".f4v",
         ".asf",
         ".lst",
+        ".mts",
         ".webm",
         ".mpe",
        /* "" */
@@ -603,6 +605,7 @@ public class FileOp {
             }
             source_path = null;
             target_path = null;
+			out.force(true);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

@@ -287,7 +287,7 @@ public class FileBrower extends Activity {
 						tvForPaste=(TextView)edit_dialog.findViewById(R.id.text_view_paste);
                 	}
 
-				Log.i("wxl","msg.what:"+msg.what);
+				//Log.i(TAG,"msg.what:"+msg.what);
               	
                 switch(msg.what) {
                 case 0: 	//set invisible
