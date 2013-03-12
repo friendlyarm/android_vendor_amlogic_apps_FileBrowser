@@ -1,6 +1,7 @@
 package com.fb.FileBrower;
 
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -610,6 +611,9 @@ public class FileUtils
             FileOutputStream output = new FileOutputStream(destFile);
             try {
                 IOUtils.copy(input, output);
+				FileDescriptor fd = output.getFD();
+				if(fd.valid())
+					fd.sync();
             } finally {
                 IOUtils.closeQuietly(output);
             }
@@ -910,6 +914,9 @@ public class FileUtils
             FileOutputStream output = openOutputStream(destination);
             try {
                 IOUtils.copy(input, output);
+				FileDescriptor fd = output.getFD();
+				if(fd.valid())
+					fd.sync();
             } finally {
                 IOUtils.closeQuietly(output);
             }
