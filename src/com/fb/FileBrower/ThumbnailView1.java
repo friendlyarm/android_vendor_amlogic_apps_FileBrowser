@@ -223,6 +223,29 @@ public class ThumbnailView1 extends Activity{
 			}
 		}
 
+		dir = new File(USB_PATH);
+		if (dir.exists() && dir.isDirectory()) { 
+			if (dir.listFiles() != null) {
+				for (File file : dir.listFiles()) {
+					if (file.isDirectory()) {
+						String devname = null;
+						String path = file.getAbsolutePath();
+						if (path.startsWith(USB_PATH+"/sr")&&!path.equals(SD_PATH)) {
+							map = new HashMap<String, Object>();
+							map.put("item_name", getText(R.string.cdrom_device_str) + 
+									" " + file.getName());
+							map.put("file_path", path);
+							map.put("item_type", R.drawable.cd_rom_default);
+							map.put("file_date", 0);
+							map.put("file_size", 3);	//for sort
+							map.put("item_sel", R.drawable.item_img_unsel);
+							list.add(map);	
+						}
+					}
+				}
+			}
+		}
+
 		dir = new File(SATA_PATH);
 		if (dir.exists() && dir.isDirectory()) { 
 			map = new HashMap<String, Object>();

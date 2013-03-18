@@ -75,6 +75,7 @@ DROP TABLE IF EXISTS file_thumbnails_table
 	<string name="ext_sdcard_device_str">External Storage Card</string>
 	<string name="sata_device_str">SATA</string>
 	<string name="usb_device_str">USB</string>
+	<string name="cdrom_device_str">CD ROM</string>
 	<string name="Toast_copy_fail">Copy Failed</string>
 	<string name="Toast_no_sdcard">No TF Card!</string>
 </resources>

@@ -643,13 +643,14 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 }   
     
     private void DeviceScan() {
-		// TODO Auto-generated method stub
-    	devList.clear();
-    	String internal = getString(R.string.memory_device_str);
-    	String sdcard = getString(R.string.sdcard_device_str);
-    	String usb = getString(R.string.usb_device_str);
-		String sdcardExt = getString(R.string.ext_sdcard_device_str);
-    	String DeviceArray[]={internal,sdcard,usb,sdcardExt};
+        // TODO Auto-generated method stub
+        devList.clear();
+        String internal = getString(R.string.memory_device_str);
+        String sdcard = getString(R.string.sdcard_device_str);
+        String usb = getString(R.string.usb_device_str);
+        String cdrom = getString(R.string.cdrom_device_str);
+        String sdcardExt = getString(R.string.ext_sdcard_device_str);
+        String DeviceArray[]={internal,sdcard,usb,cdrom,sdcardExt};
 
 		int length=0;
 		length=DeviceArray.length;
@@ -812,6 +813,33 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 				}
 			}
 		}
+
+        dir = new File(USB_PATH);
+        if (dir.exists() && dir.isDirectory()) { 
+            if (dir.listFiles() != null) {
+                int dev_count=0;
+                for (File file : dir.listFiles()) {
+                    if (file.isDirectory()) {
+                        String devname = null;
+                        String path = file.getAbsolutePath();
+                        if (path.startsWith(USB_PATH+"/sr")&&!path.equals(SD_PATH)) {
+                            map = new HashMap<String, Object>();
+                            dev_count++;
+                            char data = (char) ('A' +dev_count-1);
+                            devname =  getText(R.string.cdrom_device_str) +"(" +data + ":)" ;
+                            map.put("item_name", devname);
+                            map.put("file_path", path);
+                            map.put("item_type", R.drawable.cd_rom_icon);
+                            map.put("file_date", 0);
+                            map.put("file_size", 3);	//for sort
+                            map.put("item_size", null);
+                            map.put("item_rw", null);
+                            list.add(map);	
+                        }
+                    }
+                }
+            }
+        }
 
 		dir = new File(SATA_PATH);
 		if (dir.exists() && dir.isDirectory()) { 

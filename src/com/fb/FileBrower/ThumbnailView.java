@@ -464,14 +464,15 @@ public class ThumbnailView extends Activity{
     	db.close();
     }
     protected void DeviceScan() {
-    	// TODO Auto-generated method stub
-    	List<String> dev_list = new ArrayList<String>();
-    	filelist.clear();
-    	String internal = getString(R.string.memory_device_str);
-    	String sdcard = getString(R.string.sdcard_device_str);
-    	String usb = getString(R.string.usb_device_str);
-    	
-    	String DeviceArray[]={internal,sdcard,usb};   	
+        // TODO Auto-generated method stub
+        List<String> dev_list = new ArrayList<String>();
+        filelist.clear();
+        String internal = getString(R.string.memory_device_str);
+        String sdcard = getString(R.string.sdcard_device_str);
+        String usb = getString(R.string.usb_device_str);
+        String cdrom = getString(R.string.cdrom_device_str);
+
+        String DeviceArray[]={internal,sdcard,usb,cdrom};   	
     	for(int i=0;i<DeviceArray.length;i++){
     		if(FileOp.deviceExist(DeviceArray[i])){
     			dev_list.add(DeviceArray[i]);
