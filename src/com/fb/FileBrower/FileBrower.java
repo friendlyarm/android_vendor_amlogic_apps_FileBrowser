@@ -475,48 +475,54 @@ public class FileBrower extends Activity {
 					return;
 				}
 
-				ToggleButton btn_mode = (ToggleButton) findViewById(R.id.btn_mode); 
-				if (!btn_mode.isChecked()){
-					if (file.isDirectory()) {	
-						cur_path = file_path;
-						lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
-					}
-					else
-					{
-						openFile(file);
-						//showDialog(CLICK_DIALOG_ID);
-					}
-					
-				}
-				else {
-					if (!cur_path.equals(ROOT_PATH))
-					{
-						if (item.get("item_sel").equals(R.drawable.item_img_unsel)) {
-						FileOp.updateFileStatus(file_path, 1,"list");
-						item.put("item_sel", R.drawable.item_img_sel);
+                if(Intent.ACTION_GET_CONTENT.equalsIgnoreCase(FileBrower.this.getIntent().getAction())) {
+                    FileBrower.this.setResult(Activity.RESULT_OK,new Intent(null, Uri.fromFile(file)));
+                    FileBrower.this.finish();
+                }
+                else {
+					ToggleButton btn_mode = (ToggleButton) findViewById(R.id.btn_mode); 
+					if (!btn_mode.isChecked()){
+						if (file.isDirectory()) {	
+							cur_path = file_path;
+							lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
 						}
-						else if (item.get("item_sel").equals(R.drawable.item_img_sel)) {
-							FileOp.updateFileStatus(file_path, 0,"list");
-							item.put("item_sel", R.drawable.item_img_unsel);
+						else
+						{
+							openFile(file);
+							//showDialog(CLICK_DIALOG_ID);
 						}
 					
-						((BaseAdapter) lv.getAdapter()).notifyDataSetChanged();	
 					}
-					else 
-					{
-						cur_path = file_path;
-						lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));	
-	        		}
-				}
+					else {
+						if (!cur_path.equals(ROOT_PATH))
+						{
+							if (item.get("item_sel").equals(R.drawable.item_img_unsel)) {
+							FileOp.updateFileStatus(file_path, 1,"list");
+							item.put("item_sel", R.drawable.item_img_sel);
+							}
+							else if (item.get("item_sel").equals(R.drawable.item_img_sel)) {
+								FileOp.updateFileStatus(file_path, 0,"list");
+								item.put("item_sel", R.drawable.item_img_unsel);
+							}
+					
+							((BaseAdapter) lv.getAdapter()).notifyDataSetChanged();	
+						}
+						else 
+						{
+							cur_path = file_path;
+							lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));	
+		        		}
+					}
 				
-				item_position_selected = lv.getSelectedItemPosition();
-				item_position_first = lv.getFirstVisiblePosition();
-				item_position_last = lv.getLastVisiblePosition();
-				View cv = lv.getChildAt(item_position_selected - item_position_first);
-			    if (cv != null) {
-			        fromtop_piexl = cv.getTop();
-			    }
-			}        	
+					item_position_selected = lv.getSelectedItemPosition();
+					item_position_first = lv.getFirstVisiblePosition();
+					item_position_last = lv.getLastVisiblePosition();
+					View cv = lv.getChildAt(item_position_selected - item_position_first);
+				    if (cv != null) {
+				        fromtop_piexl = cv.getTop();
+				    }
+				}        	
+			}
         });      
         
         /* btn_parent listener */

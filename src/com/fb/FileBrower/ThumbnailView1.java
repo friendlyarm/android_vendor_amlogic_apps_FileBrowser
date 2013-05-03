@@ -1059,39 +1059,44 @@ public class ThumbnailView1 extends Activity{
 					return;
 				}
 
-				
-				ToggleButton btn_mode = (ToggleButton) findViewById(R.id.btn_thumbmode); 
-				if (!btn_mode.isChecked()){
-					if (file.isDirectory()) {						
-						cur_path = file_path;
-						//GetCurrentFilelist(cur_path,cur_sort_type);
-	                	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
-						//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type)); 
-					}
-					else
-					{
-						openFile(file_path);
-					}
-					
-				}
-				else {	
-					if (!cur_path.equals(ROOT_PATH))
-					{
-						if (item.get("item_sel").equals(R.drawable.item_img_unsel)) {
-						FileOp.updateFileStatus(file_path, 1,"thumbnail1");
-						item.put("item_sel", R.drawable.item_img_sel);
+                if(Intent.ACTION_GET_CONTENT.equalsIgnoreCase(ThumbnailView1.this.getIntent().getAction())) {
+                    ThumbnailView1.this.setResult(Activity.RESULT_OK,new Intent(null, Uri.fromFile(file)));
+                    ThumbnailView1.this.finish();
+                }
+                else {
+					ToggleButton btn_mode = (ToggleButton) findViewById(R.id.btn_thumbmode); 
+					if (!btn_mode.isChecked()){
+						if (file.isDirectory()) {						
+							cur_path = file_path;
+							//GetCurrentFilelist(cur_path,cur_sort_type);
+		                	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+							//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type)); 
 						}
-						else if (item.get("item_sel").equals(R.drawable.item_img_sel)) {
-							FileOp.updateFileStatus(file_path, 0,"thumbnail1");
-							item.put("item_sel", R.drawable.item_img_unsel);
+						else
+						{
+							openFile(file_path);
 						}
 					
-						((BaseAdapter) ThumbnailView.getAdapter()).notifyDataSetChanged();
 					}
-					else
-					{
-		    			cur_path = file_path;
-	                	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));					
+					else {	
+						if (!cur_path.equals(ROOT_PATH))
+						{
+							if (item.get("item_sel").equals(R.drawable.item_img_unsel)) {
+							FileOp.updateFileStatus(file_path, 1,"thumbnail1");
+							item.put("item_sel", R.drawable.item_img_sel);
+							}
+							else if (item.get("item_sel").equals(R.drawable.item_img_sel)) {
+								FileOp.updateFileStatus(file_path, 0,"thumbnail1");
+								item.put("item_sel", R.drawable.item_img_unsel);
+							}
+					
+							((BaseAdapter) ThumbnailView.getAdapter()).notifyDataSetChanged();
+						}
+						else
+						{
+			    			cur_path = file_path;
+		                	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));					
+						}
 					}
 				}
 			}			
