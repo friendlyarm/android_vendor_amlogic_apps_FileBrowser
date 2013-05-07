@@ -1060,8 +1060,16 @@ public class ThumbnailView1 extends Activity{
 				}
 
                 if(Intent.ACTION_GET_CONTENT.equalsIgnoreCase(ThumbnailView1.this.getIntent().getAction())) {
-                    ThumbnailView1.this.setResult(Activity.RESULT_OK,new Intent(null, Uri.fromFile(file)));
-                    ThumbnailView1.this.finish();
+                    if (file.isDirectory()) {						
+						cur_path = file_path;
+						//GetCurrentFilelist(cur_path,cur_sort_type);
+	                	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+						//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type)); 
+					}
+                    else {
+                        ThumbnailView1.this.setResult(Activity.RESULT_OK,new Intent(null, Uri.fromFile(file)));
+                        ThumbnailView1.this.finish();
+                    }
                 }
                 else {
 					ToggleButton btn_mode = (ToggleButton) findViewById(R.id.btn_thumbmode); 

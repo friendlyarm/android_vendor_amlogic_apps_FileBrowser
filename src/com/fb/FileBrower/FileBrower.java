@@ -476,8 +476,14 @@ public class FileBrower extends Activity {
 				}
 
                 if(Intent.ACTION_GET_CONTENT.equalsIgnoreCase(FileBrower.this.getIntent().getAction())) {
-                    FileBrower.this.setResult(Activity.RESULT_OK,new Intent(null, Uri.fromFile(file)));
-                    FileBrower.this.finish();
+                    if (file.isDirectory()) {	
+						cur_path = file_path;
+						lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+					}
+                    else {
+                        FileBrower.this.setResult(Activity.RESULT_OK,new Intent(null, Uri.fromFile(file)));
+                        FileBrower.this.finish();
+                    }
                 }
                 else {
 					ToggleButton btn_mode = (ToggleButton) findViewById(R.id.btn_mode); 
