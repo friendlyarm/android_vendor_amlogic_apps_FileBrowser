@@ -78,4 +78,5 @@ DROP TABLE IF EXISTS file_thumbnails_table
 	<string name="cdrom_device_str">光盘驱动器</string>
 	<string name="Toast_copy_fail">拷贝失败！</string>
 	<string name="Toast_no_sdcard">TF卡不存在！</string>
+	<string name="Thumbnail_unsupport">添加附件时不支持缩略图模式. </string>
 </resources>

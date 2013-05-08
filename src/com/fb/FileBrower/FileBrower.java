@@ -175,100 +175,7 @@ public class FileBrower extends Activity {
         super.onResume();
         //StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
 		//m_storagemgr.registerListener(mListener);
-		
-        // install an intent filter to receive SD card related events.
-        IntentFilter intentFilter =
-                new IntentFilter(Intent.ACTION_MEDIA_MOUNTED);
-        intentFilter.addAction(Intent.ACTION_MEDIA_EJECT);
-        intentFilter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
-		intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
-        intentFilter.addDataScheme("file");
-        registerReceiver(mMountReceiver, intentFilter);
-        		
-        if(cur_path.equals(ROOT_PATH)){       	
-        	 DeviceScan();
-        }
-        else{
-        	lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
-        }		
-        lv.setSelectionFromTop(item_position_selected, fromtop_piexl);
 
-		isInFileBrowserView=true;
-    }
-    
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        //StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
-        //m_storagemgr.unregisterListener(mListener);
-        
-        unregisterReceiver(mMountReceiver);
-        
-        mLoadCancel = true;
-        
-        //update sharedPref
-    	SharedPreferences settings = getSharedPreferences("settings", Activity.MODE_PRIVATE); 
-    	SharedPreferences.Editor editor = settings.edit();
-    	editor.putString("cur_path", cur_path);
-    	editor.putBoolean("isChecked", btn_mode.isChecked());
-    	editor.commit();          
-
-		if (load_dialog != null)
-			load_dialog.dismiss();
-
-		if(mListLoaded==true)
-			mListLoaded = false;
-
-		if(!local_mode){
-    		db.deleteAllFileMark();  
-    		
-    	}  	  	
-    	db.close();   
-    }
-	
-    /** Called when the activity is first created. */
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);        
-        setContentView(R.layout.main);
-       
-        //Log.i(TAG, "category =" + getIntent().getCategories());
-        try{
-	        Bundle bundle = this.getIntent().getExtras();  
-	        if(!bundle.getString("sort_flag").equals("")){
-	        	lv_sort_flag=bundle.getString("sort_flag");
-	        }
-        }
-        catch(Exception e){
-     	   Log.e(TAG, "Do not set sort flag");
-        }
-        PowerManager pm = (PowerManager)getSystemService(Context.POWER_SERVICE);
-        //mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, TAG);
-		mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
-                
-        /* setup database */
-        db = new FileBrowerDatabase(this); 
-        SharedPreferences settings = getSharedPreferences("settings", Activity.MODE_PRIVATE);  
-
-        /* btn_mode default checked */
-        btn_mode = (ToggleButton) findViewById(R.id.btn_mode); 
-        btn_mode.setChecked(settings.getBoolean("isChecked", false));
-        
-        /* setup file list */
-        lv = (ListView) findViewById(R.id.listview);  
-        local_mode = false;
-        
-    	cur_path = settings.getString("cur_path", ROOT_PATH);        	
-    	if (cur_path != null) {
-    		File file = new File(cur_path);
-    		if (!file.exists())
-    			cur_path = ROOT_PATH;
-    	} else
-    		cur_path = ROOT_PATH; 
-        
-        mList = new ArrayList<Map<String, Object>>();
-        
         /** edit process bar handler
          *  mProgressHandler.sendMessage(Message.obtain(mProgressHandler, msg.what, msg.arg1, msg.arg2));            
          */
@@ -452,7 +359,100 @@ public class FileBrower extends Activity {
                 }
                 
             }
-        };        
+        };  
+		
+        // install an intent filter to receive SD card related events.
+        IntentFilter intentFilter =
+                new IntentFilter(Intent.ACTION_MEDIA_MOUNTED);
+        intentFilter.addAction(Intent.ACTION_MEDIA_EJECT);
+        intentFilter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
+		intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
+        intentFilter.addDataScheme("file");
+        registerReceiver(mMountReceiver, intentFilter);
+        		
+        if(cur_path.equals(ROOT_PATH)){       	
+        	 DeviceScan();
+        }
+        else{
+        	lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+        }		
+        lv.setSelectionFromTop(item_position_selected, fromtop_piexl);
+
+		isInFileBrowserView=true;
+    }
+    
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        //StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
+        //m_storagemgr.unregisterListener(mListener);
+        
+        unregisterReceiver(mMountReceiver);
+        
+        mLoadCancel = true;
+        
+        //update sharedPref
+    	SharedPreferences settings = getSharedPreferences("settings", Activity.MODE_PRIVATE); 
+    	SharedPreferences.Editor editor = settings.edit();
+    	editor.putString("cur_path", cur_path);
+    	editor.putBoolean("isChecked", btn_mode.isChecked());
+    	editor.commit();          
+
+		if (load_dialog != null)
+			load_dialog.dismiss();
+
+		if(mListLoaded==true)
+			mListLoaded = false;
+
+		if(!local_mode){
+    		db.deleteAllFileMark();  
+    		
+    	}  	  	
+    	db.close();   
+    }
+	
+    /** Called when the activity is first created. */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);        
+        setContentView(R.layout.main);
+       
+        //Log.i(TAG, "category =" + getIntent().getCategories());
+        try{
+	        Bundle bundle = this.getIntent().getExtras();  
+	        if(!bundle.getString("sort_flag").equals("")){
+	        	lv_sort_flag=bundle.getString("sort_flag");
+	        }
+        }
+        catch(Exception e){
+     	   Log.e(TAG, "Do not set sort flag");
+        }
+        PowerManager pm = (PowerManager)getSystemService(Context.POWER_SERVICE);
+        //mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, TAG);
+		mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
+                
+        /* setup database */
+        db = new FileBrowerDatabase(this); 
+        SharedPreferences settings = getSharedPreferences("settings", Activity.MODE_PRIVATE);  
+
+        /* btn_mode default checked */
+        btn_mode = (ToggleButton) findViewById(R.id.btn_mode); 
+        btn_mode.setChecked(settings.getBoolean("isChecked", false));
+        
+        /* setup file list */
+        lv = (ListView) findViewById(R.id.listview);  
+        local_mode = false;
+        
+    	cur_path = settings.getString("cur_path", ROOT_PATH);        	
+    	if (cur_path != null) {
+    		File file = new File(cur_path);
+    		if (!file.exists())
+    			cur_path = ROOT_PATH;
+    	} else
+    		cur_path = ROOT_PATH; 
+        
+        mList = new ArrayList<Map<String, Object>>();
         
         if(cur_path.equals(ROOT_PATH)){       	
         	 DeviceScan();
@@ -599,19 +599,26 @@ public class FileBrower extends Activity {
 		
         /* btn_istswitch_listener */
         Button btn_listswitch = (Button) findViewById(R.id.btn_listswitch);  
-        btn_listswitch.setOnClickListener(new OnClickListener() {
-    		public void onClick(View v) {
-    			FileOp.SetMode(true);
-    			Intent intent = new Intent();
-    			intent.setClass(FileBrower.this, ThumbnailView1.class);	
-    			Bundle bundle = new Bundle();  
-                bundle.putString("sort_flag", lv_sort_flag);  
-                intent.putExtras(bundle);
-    			local_mode = true;
-    			FileBrower.this.finish();   
-    			startActivity(intent);
-    		}
-    		   			       		
+            btn_listswitch.setOnClickListener(new OnClickListener() {
+                public void onClick(View v) {
+                    if(Intent.ACTION_GET_CONTENT.equalsIgnoreCase(FileBrower.this.getIntent().getAction())) {
+                        Toast.makeText(FileBrower.this,
+                            getText(R.string. Thumbnail_unsupport),
+                            Toast.LENGTH_SHORT).show(); 
+                    }
+                    else {
+                        FileOp.SetMode(true);
+                        Intent intent = new Intent();
+                        intent.setClass(FileBrower.this, ThumbnailView1.class);	
+                        Bundle bundle = new Bundle();  
+                        bundle.putString("sort_flag", lv_sort_flag);  
+                        intent.putExtras(bundle);
+                        local_mode = true;
+                        FileBrower.this.finish();   
+                        startActivity(intent);
+                    }
+            }
+           		
         }); 
         
 

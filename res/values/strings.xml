@@ -78,4 +78,5 @@ DROP TABLE IF EXISTS file_thumbnails_table
 	<string name="cdrom_device_str">CD ROM</string>
 	<string name="Toast_copy_fail">Copy Failed</string>
 	<string name="Toast_no_sdcard">No TF Card!</string>
+	<string name="Thumbnail_unsupport">Thumbnail mode unsupported in attachment adding. </string>
 </resources>
