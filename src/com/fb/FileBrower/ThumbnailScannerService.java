@@ -34,6 +34,13 @@ public class ThumbnailScannerService extends Service implements Runnable {
     private volatile Looper mServiceLooper;
     private volatile ServiceHandler mServiceHandler;
 	private PowerManager.WakeLock mWakeLock;
+    
+    private static final String ROOT_PATH = "/storage";
+	private static final String SHEILD_EXT_STOR = "/storage/sdcard0/external_storage";
+	private static final String NAND_PATH = "/storage/sdcard0";
+	private static final String SD_PATH = "/storage/external_storage/sdcard1";
+	private static final String USB_PATH ="/storage/external_storage";
+	private static final String SATA_PATH ="/storage/external_storage/sata";
 	
     @Override
     public void onCreate()
@@ -123,17 +130,18 @@ public class ThumbnailScannerService extends Service implements Runnable {
             	        long start_time, end_time;
             	        start_time = System.currentTimeMillis();
 
-            	        File dir = new File("/mnt");
+            	        File dir = new File(ROOT_PATH);
             			if (dir.exists() && dir.isDirectory()) {
             				if (dir.listFiles() != null) {
             					if (dir.listFiles().length > 0) {
             						for (File file : dir.listFiles()) {
             							if (file.isDirectory()) {
             								String path = file.getAbsolutePath();            								
-            								if (path.equals("/mnt/flash") ||
-            									path.equals("/mnt/sdcard") ||
-            									path.equals("/mnt/usb") ||
-            									path.startsWith("/mnt/sd")) {
+            								if (path.equals(NAND_PATH) ||
+            									path.equals(SD_PATH) ||
+            									path.equals(USB_PATH) ||
+            									path.equals(SATA_PATH)) {
+            									//path.startsWith("/mnt/sd")) {
             		                			if (createThumbnailsInDir(path) > 0) {
             		                				sendBroadcast(new Intent(ACTION_THUMBNAIL_SCANNER_FINISHED));	
             		                			}
@@ -144,10 +152,11 @@ public class ThumbnailScannerService extends Service implements Runnable {
             						for (File file : dir.listFiles()) {
             							if (file.isDirectory()) {
             								String path = file.getAbsolutePath();            								
-            								if (path.equals("/mnt/flash") ||
-            									path.equals("/mnt/sdcard") ||
-            									path.equals("/mnt/usb") ||
-            									path.startsWith("/mnt/sd")) {
+            								if (path.equals(NAND_PATH) ||
+            									path.equals(SD_PATH) ||
+            									path.equals(USB_PATH) ||
+            									path.equals(SATA_PATH)) {
+            									//path.startsWith("/mnt/sd")) {
             									createAllThumbnailsInDir(path);
             									sendBroadcast(new Intent(ACTION_THUMBNAIL_SCANNER_FINISHED)); 
             								}
@@ -235,7 +244,7 @@ public class ThumbnailScannerService extends Service implements Runnable {
 		 int count = 0;		 
 		 if (file_path != null && db != null) {
 		 	 File file = new File(file_path);
-			 if (FileOp.isPhoto(file_path) &&  file != null && file.exists()) {				
+			 if (FileOp.isPhoto(file_path) &&  file != null && file.exists()) {
 			 	
 			 	 //OutOfMemoryError, ignore file size >15MB 		 	 	 	 
 				 if (file.length() > 1024*1024*15 || file.length() <= 0) {
@@ -307,10 +316,10 @@ public class ThumbnailScannerService extends Service implements Runnable {
         long start_time, end_time;
         start_time = System.currentTimeMillis();		
 		if (dir_path != null) {
-			if (!dir_path.startsWith("/mnt/sdcard") &&
-				!dir_path.startsWith("/mnt/flash") &&
-				!dir_path.startsWith("/mnt/usb") &&
-				!dir_path.startsWith("/mnt/sd")) 				
+			if (!dir_path.startsWith(NAND_PATH) &&
+				!dir_path.startsWith(SD_PATH) &&
+				!dir_path.startsWith(USB_PATH) &&
+				!dir_path.startsWith(SATA_PATH)) 				
 				return 0;			
 			
 			File dir = new File(dir_path);
@@ -344,10 +353,10 @@ public class ThumbnailScannerService extends Service implements Runnable {
         mWakeLock.acquire();
         
 		if (dir_path != null) {
-			if (!dir_path.startsWith("/mnt/sdcard") &&
-				!dir_path.startsWith("/mnt/flash") &&
-				!dir_path.startsWith("/mnt/usb") &&
-				!dir_path.startsWith("/mnt/sd")) 				
+			if (!dir_path.startsWith(NAND_PATH) &&
+				!dir_path.startsWith(SD_PATH) &&
+				!dir_path.startsWith(USB_PATH) &&
+				!dir_path.startsWith(SATA_PATH)) 				
 				return;	
 			
 			File dir = new File(dir_path);

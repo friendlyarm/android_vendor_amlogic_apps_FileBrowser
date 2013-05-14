@@ -31,6 +31,7 @@ public class ThumbnailAdapter extends BaseAdapter{
   private static  List<Photo> images =  new  ArrayList<Photo>();  
   Context c;
   Bitmap bitMap = null;
+  private static final String ROOT_PATH = "/storage";
   /* MyAdapter  */  
   public ThumbnailAdapter(Context context,List<String> it){
    
@@ -94,7 +95,7 @@ public class ThumbnailAdapter extends BaseAdapter{
       file_path = images.get(position).getFilename();
       final File f = new File(file_path);
       String file_name = f.getName();
-      if(f.getParent().equals("/mnt")){
+      if(f.getParent().equals(ROOT_PATH)){
     	  holder.f_title.setText(FileOp.getDeviceName(c, file_path));
       }
       else{
@@ -112,7 +113,7 @@ public class ThumbnailAdapter extends BaseAdapter{
       }
       bitMap = images.get(position).getBm();
       if(f.isDirectory()){
-    	  if(f.getParent().equals("/mnt")){
+    	  if(f.getParent().equals(ROOT_PATH)){
     		  int icon = FileOp.getThumbDeviceIcon(c,file_name);   		 
     		  holder.f_icon.setImageResource(icon);
     		  

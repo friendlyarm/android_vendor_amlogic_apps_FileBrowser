@@ -6,6 +6,13 @@ import android.os.Bundle;
 import android.util.Log;
 
 public class ThumbnailOpUtils {
+
+    private static final String ROOT_PATH = "/storage";
+	private static final String SHEILD_EXT_STOR = "/storage/sdcard0/external_storage";
+	private static final String NAND_PATH = "/storage/sdcard0";
+	private static final String SD_PATH = "/storage/external_storage/sdcard1";
+	private static final String USB_PATH ="/storage/external_storage";
+	private static final String SATA_PATH ="/storage/external_storage/sata";
 	
 	public static void stopThumbnailSanner(Context context) {
 		context.stopService(new Intent(context, ThumbnailScannerService.class));
@@ -34,10 +41,11 @@ public class ThumbnailOpUtils {
 	
 	public static void updateThumbnailsForDev(Context context, String dev_path) {
 		if (dev_path != null) {
-			if (!dev_path.equals("/mnt/sdcard") &&
-				!dev_path.equals("/mnt/flash") &&
-				!dev_path.equals("/mnt/usb") &&
-				!dev_path.startsWith("/mnt/sd")) 				
+			if (!dev_path.equals(NAND_PATH) &&
+				!dev_path.equals(SD_PATH) &&
+				!dev_path.equals(USB_PATH) &&
+				!dev_path.equals(SATA_PATH) &&
+				!dev_path.startsWith(ROOT_PATH)) 				
 					return;			
 			
 			Bundle args = new Bundle();
@@ -50,10 +58,11 @@ public class ThumbnailOpUtils {
 	
 	public static void updateThumbnailsForDir(Context context, String dir_path) {
 		if (dir_path != null) {
-			if (!dir_path.startsWith("/mnt/sdcard") &&
-				!dir_path.startsWith("/mnt/flash") &&
-				!dir_path.startsWith("/mnt/usb") &&
-				!dir_path.startsWith("/mnt/sd")) 				
+			if (!dir_path.equals(NAND_PATH) &&
+				!dir_path.equals(SD_PATH) &&
+				!dir_path.equals(USB_PATH) &&
+				!dir_path.equals(SATA_PATH) &&
+				!dir_path.startsWith(ROOT_PATH)) 						
 				return;	
 			
 			Bundle args = new Bundle();
