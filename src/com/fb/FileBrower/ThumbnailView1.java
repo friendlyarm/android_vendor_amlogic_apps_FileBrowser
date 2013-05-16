@@ -714,7 +714,7 @@ public class ThumbnailView1 extends Activity{
 			Log.d(TAG, "MediaScannerReceiver, " + action);
             if (action.equals(Intent.ACTION_MEDIA_SCANNER_STARTED)) {
             	mMediaScannerRunning = true;
-				ThumbnailOpUtils.stopThumbnailSanner(getBaseContext());
+				//ThumbnailOpUtils.stopThumbnailSanner(getBaseContext());
 				            	
             } else if (action.equals(Intent.ACTION_MEDIA_SCANNER_FINISHED)) {
             	mMediaScannerRunning = false;
@@ -898,8 +898,8 @@ public class ThumbnailView1 extends Activity{
         			db.deleteAllFileMark();
         			//GetCurrentFilelist(cur_path,cur_sort_type);   
                 	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));  
-                	if (!mMediaScannerRunning)
-						ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path);
+                	//if (!mMediaScannerRunning)
+						//ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path);
         			//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type)); 
         			Toast.makeText(ThumbnailView1.this,
         					getText(R.string.Toast_msg_paste_ok),
