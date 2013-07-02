@@ -22,6 +22,7 @@ import android.os.StatFs;
 import android.util.Log;
 import com.fb.FileBrower.FileBrowerDatabase.FileMarkCursor;
 import android.net.Uri;
+import android.os.Environment;
 
 public class FileOp {
 	public static File copying_file = null;
@@ -31,7 +32,7 @@ public class FileOp {
 	public static String source_path = null;
 	public static String target_path = null;
 	private static final String ROOT_PATH = "/storage";
-	private static final String NAND_PATH = "/storage/sdcard0";
+	private static final String NAND_PATH = Environment.getExternalStorageDirectory().getPath();//"/storage/sdcard0";
 	private static final String SD_PATH = "/storage/sdcard0/external_sdcard";
 	private static final String USB_PATH ="/storage/sdcard0/usbdrive";
 	private static final String SATA_PATH ="/storage/sdcard0/sata";
