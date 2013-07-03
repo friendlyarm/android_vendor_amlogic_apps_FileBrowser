@@ -194,6 +194,9 @@ public class FileOp {
     	".mid",
     	".xmf",
     	".mka",
+    	".aiff",
+    	".aifc",
+    	".aif",
     	".pcm",
     	".adpcm"
     };
