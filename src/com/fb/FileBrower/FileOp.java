@@ -179,6 +179,7 @@ public class FileOp {
         ".mts",
         ".webm",
         ".mpe",
+        ".pmp",
        /* "" */
     };
     //music
