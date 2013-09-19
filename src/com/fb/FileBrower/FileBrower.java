@@ -1544,7 +1544,8 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
                 @Override
                 public void run() {                                       
                     mList = getFileListDataSortedAsync(ppath, ssort_type);
-                    mProgressHandler.sendMessage(Message.obtain(mProgressHandler, 10));                    
+                    if(null != mProgressHandler)
+                        mProgressHandler.sendMessage(Message.obtain(mProgressHandler, 10));                    
                 }
     
             }.start();          
