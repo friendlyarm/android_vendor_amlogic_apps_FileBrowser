@@ -171,6 +171,7 @@ public class FileOp {
         ".dat",
         ".vob",
         ".flv",
+        ".bit",
         ".vc1",
         ".m4v",
         ".f4v",
