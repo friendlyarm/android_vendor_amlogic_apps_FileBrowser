@@ -444,6 +444,7 @@ public class FileBrower extends Activity {
         catch(Exception e){
      	   Log.e(TAG, "Do not set sort flag");
         }
+        
         PowerManager pm = (PowerManager)getSystemService(Context.POWER_SERVICE);
         //mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, TAG);
 		mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
@@ -459,23 +460,33 @@ public class FileBrower extends Activity {
         /* setup file list */
         lv = (ListView) findViewById(R.id.listview);  
         local_mode = false;
-        
-    	cur_path = settings.getString("cur_path", ROOT_PATH);        	
+        cur_path = settings.getString("cur_path", ROOT_PATH);
+        try{
+	        Bundle bundle = this.getIntent().getExtras();  
+	        if(!bundle.getString("cur_path").equals("")){
+	        	cur_path=bundle.getString("cur_path");
+                
+	        }
+        }
+        catch(Exception e){
+     	   Log.e(TAG, "Do not set cur_path");
+        }  	
     	if (cur_path != null) {
     		File file = new File(cur_path);
     		if (!file.exists())
     			cur_path = ROOT_PATH;
-    	} else
+    	} else {
     		cur_path = ROOT_PATH; 
+        }        
         
         mList = new ArrayList<Map<String, Object>>();
         
-        if(cur_path.equals(ROOT_PATH)){       	
+       /* if(cur_path.equals(ROOT_PATH)){       	
         	 DeviceScan();
         }
         else{
         	lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
-        }
+        }*/
         
         /* lv OnItemClickListener */
         lv.setOnItemClickListener(new OnItemClickListener() {
@@ -1551,7 +1562,6 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
     
     private List<Map<String, Object>> getFileListDataSorted(String path, String sort_type) {
         updatePathShow(path);
-
         if (!mListLoaded) {
             mListLoaded = true; 
             showDialog(LOAD_DIALOG_ID);
