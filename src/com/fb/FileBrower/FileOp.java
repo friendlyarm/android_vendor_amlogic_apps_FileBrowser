@@ -16,6 +16,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import java.io.InputStream;
 
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.Message;
 import android.os.StatFs;
@@ -631,7 +632,7 @@ public class FileOp {
         }
     }
     public static FileOpReturn pasteSelectedFile(String cur_page) {
-    	List<String> fileList = new ArrayList<String>();
+    	ArrayList<String> fileList = new ArrayList<String>();
     	//long copy_time_start=0, copy_time_end = 0;
     	//copying_file = null;
     	copy_cancel = false;
@@ -1007,21 +1008,29 @@ public class FileOp {
 				IsBusy = false;
 		        return FileOpReturn.ERR;
 			}
-			
+            
+			Bundle data = new Bundle();
+            Message msg ;
         	if(cur_page.equals("list")){
-				FileBrower.mProgressHandler.sendMessage(Message.obtain(
-	        			FileBrower.mProgressHandler, 4));
+                msg = Message.obtain(FileBrower.mProgressHandler, 4);
+                data.putStringArrayList("file_name_list", fileList);
+                msg.setData(data);
+				FileBrower.mProgressHandler.sendMessage(msg);
 	    		IsBusy = false;
 	        	return FileOpReturn.SUCCESS;
         	}
         	else if (cur_page.equals("thumbnail")){
-        		ThumbnailView.mProgressHandler.sendMessage(Message.obtain(
-        				ThumbnailView.mProgressHandler, 4));
+                msg = Message.obtain(ThumbnailView.mProgressHandler, 4);
+                data.putStringArrayList("file_name_list", fileList);
+                msg.setData(data);
+        		ThumbnailView.mProgressHandler.sendMessage(msg);
         		IsBusy = false;
             	return FileOpReturn.SUCCESS;
         	} else if (cur_page.equals("thumbnail1")){
-        		ThumbnailView1.mProgressHandler.sendMessage(Message.obtain(
-	    				ThumbnailView1.mProgressHandler, 4));
+        	    msg = Message.obtain(ThumbnailView1.mProgressHandler, 4);
+                data.putStringArrayList("file_name_list", fileList);
+                msg.setData(data);
+        		ThumbnailView1.mProgressHandler.sendMessage(msg);
 	    		IsBusy = false;
 	        	return FileOpReturn.SUCCESS;
         	}

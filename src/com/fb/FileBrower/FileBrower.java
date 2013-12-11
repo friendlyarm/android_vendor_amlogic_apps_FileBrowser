@@ -25,6 +25,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaScannerConnection;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
@@ -224,8 +225,23 @@ public class FileBrower extends Activity {
                 	}
                 	break;
                 case 4:		//file paste ok
-					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
-	    				+ ROOT_PATH)));                       
+					//sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" + ROOT_PATH)));   
+                    Bundle data = msg.getData();
+                    ArrayList<String> fileList =  data.getStringArrayList("file_name_list");
+                    for(int i = 0; i < fileList.size(); i++){
+                        String name = fileList.get(i);
+        		        File file = new File(name);
+                        MediaScannerConnection.scanFile(FileBrower.this,
+                        new String[] { file.toString() }, null,
+                            new MediaScannerConnection.OnScanCompletedListener() {
+                                public void onScanCompleted(String path, Uri uri) {
+                                    Log.i(TAG, "Scanned path : " + path );
+                                    Log.i(TAG, "-> uri=" + uri);
+                                    }
+                                }
+                        );
+                    }
+                                       
         			db.deleteAllFileMark();
         			lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
         			ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path);
@@ -1066,6 +1082,8 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 
 							if(cur_path.startsWith(SD_PATH))
 							{
+							    Log.d(TAG,"==== Environment.getExternalStorage2State():"+Environment.getExternalStorage2State());
+                                Log.d(TAG,"==== Environment.MEDIA_MOUNTED:"+Environment.MEDIA_MOUNTED);
 								if(Environment.getExternalStorage2State().equals(Environment.MEDIA_MOUNTED))
 								{
 									new Thread () {
