@@ -182,6 +182,7 @@ public class FileOp {
         ".webm",
         ".mpe",
         ".pmp",
+        ".mvc",
        /* "" */
     };
     //music
@@ -237,7 +238,9 @@ public class FileOp {
 					typeStr = "text/html";
 				else if (isPdf(filename))
 					typeStr = "application/pdf";
-        else {
+        else if (isPlain(filename)){
+            typeStr = "text/plain";
+        }else {
 					typeStr = "application/*";
         }
         
@@ -1346,5 +1349,23 @@ public class FileOp {
 		Log.i(FileBrower.TAG,"path :"+path);
 		return path;
 	}
+    public static boolean isPlain(String filename) {
+        String name = filename.toLowerCase();
+        for (String ext : plain_extensions) {
+            if (name.endsWith(ext))
+                return true;
+        }
+        return false;
+    }
+
+    public static final String[] plain_extensions = {".txt",
+        ".c",
+        ".cpp",
+        ".java",
+        ",conf",
+        ".h",
+        ".log",
+        ".rc",
+        };
 }
          

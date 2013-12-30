@@ -339,10 +339,7 @@ public class FileBrower extends Activity {
                     	edit_dialog.dismiss();   
     				if (mWakeLock.isHeld())
     					mWakeLock.release(); 
-
-					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
-	    				+ ROOT_PATH))); 
-
+          scanAll();
 					if(tvForPaste!=null)
 					{
 						tvForPaste.setText("");
@@ -1131,10 +1128,9 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
             				FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
             				//Log.i(TAG, "DO delete...");   
             				if (FileOpReturn.SUCCESS == FileOp.deleteSelectedFile("list")) {
-            					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
-				    				+ ROOT_PATH)));
             					db.deleteAllFileMark(); 
                 				lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+                				scanAll();
                 				Toast.makeText(FileBrower.this,
                 						getText(R.string.Toast_msg_del_ok),
                 						Toast.LENGTH_SHORT).show();
@@ -1338,10 +1334,9 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 
 	    			if(mRenameFile.renameTo(new File(newFileName)))
 	    			{
-	    				sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
-				    				+ ROOT_PATH)));
 						db.deleteAllFileMark(); 
 	    				lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+	    				scanAll();
 	    			}
 	    			else
 	    			{
@@ -1865,5 +1860,13 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
         String str = path.substring(0, umount_path.length());
         return str.equals(umount_path);
     }
-     
+
+    private void scanAll(){
+        Intent intent = new Intent();
+        intent.setClassName("com.android.providers.media","com.android.providers.media.MediaScannerService");
+        Bundle args = new Bundle();
+        //args.putString("path", ROOT_PATH);
+        args.putString("volume","external");
+        startService(intent.putExtras(args));
+      }
 }

@@ -893,11 +893,11 @@ public class ThumbnailView1 extends Activity{
                 	break;
                 case 4:		//file paste ok
                 	updateThumbnials();
-					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
-	    				+ ROOT_PATH)));                	
+
         			db.deleteAllFileMark();
         			//GetCurrentFilelist(cur_path,cur_sort_type);   
-                	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));  
+                	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+                	scanAll();
                 	//if (!mMediaScannerRunning)
 						//ThumbnailOpUtils.updateThumbnailsForDir(getBaseContext(), cur_path);
         			//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,cur_sort_type)); 
@@ -1002,10 +1002,7 @@ public class ThumbnailView1 extends Activity{
                     	edit_dialog.dismiss();   
     				if (mWakeLock.isHeld())
     					mWakeLock.release(); 
-
-					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
-	    				+ ROOT_PATH))); 
-    					
+            scanAll();
     				if(tvForPaste!=null)
 					{
 						tvForPaste.setText("");
@@ -1692,11 +1689,10 @@ public class ThumbnailView1 extends Activity{
             				//Log.i(TAG, "DO delete...");   
             				updateThumbnials();
             				if (FileOpReturn.SUCCESS == FileOp.deleteSelectedFile("thumbnail1")) {
-            					sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" 
-				    				+ ROOT_PATH)));
             					db.deleteAllFileMark();
             					//GetCurrentFilelist(cur_path,cur_sort_type);
                             	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+                        scanAll();
                 				//ThumbnailView.setAdapter(getThumbnailAdapter(cur_path,null));  
                 				Toast.makeText(ThumbnailView1.this,
                 						getText(R.string.Toast_msg_del_ok),
@@ -2092,8 +2088,16 @@ public class ThumbnailView1 extends Activity{
 		}
         menu.add(0, 0, 0, getText(R.string.app_name) + " v" + ver_str);
         return true;
-    }      
-    
+    }
+
+    private void scanAll(){
+        Intent intent = new Intent();
+        intent.setClassName("com.android.providers.media","com.android.providers.media.MediaScannerService");
+        Bundle args = new Bundle();
+        //args.putString("path", ROOT_PATH);
+        args.putString("volume","external");
+        startService(intent.putExtras(args));
+      }
 }
 
 
