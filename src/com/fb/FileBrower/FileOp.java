@@ -157,6 +157,7 @@ public class FileOp {
     	".3g2",
         ".divx",
         ".h264",
+        ".h265",
         ".avi",
         ".m2ts",
         ".mkv",
