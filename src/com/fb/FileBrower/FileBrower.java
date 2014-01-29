@@ -1025,8 +1025,10 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
         	}
             dialog.getWindow().setAttributes(lp);  
 
+            if(mProgressHandler == null) return;
             mProgressHandler.sendMessage(Message.obtain(mProgressHandler, 0));
-            edit_lv = (ListView) edit_dialog.getWindow().findViewById(R.id.edit_listview);  
+            edit_lv = (ListView) edit_dialog.getWindow().findViewById(R.id.edit_listview); 
+            if(edit_lv == null) return;
             edit_lv.setAdapter(getDialogListAdapter(EDIT_DIALOG_ID));
 			//edit_dialog.setCanceledOnTouchOutside(false);
 			edit_dialog.setOnDismissListener(new OnDismissListener(){
