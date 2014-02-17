@@ -13,6 +13,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -1471,7 +1472,14 @@ public class ThumbnailView1 extends Activity{
         String type = "*/*";        
         type = FileOp.CheckMediaType(file);
         intent.setDataAndType(Uri.fromFile(file),type);
-        startActivity(intent); 
+        try {
+            startActivity(intent); 
+        }
+        catch (ActivityNotFoundException e){
+            Toast.makeText(ThumbnailView1.this,
+                getText(R.string.Toast_msg_no_applicaton),
+                Toast.LENGTH_SHORT).show();  
+        }
 		
 	}
 	

@@ -16,6 +16,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
@@ -675,7 +676,14 @@ protected void openFile(File f) {
         String type = "*/*";        
         type = FileOp.CheckMediaType(f);
         intent.setDataAndType(Uri.fromFile(f),type);
-        startActivity(intent);      		
+        try{
+            startActivity(intent);  
+        }
+        catch (ActivityNotFoundException e){
+            Toast.makeText(FileBrower.this,
+                getText(R.string.Toast_msg_no_applicaton),
+                Toast.LENGTH_SHORT).show();  
+        }
 	}
 protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 // TODO Auto-generated method stub
