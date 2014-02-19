@@ -685,9 +685,9 @@ public class ThumbnailView1 extends Activity{
         			FileOp.copy_cancel = true;
         		}        					
             } else if (action.equals(Intent.ACTION_MEDIA_MOUNTED)) {          	
-        		if (cur_path.equals(ROOT_PATH)) {
+        		//if (cur_path.equals(ROOT_PATH)) {
                 	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
-        		}
+        		//}
             } else if (action.equals(Intent.ACTION_MEDIA_UNMOUNTED)) {
         		if (cur_path.startsWith(path)) {
         			cur_path = ROOT_PATH;
