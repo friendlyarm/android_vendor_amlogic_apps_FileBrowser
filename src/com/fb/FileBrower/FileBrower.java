@@ -120,7 +120,8 @@ public class FileBrower extends Activity {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             Uri uri = intent.getData();
-            String path = uri.getPath();                        
+            String path = uri.getPath(); 
+            //Log.i("wxl","[mMountReceiver]action:"+action+",path:"+path+",cur_path:"+cur_path);
             
             if (action == null || path == null)
             	return;
@@ -143,6 +144,9 @@ public class FileBrower extends Activity {
         		if (cur_path.equals(ROOT_PATH)) {
         			DeviceScan();
         		}
+                    else{
+                        lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+                    }
             } else if (action.equals(Intent.ACTION_MEDIA_UNMOUNTED)) {
         		if (cur_path.startsWith(path)) {
         			cur_path = ROOT_PATH;
@@ -225,8 +229,9 @@ public class FileBrower extends Activity {
                 	}
                 	break;
                 case 4:		//file paste ok
-					//sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" + ROOT_PATH)));   
-                    Bundle data = msg.getData();
+					//sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" + ROOT_PATH)));  
+					scanAll();
+                    /*Bundle data = msg.getData();
                     ArrayList<String> fileList =  data.getStringArrayList("file_name_list");
                     for(int i = 0; i < fileList.size(); i++){
                         String name = fileList.get(i);
@@ -240,7 +245,7 @@ public class FileBrower extends Activity {
                                     }
                                 }
                         );
-                    }
+                    }*/
                                        
         			db.deleteAllFileMark();
         			lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
@@ -382,6 +387,7 @@ public class FileBrower extends Activity {
 		intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
         intentFilter.addDataScheme("file");
         registerReceiver(mMountReceiver, intentFilter);
+        //Log.i("wxl","[mMountReceiver]registerReceiver");
         		
         if(cur_path.equals(ROOT_PATH)){       	
         	 DeviceScan();
@@ -400,7 +406,8 @@ public class FileBrower extends Activity {
 
         //StorageManager m_storagemgr = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
         //m_storagemgr.unregisterListener(mListener);
-        
+
+        //Log.i("wxl","[mMountReceiver]unregisterReceiver");
         unregisterReceiver(mMountReceiver);
         
         mLoadCancel = true;
@@ -1866,9 +1873,14 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
     private void scanAll(){
         Intent intent = new Intent();
         intent.setClassName("com.android.providers.media","com.android.providers.media.MediaScannerService");
-        Bundle args = new Bundle();
-        args.putString("path", NAND_PATH);
-        args.putString("volume","external");
-        startService(intent.putExtras(args));
+        Bundle argsa = new Bundle();
+        argsa.putString("path", NAND_PATH);
+        argsa.putString("volume","external");
+        startService(intent.putExtras(argsa));
+
+        Bundle argsb = new Bundle();
+        argsb.putString("path", USB_PATH);
+        argsb.putString("volume","external");
+        startService(intent.putExtras(argsb));
       }
 }

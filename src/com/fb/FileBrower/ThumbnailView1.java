@@ -2095,10 +2095,15 @@ public class ThumbnailView1 extends Activity{
     private void scanAll(){
         Intent intent = new Intent();
         intent.setClassName("com.android.providers.media","com.android.providers.media.MediaScannerService");
-        Bundle args = new Bundle();
-        args.putString("path", NAND_PATH);
-        args.putString("volume","external");
-        startService(intent.putExtras(args));
+        Bundle argsa = new Bundle();
+        argsa.putString("path", NAND_PATH);
+        argsa.putString("volume","external");
+        startService(intent.putExtras(argsa));
+
+        Bundle argsb = new Bundle();
+        argsb.putString("path", USB_PATH);
+        argsb.putString("volume","external");
+        startService(intent.putExtras(argsb));
       }
 }
 
