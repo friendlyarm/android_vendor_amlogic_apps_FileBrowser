@@ -116,6 +116,7 @@ public class FileBrower extends Activity {
 	
 	String open_mode[] = {"movie","music","photo","packageInstall"};
 
+    StorageManager sm = null ;
     private BroadcastReceiver mMountReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -438,7 +439,7 @@ public class FileBrower extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);        
         setContentView(R.layout.main);
-       
+        sm = (StorageManager)getSystemService(Context.STORAGE_SERVICE);
         //Log.i(TAG, "category =" + getIntent().getCategories());
         try{
 	        Bundle bundle = this.getIntent().getExtras();  
@@ -835,7 +836,8 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 		dir = new File(SD_PATH);
 		if (dir.exists() && dir.isDirectory()) { 
 			map = new HashMap<String, Object>();
-			map.put("item_name", getText(R.string.ext_sdcard_device_str));
+            String label = sm.getVolumeFSLabel(SD_PATH);
+			map.put("item_name", (label==null)?getText(R.string.ext_sdcard_device_str):label);
 			map.put("file_path", SD_PATH);
 			map.put("item_type", R.drawable.sd_card_icon);
 			map.put("file_date", 0);
@@ -857,8 +859,9 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
 							map = new HashMap<String, Object>();
 							dev_count++;
 							char data = (char) ('A' +dev_count-1);
+                            String label = sm.getVolumeFSLabel(path);
 							devname =  getText(R.string.usb_device_str) +"(" +data + ":)" ;
-							map.put("item_name", devname);
+							map.put("item_name", (label==null)?devname:label);
 							map.put("file_path", path);
 							map.put("item_type", R.drawable.usb_card_icon);
 							map.put("file_date", 0);

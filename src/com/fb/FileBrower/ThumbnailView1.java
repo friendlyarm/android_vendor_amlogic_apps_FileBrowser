@@ -98,7 +98,7 @@ public class ThumbnailView1 extends Activity{
 	private ToggleButton btn_mode;
 	private String lv_sort_flag = "by_name"; 
 	private boolean isInFileBrowserView=false;
-	
+	StorageManager sm = null ;
 	private void updateThumbnials() {
        // sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://"
        //         + Environment.getExternalStorageDirectory())));
@@ -192,7 +192,8 @@ public class ThumbnailView1 extends Activity{
 		dir = new File(SD_PATH);
 		if (dir.exists() && dir.isDirectory()) { 
 			map = new HashMap<String, Object>();
-			map.put("item_name", getText(R.string.ext_sdcard_device_str));
+            String label = sm.getVolumeFSLabel(SD_PATH);
+			map.put("item_name", (label==null)?getText(R.string.ext_sdcard_device_str):label);
 			map.put("file_path", SD_PATH);
 			map.put("item_type", R.drawable.sdcard_default);
 			map.put("file_date", 0);
@@ -210,8 +211,9 @@ public class ThumbnailView1 extends Activity{
 						String path = file.getAbsolutePath();
 						if (path.startsWith(USB_PATH+"/sd")&&!path.equals(SD_PATH)) {
 							map = new HashMap<String, Object>();
-							map.put("item_name", getText(R.string.usb_device_str) + 
-									" " + file.getName());
+                            String label = sm.getVolumeFSLabel(path);
+							map.put("item_name",(label==null)? (getText(R.string.usb_device_str) + 
+									" " + file.getName()):label);
 							map.put("file_path", path);
 							map.put("item_type", R.drawable.usb_default);
 							map.put("file_date", 0);
@@ -797,7 +799,7 @@ public class ThumbnailView1 extends Activity{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);         
         setContentView(R.layout.thumbnail);  
-        
+        sm = (StorageManager)getSystemService(Context.STORAGE_SERVICE);
         Bundle bundle = this.getIntent().getExtras();  
         if(!bundle.getString("sort_flag").equals("")){
         	lv_sort_flag=bundle.getString("sort_flag");
