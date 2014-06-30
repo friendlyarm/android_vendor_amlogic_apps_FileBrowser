@@ -761,6 +761,10 @@ public class ThumbnailView1 extends Activity{
         		mMediaScannerRunning = true;
         }
 
+        if(mListLoaded == true) {
+            mListLoaded = false;
+        }
+        
     	ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
 
 		isInFileBrowserView=true;
@@ -1014,6 +1018,9 @@ public class ThumbnailView1 extends Activity{
                 	break;
                 case 10:    //update list                                       
                     //((BaseAdapter) ThumbnailView.getAdapter()).notifyDataSetChanged();
+                    if(mListLoaded == false) {
+                        break;
+                    }
                     ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));                    
                     mListLoaded = false;
                     if (load_dialog != null)

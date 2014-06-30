@@ -355,6 +355,9 @@ public class FileBrower extends Activity {
                 	break;
                 case 10:    //update list                                       
                     //((BaseAdapter) lv.getAdapter()).notifyDataSetChanged();
+                    if(mListLoaded == false) {
+                        break;
+                    }
                     lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));                    
                     mListLoaded = false;
                     if (load_dialog != null)
@@ -390,7 +393,11 @@ public class FileBrower extends Activity {
         intentFilter.addDataScheme("file");
         registerReceiver(mMountReceiver, intentFilter);
         //Log.i("wxl","[mMountReceiver]registerReceiver");
-        		
+
+        if(mListLoaded == true) {
+            mListLoaded = false;
+        }
+        
         if(cur_path.equals(ROOT_PATH)){       	
         	 DeviceScan();
         }
