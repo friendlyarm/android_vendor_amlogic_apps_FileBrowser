@@ -1066,6 +1066,7 @@ public class FileOp {
     }   
     public static FileOpReturn deleteSelectedFile(String cur_page) {
     	List<String> fileList = new ArrayList<String>();
+	boolean IsDelSuccess = true;
     	IsBusy = true;
         try {
         	if(cur_page.equals("list")){
@@ -1123,7 +1124,7 @@ public class FileOp {
 							}
 							else
 							{
-    							file.delete();
+								IsDelSuccess = file.delete();
 							}
 	    				}
 	    				else{
@@ -1135,18 +1136,22 @@ public class FileOp {
 									}
 									else
 									{
-		    							file.delete();
+										IsDelSuccess = file.delete();
 									}
 	    	    				}        					
 	    					}
 	    				}
 	    			} catch (Exception e) {
-	    				Log.e("Exception when delete file", e.toString());
+					IsDelSuccess = false;
+					Log.e("Exception when delete file", e.toString());
 	    			}
         		}
         	}
         	IsBusy = false;
-        	return FileOpReturn.SUCCESS;
+                if(IsDelSuccess)
+                    return FileOpReturn.SUCCESS;
+                else
+                    return FileOpReturn.ERR_DEL_FAIL; 
         } else {
         	IsBusy = false;
         	return FileOpReturn.ERR;   

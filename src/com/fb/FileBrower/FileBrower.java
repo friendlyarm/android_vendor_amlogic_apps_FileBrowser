@@ -1153,13 +1153,18 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
             			}
             			else if (pos == 3) {
             				FileOp.file_op_todo = FileOpTodo.TODO_NOTHING;
+					FileOpReturn delStatus = FileOp.deleteSelectedFile("list");
             				//Log.i(TAG, "DO delete...");   
-            				if (FileOpReturn.SUCCESS == FileOp.deleteSelectedFile("list")) {
+            				if (FileOpReturn.SUCCESS == delStatus) {
             					db.deleteAllFileMark(); 
                 				lv.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
                 				scanAll();
                 				Toast.makeText(FileBrower.this,
                 						getText(R.string.Toast_msg_del_ok),
+                						Toast.LENGTH_SHORT).show();
+            				}else if (FileOpReturn.ERR_DEL_FAIL == delStatus) {
+                				Toast.makeText(FileBrower.this,
+                						getText(R.string.Toast_msg_del_fail),
                 						Toast.LENGTH_SHORT).show();
             				} else {
             					Toast.makeText(FileBrower.this,

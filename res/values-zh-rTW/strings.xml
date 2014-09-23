@@ -42,6 +42,7 @@ DROP TABLE IF EXISTS file_thumbnails_table
 "</string>    
 
 	<string name="Toast_msg_del_ok">已刪除選中的文件.</string>
+	<string name="Toast_msg_del_fail">刪除選中的文件失敗.</string>
 	<string name="Toast_msg_del_nofile">沒有文件被選中刪除.</string>
 	<string name="Toast_msg_paste_ok">已粘貼選中的文件到當前目錄.</string>
 	<string name="Toast_msg_paste_nofile">沒有文件被選中粘貼.</string>
