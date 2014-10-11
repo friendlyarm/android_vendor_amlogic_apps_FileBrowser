@@ -39,6 +39,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.KeyEvent;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.widget.AdapterView;
@@ -58,6 +59,8 @@ import android.content.res.Configuration;
 import android.os.Environment;
 import android.os.storage.StorageVolume;
 import android.content.BroadcastReceiver;
+import java.util.Iterator;
+import android.util.Log;
 
 import com.fb.FileBrower.FileBrowerDatabase.FileMarkCursor;
 import com.fb.FileBrower.FileBrowerDatabase.ThumbnailCursor;
@@ -1906,4 +1909,33 @@ protected void onActivityResult(int requestCode, int resultCode,Intent data) {
         argsb.putString("volume","external");
         startService(intent.putExtras(argsb));
       }
+@Override
+public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+//	if (Utils.DEBUG) Log.d(TAG, "onKeyDown(),keyCode : " + keyCode);
+
+	
+	if (keyCode == KeyEvent.KEYCODE_BACK) {
+		
+		if (!cur_path.equals(ROOT_PATH)) { 
+			File file = new File(cur_path);
+			String parent_path = file.getParent();
+		if(cur_path.equals(NAND_PATH)||cur_path.equals(SD_PATH)||parent_path. equals(USB_PATH)) {
+			cur_path = ROOT_PATH;
+			DeviceScan(); 
+			
+			 Log.d(TAG, "onKeyDown(),keyCode : " + keyCode);
+			 return false;}
+		else { cur_path = parent_path;
+			lv.setAdapter(getFileListAdapterSorted(parent_path, lv_sort_flag)); } }
+
+	}
+
+
+	return super.onKeyDown(keyCode, event);
 }
+}
+
+
+
+

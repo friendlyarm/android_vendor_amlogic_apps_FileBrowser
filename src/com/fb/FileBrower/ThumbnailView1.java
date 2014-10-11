@@ -33,6 +33,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.KeyEvent;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.widget.AdapterView;
@@ -1163,7 +1164,7 @@ public class ThumbnailView1 extends Activity{
 				}
     		}
     		   			       		
-        });         
+        });        
         /*edit button*/
         Button btn_thumbsort = (Button) findViewById(R.id.btn_thumbsort); 
         btn_thumbsort.setOnClickListener(new OnClickListener() {
@@ -2122,6 +2123,43 @@ public class ThumbnailView1 extends Activity{
         argsb.putString("volume","external");
         startService(intent.putExtras(argsb));
       }
+
+
+
+
+
+@Override
+public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+//	if (Utils.DEBUG) Log.d(TAG, "onKeyDown(),keyCode : " + keyCode);
+
+	
+	if (keyCode == KeyEvent.KEYCODE_BACK) {
+		
+		if (!cur_path.equals(ROOT_PATH)) {
+			File file = new File(cur_path);
+			String parent_path = file.getParent();
+			if(cur_path.equals(NAND_PATH)||cur_path.equals(SD_PATH)||parent_path.equals(USB_PATH)) 
+			{
+				cur_path = ROOT_PATH;
+				ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+				return false;
+			}
+			else 
+			{
+				cur_path = parent_path;
+				ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
+			}
+		}
+
+
+	}
+
+
+	return super.onKeyDown(keyCode, event);
+}
+
+
 }
 
 
