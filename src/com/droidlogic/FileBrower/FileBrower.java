@@ -4,6 +4,7 @@ import android.os.storage.*;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -121,6 +122,18 @@ public class FileBrower extends Activity {
     String open_mode[] = {"movie","music","photo","packageInstall"};
 
     StorageManager sm = null ;
+
+    Comparator  mFileComparator = new Comparator<File>(){
+        @Override
+        public int compare(File o1, File o2) {
+            if (o1.isDirectory() && o2.isFile())
+                return -1;
+            if (o1.isFile() && o2.isDirectory())
+                return 1;
+            return o1.getName().compareTo(o2.getName());
+        }
+    };
+
     private BroadcastReceiver mMountReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -766,7 +779,9 @@ public class FileBrower extends Activity {
         if (dir.exists() && dir.isDirectory()) {
             if (dir.listFiles() != null) {
                 int dev_count=0;
-                for (File file : dir.listFiles()) {
+                List<File> files = Arrays.asList(dir.listFiles());
+                Collections.sort(files, mFileComparator);
+                for (File file : files) {
                     if (file.isDirectory()) {
                         String devname = null;
                         String path = file.getAbsolutePath();
@@ -828,7 +843,9 @@ public class FileBrower extends Activity {
         if (dir.exists() && dir.isDirectory()) {
             if (dir.listFiles() != null) {
                 int dev_count=0;
-                for (File file : dir.listFiles()) {
+                List<File> files = Arrays.asList(dir.listFiles());
+                Collections.sort(files, mFileComparator);
+                for (File file : files) {
                     if (file.isDirectory()) {
                         String devname = null;
                         String path = file.getAbsolutePath();
@@ -846,7 +863,6 @@ public class FileBrower extends Activity {
                             map.put("file_size", 3);	//for sort
                             map.put("item_size", null);
                             map.put("item_rw", null);
-
                             String stateStr = Environment.getStorageState(new File(path));
                             //if((dirtmp.listFiles() != null) && (dirtmp.listFiles().length > 0)) {
                             if (stateStr.equals(Environment.MEDIA_MOUNTED)) {
