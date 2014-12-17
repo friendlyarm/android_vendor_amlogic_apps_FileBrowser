@@ -1830,15 +1830,14 @@ public class FileBrower extends Activity {
                     cur_path = ROOT_PATH;
                     DeviceScan();
                     Log.d(TAG, "onKeyDown(),keyCode : " + keyCode);
-                    return false;
                 }
                 else {
                     cur_path = parent_path;
                     lv.setAdapter(getFileListAdapterSorted(parent_path, lv_sort_flag));
                 }
+                return true;
             }
         }
-
         return super.onKeyDown(keyCode, event);
     }
 }

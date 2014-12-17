@@ -1711,12 +1711,12 @@ public class ThumbnailView1 extends Activity{
                 if(cur_path.equals(NAND_PATH)||cur_path.equals(SD_PATH)||parent_path.equals(USB_PATH)) {
                     cur_path = ROOT_PATH;
                     ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
-                    return false;
                 }
                 else {
                     cur_path = parent_path;
                     ThumbnailView.setAdapter(getFileListAdapterSorted(cur_path, lv_sort_flag));
                 }
+                return true;
             }
         }
         return super.onKeyDown(keyCode, event);
