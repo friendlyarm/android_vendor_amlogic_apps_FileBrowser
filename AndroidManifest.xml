@@ -7,7 +7,8 @@
     <uses-permission android:name="android.permission.WRITE_MEDIA_STORAGE"/>        
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>    
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <application android:icon="@mipmap/filebrower" android:label="@string/app_name">
+    <application android:icon="@mipmap/filebrower" android:label="@string/app_name"
+                 android:banner="@drawable/banner">
         <activity android:name=".FileBrower"
         		  android:configChanges="orientation|screenSize|screenLayout"
                   android:label="@string/app_name"
@@ -31,4 +32,4 @@
 		<service android:name=".ThumbnailScannerService"></service>	
     </application>
     <uses-sdk android:minSdkVersion="14" />
-</manifest> 
+</manifest>
